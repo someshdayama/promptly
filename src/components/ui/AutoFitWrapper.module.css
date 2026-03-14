@@ -1,0 +1,62 @@
+.wrapper {
+  /* No fixed w/h here, let it fill the parent Flex container naturally */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* The actual white A4 canvas */
+.canvas {
+  width: 210mm;
+  height: 297mm;
+  position: relative;
+  overflow: hidden; /* Ensure nothing goes past 1 page */
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.scaler {
+  width: 100%;
+  min-height: 100%; 
+  transform-origin: top left;
+  /* Smooth scale transition so it doesn't snap jarringly */
+  transition: transform 0.2s ease-out;
+  /* Smooth template swap fade */
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(var(--current-scale, 1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(var(--current-scale, 1));
+  }
+}
+
+@media print {
+  .wrapper {
+    display: block;
+  }
+  
+  .canvas {
+    box-shadow: none;
+    margin: 0;
+    /* Strict 1 page size for PDF engine */
+    width: 210mm;
+    height: 297mm;
+    page-break-after: avoid;
+    page-break-before: avoid;
+    page-break-inside: avoid;
+    overflow: hidden !important;
+  }
+  
+  .scaler {
+    /* Keep scaling intact during print */
+    width: 210mm;
+    box-shadow: none !important;
+  }
+}

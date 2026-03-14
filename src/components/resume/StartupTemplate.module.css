@@ -1,0 +1,196 @@
+.page {
+  width: 100%;
+  min-height: 297mm;
+  margin: 0 auto;
+  background-color: #fafafa;
+  color: #1a1a1a;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+  padding: 2.5rem;
+}
+
+.header {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #e5e5e5;
+  display: flex;
+  justify-content: space-between;
+}
+
+.name {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  margin: 0 0 0.5rem 0;
+  color: #000;
+  text-transform: lowercase;
+}
+
+.contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.contact a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.accentShape {
+  position: absolute;
+  top: -2.5rem;
+  right: -2.5rem;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, #facc15 0%, transparent 70%);
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.summarySection {
+  margin-bottom: 2.5rem;
+  padding-left: 1rem;
+  border-left: 4px solid #000;
+}
+
+.summary {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #333;
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 3rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+  page-break-inside: avoid;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.slash {
+  color: #2563eb;
+  font-weight: 900;
+}
+
+.job {
+  margin-bottom: 1.5rem;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.jobHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.25rem;
+}
+
+.jobTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.jobDate {
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.company {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2563eb;
+  margin-bottom: 0.5rem;
+}
+
+.descriptionList {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #444;
+}
+
+.descriptionList li {
+  margin-bottom: 0.4rem;
+}
+
+.descriptionList li::marker {
+  color: #2563eb;
+}
+
+.skillsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skillsList li {
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: #000;
+  color: #fff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+}
+
+.educationItem {
+  margin-bottom: 1.25rem;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.degree {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+
+.institution {
+  font-size: 0.95rem;
+  color: #444;
+  margin-bottom: 0.25rem;
+}
+
+.educationDate {
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 500;
+}
+
+@media print {
+  .page {
+    padding: 15mm;
+    margin: 0;
+    width: 100%;
+    min-height: 297mm;
+    display: block !important;
+  }
+}

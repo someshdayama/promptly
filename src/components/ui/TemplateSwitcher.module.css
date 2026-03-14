@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  background-color: var(--surface);
+  padding: 0.25rem;
+  border-radius: var(--radius-md);
+  gap: 0.25rem;
+  border: 1px solid var(--surface-border);
+}
+
+.button {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  color: var(--foreground);
+}
+
+.active {
+  background-color: var(--surface);
+  color: var(--foreground);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

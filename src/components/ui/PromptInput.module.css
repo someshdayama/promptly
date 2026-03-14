@@ -1,0 +1,122 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 2.5rem;
+  background-color: var(--surface);
+  border-radius: calc(var(--radius-lg) + 4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Subtle edge highlight for dark mode */
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.helperActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.helperButton {
+  background: transparent;
+  border: 1px solid var(--surface-border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.helperButton:hover:not(:disabled) {
+  background-color: var(--background);
+  color: var(--foreground);
+  border-color: #60a5fa;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #a1a1aa; /* Softer gray */
+  line-height: 1.6;
+}
+
+.textarea {
+  flex: 1;
+  min-height: 300px;
+  padding: 1.25rem;
+  background-color: #09090b; /* Deep background inset */
+  color: var(--foreground);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  font-size: 1rem;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #60a5fa; /* Primary blue pop */
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.error {
+  color: var(--text-danger);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6); /* Vibrant Promptly gradient */
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(59, 130, 246, 0.5);
+  filter: brightness(1.1);
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.iconSpin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
