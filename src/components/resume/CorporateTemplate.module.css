@@ -5,7 +5,7 @@
   margin: 0 auto;
   background-color: white;
   color: #000;
-  font-family: "Times New Roman", Times, serif;
+  font-family: var(--resume-font, "Times New Roman", Times, serif);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
 }
@@ -48,7 +48,7 @@
 }
 
 .section {
-  margin-bottom: 0.75rem;
+  margin-bottom: calc(0.75rem * var(--resume-spacing, 1));
   page-break-inside: avoid;
 }
 
@@ -70,7 +70,7 @@
 }
 
 .jobItem, .eduItem {
-  margin-bottom: 1rem;
+  margin-bottom: calc(1rem * var(--resume-spacing, 1));
   page-break-inside: avoid;
   break-inside: avoid;
 }

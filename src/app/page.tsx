@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, ComponentType } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Download } from "lucide-react";
 import styles from "./page.module.css";
@@ -8,6 +8,7 @@ import { ResumeData } from "@/types/resume";
 
 import PromptInput from "@/components/ui/PromptInput";
 import TemplateSwitcher from "@/components/ui/TemplateSwitcher";
+import FormatCustomizer, { FormatOptions } from "@/components/ui/FormatCustomizer";
 import MinimalistTemplate from "@/components/resume/MinimalistTemplate";
 import CreativeTemplate from "@/components/resume/CreativeTemplate";
 import CorporateTemplate from "@/components/resume/CorporateTemplate";
@@ -15,6 +16,14 @@ import StartupTemplate from "@/components/resume/StartupTemplate";
 import ElegantTemplate from "@/components/resume/ElegantTemplate";
 import AutoFitWrapper from "@/components/ui/AutoFitWrapper";
 import ResumeSkeleton from "@/components/ui/ResumeSkeleton";
+
+const TEMPLATES: Record<string, ComponentType<{ data: ResumeData }>> = {
+  minimalist: MinimalistTemplate,
+  creative: CreativeTemplate,
+  corporate: CorporateTemplate,
+  startup: StartupTemplate,
+  elegant: ElegantTemplate,
+};
 
 // Provide some dummy initial state so the user sees *something* on load
 const generatePlaceholderData = (): ResumeData => ({
@@ -54,6 +63,11 @@ export default function Home() {
   const [resumeData, setResumeData] = useState<ResumeData>(generatePlaceholderData());
   const [template, setTemplate] = useState("minimalist");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [formatOptions, setFormatOptions] = useState<FormatOptions>({
+    accentColor: "",
+    fontFamily: "",
+    spacing: "normal",
+  });
   
   // Ref for the template wrapper that we want to print
   const resumeRef = useRef<HTMLDivElement>(null);
@@ -64,9 +78,14 @@ export default function Home() {
     documentTitle: `${resumeData.personalInfo?.fullName || "Resume"}_CV`,
   });
 
-  const handleDataGenerated = (data: ResumeData) => {
-    setResumeData(data);
-  };
+  const TemplateComponent = TEMPLATES[template] || MinimalistTemplate;
+
+  const spacingScale = { compact: 0.8, normal: 1, relaxed: 1.2 };
+  const resumeStyle: React.CSSProperties = {
+    ...(formatOptions.accentColor && { "--resume-accent": formatOptions.accentColor }),
+    ...(formatOptions.fontFamily && { "--resume-font": formatOptions.fontFamily }),
+    ...(formatOptions.spacing !== "normal" && { "--resume-spacing": String(spacingScale[formatOptions.spacing]) }),
+  } as React.CSSProperties;
 
   return (
     <div className={styles.container}>
@@ -94,26 +113,24 @@ export default function Home() {
         {/* Left Side: Input Area */}
         <section className={styles.editorPanel}>
           <PromptInput 
-            onDataGenerated={handleDataGenerated} 
+            onDataGenerated={setResumeData} 
             onLoading={setIsGenerating}
+          />
+          <FormatCustomizer
+            options={formatOptions}
+            onChange={setFormatOptions}
           />
         </section>
 
         {/* Right Side: Preview & Export Area */}
         <section className={styles.previewPanel}>
           <div className={styles.resumeWrapper}>
-            <div ref={resumeRef}>
-              <AutoFitWrapper contentDependencies={[resumeData, template, isGenerating]}>
+            <div ref={resumeRef} style={resumeStyle}>
+              <AutoFitWrapper contentDependencies={[resumeData, template, isGenerating, formatOptions]}>
                 {isGenerating ? (
                    <ResumeSkeleton />
                 ) : (
-                  <>
-                    {template === "minimalist" && <MinimalistTemplate data={resumeData} />}
-                    {template === "creative" && <CreativeTemplate data={resumeData} />}
-                    {template === "corporate" && <CorporateTemplate data={resumeData} />}
-                    {template === "startup" && <StartupTemplate data={resumeData} />}
-                    {template === "elegant" && <ElegantTemplate data={resumeData} />}
-                  </>
+                  <TemplateComponent data={resumeData} />
                 )}
               </AutoFitWrapper>
             </div>

@@ -1,12 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --background: #000000;
+  --background: #09090b;
   --foreground: #f8fafc;
   
   --primary: #3b82f6;
   --primary-hover: #60a5fa;
   --primary-foreground: #ffffff;
+  --accent: #8b5cf6;
   
   --surface: #0f0f11;
   --surface-border: #27272a;
@@ -17,6 +18,8 @@
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 1rem;
+
+  --gradient-brand: linear-gradient(135deg, var(--primary), var(--accent));
 }
 
 * {
@@ -46,10 +49,10 @@ button {
   background: none;
 }
 
-/* Base utility classes for scrollbars */
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -57,15 +60,14 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* Prosemirror / Text editor standard resets */
 textarea {
   font-family: inherit;
 }

@@ -94,7 +94,11 @@ export default function MinimalistTemplate({ data }: MinimalistTemplateProps) {
       {data.skills && data.skills.length > 0 && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Skills</h2>
-          <div className={styles.skillsList}>{data.skills.join(", ")}</div>
+          <div className={styles.skillsList}>
+            {data.skills.map((skill, index) => (
+              <span key={index} className={styles.skillTag}>{skill}</span>
+            ))}
+          </div>
         </section>
       )}
     </div>
