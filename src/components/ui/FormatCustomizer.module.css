@@ -117,6 +117,59 @@
   border-color: var(--primary);
 }
 
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--surface-border);
+  padding-bottom: 0.8rem;
+  margin-bottom: 0.2rem;
+}
+
+.toggleText {
+  display: flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.toggleSwitch {
+  width: 38px;
+  height: 20px;
+  background-color: var(--surface-border);
+  border-radius: 10px;
+  position: relative;
+  transition: background-color 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.toggleOn {
+  background-color: var(--primary);
+}
+
+.togglePin {
+  width: 14px;
+  height: 14px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggleOn .togglePin {
+  transform: translateX(18px);
+}
+
 /* ── Mobile ── */
 @media (max-width: 640px) {
   .colorSwatch {

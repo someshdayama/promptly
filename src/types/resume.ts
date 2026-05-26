@@ -4,9 +4,7 @@ export interface ResumeData {
     email: string;
     phone: string;
     location: string;
-    portfolioUrl?: string;
     linkedinUrl?: string;
-    githubUrl?: string;
   };
   summary: string;
   experience: {
@@ -16,10 +14,7 @@ export interface ResumeData {
     endDate: string;
     description: string[];
   }[];
-  projects?: {
-    name: string;
-    description: string;
-  }[];
+
   education: {
     institution: string;
     degree: string;

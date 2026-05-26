@@ -29,7 +29,7 @@ export default function ElegantTemplate({ data }: ElegantTemplateProps) {
           {data.personalInfo?.linkedinUrl && (
             <>
               <span className={styles.separator}>|</span>
-              <a href={data.personalInfo.linkedinUrl}>LinkedIn</a>
+              <a href={data.personalInfo.linkedinUrl} target="_blank" rel="noopener noreferrer">LinkedIn</a>
             </>
           )}
         </div>
@@ -69,23 +69,7 @@ export default function ElegantTemplate({ data }: ElegantTemplateProps) {
         </section>
       )}
 
-      {data.projects && data.projects.length > 0 && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Key Projects</h2>
-          <div className={styles.experienceList}>
-            {data.projects.map((proj, index) => (
-              <div key={index} className={styles.job}>
-                <div className={styles.jobHeader}>
-                  <div className={styles.jobTitleGroup}>
-                    <h3 className={styles.jobTitle}>{proj.name}</h3>
-                  </div>
-                </div>
-                <p className={styles.summary} style={{ marginTop: '0.25rem' }}>{proj.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+
 
       {data.education && data.education.length > 0 && (
         <section className={styles.section}>

@@ -6,6 +6,7 @@ import styles from "./AutoFitWrapper.module.css";
 interface AutoFitWrapperProps {
   children: React.ReactNode;
   contentDependencies: any[]; // Triggers recalculation when content changes
+  fitToSinglePage?: boolean;
 }
 
 /**
@@ -13,7 +14,11 @@ interface AutoFitWrapperProps {
  * on a single A4 page. It scales down to prevent overflow and scales up
  * to fill empty space, ensuring a professional, balanced look.
  */
-export default function AutoFitWrapper({ children, contentDependencies }: AutoFitWrapperProps) {
+export default function AutoFitWrapper({
+  children,
+  contentDependencies,
+  fitToSinglePage = true,
+}: AutoFitWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -41,32 +46,63 @@ export default function AutoFitWrapper({ children, contentDependencies }: AutoFi
       contentRef.current.style.minHeight = '';
       containerRef.current.style.height = '';
 
-      if (contentHeight >= targetHeight * 0.85 && contentHeight <= targetHeight * 1.15) {
-        // Close to A4: scale to fit exactly 1 page
-        let s = targetHeight / contentHeight;
-        
-        // Iteratively find perfect virtual aspect ratio (2 passes is usually enough)
-        for (let i = 0; i < 2; i++) {
-          contentRef.current.style.width = `${(1 / s) * 100}%`;
-          contentHeight = contentRef.current.scrollHeight;
-          const virtualTargetHeight = targetHeight / s;
-          s = s * (virtualTargetHeight / contentHeight);
+      if (fitToSinglePage) {
+        // Mode 1: Force Single Page (scale down if too long)
+        if (contentHeight > targetHeight) {
+          let s = targetHeight / contentHeight;
+          
+          // Damped numerical convergence loop to find exact scaling and prevent oscillation
+          for (let i = 0; i < 4; i++) {
+            contentRef.current.style.width = `${(1 / s) * 100}%`;
+            contentHeight = contentRef.current.scrollHeight;
+            const sCalculated = targetHeight / contentHeight;
+            s = 0.5 * s + 0.5 * sCalculated;
+          }
+          
+          const finalScale = Math.max(s, 0.35); // Remove large safety margins to fit A4 exactly
+          setScale(finalScale);
+          setVirtualWidth(`${(1 / finalScale) * 100}%`);
+          setCanvasHeight(`${targetHeight}px`);
+        } else if (contentHeight >= targetHeight * 0.85) {
+          // Close to A4: scale to fit exactly 1 page
+          let s = targetHeight / contentHeight;
+          for (let i = 0; i < 4; i++) {
+            contentRef.current.style.width = `${(1 / s) * 100}%`;
+            contentHeight = contentRef.current.scrollHeight;
+            const sCalculated = targetHeight / contentHeight;
+            s = 0.5 * s + 0.5 * sCalculated;
+          }
+          const finalScale = Math.max(s, 0.4);
+          setScale(finalScale);
+          setVirtualWidth(`${(1 / finalScale) * 100}%`);
+          setCanvasHeight(`${targetHeight}px`);
+        } else {
+          // Short content: keep 1.0 scale, shrink page height to fit content
+          setScale(1);
+          setVirtualWidth("100%");
+          setCanvasHeight(`${contentHeight + 20}px`);
         }
-        
-        const finalScale = Math.max(s * 0.98, 0.4); // 2% safety margin
-        setScale(finalScale);
-        setVirtualWidth(`${(1 / finalScale) * 100}%`);
-        setCanvasHeight(`${targetHeight}px`);
-      } else if (contentHeight < targetHeight * 0.85) {
-        // Short content: keep 1.0 scale, shrink page height to fit content
-        setScale(1);
-        setVirtualWidth("100%");
-        setCanvasHeight(`${contentHeight + 20}px`);
       } else {
-        // Tall content: keep 1.0 scale to maintain legibility, let page grow tall
-        setScale(1);
-        setVirtualWidth("100%");
-        setCanvasHeight(`${contentHeight + 20}px`);
+        // Mode 2: Multi-Page / Natural height (do not scale down to fit long content)
+        if (contentHeight >= targetHeight * 0.85 && contentHeight <= targetHeight * 1.15) {
+          // Close to A4: scale to fit exactly 1 page
+          let s = targetHeight / contentHeight;
+          for (let i = 0; i < 4; i++) {
+            contentRef.current.style.width = `${(1 / s) * 100}%`;
+            contentHeight = contentRef.current.scrollHeight;
+            const sCalculated = targetHeight / contentHeight;
+            s = 0.5 * s + 0.5 * sCalculated;
+          }
+          const finalScale = Math.max(s, 0.4);
+          setScale(finalScale);
+          setVirtualWidth(`${(1 / finalScale) * 100}%`);
+          setCanvasHeight(`${targetHeight}px`);
+        } else {
+          // Short or long: keep 1.0 scale, adjust canvas height to fit content
+          setScale(1);
+          setVirtualWidth("100%");
+          setCanvasHeight(`${contentHeight + 20}px`);
+        }
       }
     };
 
@@ -81,7 +117,7 @@ export default function AutoFitWrapper({ children, contentDependencies }: AutoFi
       window.removeEventListener('resize', calculateScale);
     };
     
-  }, [...contentDependencies]);
+  }, [...contentDependencies, fitToSinglePage]);
 
   return (
     <div className={styles.wrapper}>

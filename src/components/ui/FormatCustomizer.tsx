@@ -8,6 +8,7 @@ export interface FormatOptions {
   accentColor: string;
   fontFamily: string;
   spacing: "compact" | "normal" | "relaxed";
+  fitToSinglePage: boolean;
 }
 
 interface FormatCustomizerProps {
@@ -59,6 +60,26 @@ export default function FormatCustomizer({ options, onChange }: FormatCustomizer
 
       {isOpen && (
         <div className={styles.panel}>
+          {/* Fit to 1 Page Toggle */}
+          <div className={styles.group}>
+            <div className={styles.toggleLabel} onClick={() => update({ fitToSinglePage: !options.fitToSinglePage })}>
+              <span className={styles.toggleText}>
+                <AlignVerticalSpaceAround size={13} style={{ marginRight: '0.4rem', display: 'inline-block', verticalAlign: 'middle' }} />
+                Fit to 1 Page
+              </span>
+              <button
+                type="button"
+                className={`${styles.toggleSwitch} ${options.fitToSinglePage ? styles.toggleOn : ""}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  update({ fitToSinglePage: !options.fitToSinglePage });
+                }}
+              >
+                <span className={styles.togglePin} />
+              </button>
+            </div>
+          </div>
+
           {/* Accent Color */}
           <div className={styles.group}>
             <label className={styles.label}>

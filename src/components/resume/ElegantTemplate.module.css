@@ -5,7 +5,7 @@
 
 .page {
   width: 100%;
-  min-height: auto;
+  min-height: 100%;
   padding: 32px 40px;
   margin: 0 auto;
   background-color: #fff;
@@ -16,33 +16,33 @@
 }
 
 .header {
-  text-align: center;
-  margin-bottom: 1.8rem;
-  border-top: 2px solid #111827;
-  border-bottom: 2px solid #111827;
-  padding: 1.2rem 0;
+  text-align: left;
+  margin-bottom: 1.6rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 1.2rem;
 }
 
 .name {
-  font-size: 2.4rem;
+  font-family: var(--resume-font, 'Lora', serif);
+  font-size: 2.5rem;
   font-weight: 600;
-  margin: 0 0 0.6rem 0;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  margin: 0 0 0.5rem 0;
   color: #111827;
   line-height: 1;
+  text-transform: none;
+  letter-spacing: -0.01em;
 }
 
 .contactInfo {
-  font-size: 0.74rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 400;
   color: #4b5563;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  gap: 0.5rem 1.2rem;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .separator {
@@ -67,23 +67,22 @@
 }
 
 .sectionTitle {
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
+  font-family: var(--resume-font, 'Lora', serif);
+  font-size: 1.15rem;
+  font-weight: 600;
   color: #111827;
-  border-bottom: 2px solid #111827;
-  margin-bottom: 0.95rem;
-  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.2rem;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .summary {
-  font-size: 0.86rem;
-  font-style: italic;
+  font-size: 0.84rem;
   color: #374151;
-  text-align: center;
-  max-width: 88%;
-  margin: 0 auto;
+  text-align: justify;
+  margin: 0;
   line-height: 1.65;
 }
 
@@ -121,9 +120,8 @@
 
 .companyName {
   font-size: 0.82rem;
-  font-style: italic;
   color: #374151;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .jobDate {
@@ -190,8 +188,8 @@
 
 .institution {
   font-size: 0.8rem;
-  font-style: italic;
   color: #374151;
+  font-weight: 600;
 }
 
 .skillsGrid {

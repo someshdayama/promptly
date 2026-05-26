@@ -6,6 +6,7 @@ import { useReactToPrint } from "react-to-print";
 import { Download, Sparkles } from "lucide-react";
 import styles from "./page.module.css";
 import { ResumeData } from "@/types/resume";
+import { SOMESH_PROFILE } from "@/data/someshProfile";
 
 import PromptInput from "@/components/ui/PromptInput";
 import TemplateSwitcher from "@/components/ui/TemplateSwitcher";
@@ -26,137 +27,31 @@ const TEMPLATES: Record<string, ComponentType<{ data: ResumeData }>> = {
   elegant: ElegantTemplate,
 };
 
-// Somesh's real resume — pre-filled when Career Radar launches Promptly
-const SOMESH_BASE_PROMPT = `My name is Somesh Dayama. I am based in Mumbai, India. Phone: 7049614849. Email: someshdayama2@gmail.com.
+// Dynamically construct baseline prompt from profile data to avoid duplication
+const buildBasePromptFromProfile = (profile: ResumeData): string => {
+  return `My name is ${profile.personalInfo.fullName}. I am based in ${profile.personalInfo.location}. Phone: ${profile.personalInfo.phone}. Email: ${profile.personalInfo.email}.
 
 I am a Software Engineer with over 3 years of experience specializing in cloud infrastructure, high-performance CI/CD automation, and site reliability engineering.
 
 SKILLS:
-- Cloud Platforms: GCP (Compute Engine, GKE, Cloud SQL, IAM, VPC), AWS, Azure
-- DevOps & IaC: Terraform, Ansible, Docker, Kubernetes (GKE), Helm, Jenkins, GitHub Actions
-- Programming & Scripting: Java, Python, Groovy, Bash, Linux Shell, SQL
-- Monitoring & Observability: Prometheus, Grafana
-- Methodologies & Tools: System Design, Agile/Scrum, Git, JIRA, Maven
+${profile.skills.map(s => `- ${s}`).join("\n")}
 
 WORK EXPERIENCE:
-
-NCR Atleos Corporation | Mumbai, India — Software Engineer — Feb 2025 to Present
-- Release Train Engineer (RTE): Managed release lifecycles and cross-functional CI/CD coordination for the AMP Services Product on Azure, aligning delivery timelines and mitigating operational risks.
-- Scrum Master: Facilitated agile ceremonies and cleared blockers for an 11-member engineering squad, driving sprint predictability and process optimization.
-- Incident Response & Release Lead: Functioned as primary Incident Commander for mission-critical production outages, architecting coordination strategies between Dev and Ops teams to significantly reduce Mean Time to Resolution.
-- DevOps Orchestration: Spearheaded infrastructure provisioning and environment setup using GCP (GKE, Compute Engine), utilizing Jenkins, Helm, and Ansible to maintain high availability and deployment velocity.
-- Infrastructure Optimization: Conducted self-initiated legacy upgrades and continuous drift detection, successfully maintaining zero configuration drift across multi-cloud environments.
-
-Monocept Consulting Pvt. Ltd. | Hyderabad, India — Software Engineer — May 2023 to Feb 2025
-- FinOps & Cost Optimization: Developed automated scripts and engineered resource allocation strategies on GCP, delivering a 34.56% reduction in cloud infrastructure costs via precision instance rightsizing and auto-scaling.
-- Database Reliability: Architected automated database maintenance blueprints and failover strategies utilizing Terraform and Ansible, decreasing database-related production incidents by 24%.
-- Infrastructure as Code (IaC): Orchestrated environment deployment for the Authentic Switch application across production and staging GCP environments using Terraform, establishing fully reproducible, scalable infrastructure.
-
-Monocept Consulting Pvt. Ltd. | Remote — Trainee Software Engineer — Jan 2023 to Apr 2023
-- CI/CD Automation: Automated Jenkins-based deployment pipelines for the flagship Domino’s App (Jubilant Foods), radically minimizing manual interventions and reducing deployment cycle times.
-- Cloud Provisioning: Managed Linux virtual environments and leveraged AWS core services to dynamically provision scalable staging environments for cross-functional development teams.
-
-PROJECTS:
-- Velocity: Developed a high-performance network diagnostic and credit monitoring tool hosted on Netlify, focusing on low-latency network telemetry and automated diagnostic reporting.
-- Promptly: Architected a privacy-focused, AI-driven resume builder application, implementing local model optimizations to securely generate tailored professional profiles without external data leaks.
+${profile.experience.map(exp => `
+${exp.company} | ${profile.personalInfo.location} — ${exp.position} — ${exp.startDate} to ${exp.endDate}
+${exp.description.map(bullet => `- ${bullet}`).join("\n")}
+`).join("\n")}
 
 EDUCATION:
-- Master of Computer Applications (MCA) — National Institute of Technology (NIT), Bhopal — 2023
-- Bachelor of Computer Applications (BCA) — Prestige Institute of Management and Research, Indore — 2020
+${profile.education.map(edu => `- ${edu.degree} — ${edu.institution} — ${edu.endDate}`).join("\n")}
 
 OTHER:
 - Languages: English, Hindi`;
+};
 
-const generatePlaceholderData = (): ResumeData => ({
-  personalInfo: {
-    fullName: "Somesh Dayama",
-    email: "someshdayama2@gmail.com",
-    phone: "7049614849",
-    location: "Mumbai, India",
-    linkedinUrl: "https://linkedin.com",
-    githubUrl: "https://github.com",
-    portfolioUrl: "https://portfolio.com",
-  },
-  summary:
-    "Results-driven Software Engineer with over 3 years of experience specializing in cloud infrastructure, high-performance CI/CD automation, and site reliability engineering. Adept at optimizing system architecture across GCP, Azure, and AWS to drive down cloud expenditures and maximize deployment frequencies. Leverages automated tooling and agile practices as a force multiplier to streamline complex release management, eliminate technical debt, and ensure zero-drift infrastructure stability.",
-  experience: [
-    {
-      company: "NCR Atleos Corporation",
-      position: "Software Engineer",
-      startDate: "Feb 2025",
-      endDate: "Present",
-      description: [
-        "Release Train Engineer (RTE): Managed release lifecycles and cross-functional CI/CD coordination for the AMP Services Product on Azure, aligning delivery timelines and mitigating operational risks.",
-        "Scrum Master: Facilitated agile ceremonies and cleared blockers for an 11-member engineering squad, driving sprint predictability and process optimization.",
-        "Incident Response & Release Lead: Functioned as primary Incident Commander for mission-critical production outages, architecting coordination strategies between Dev and Ops teams to significantly reduce Mean Time to Resolution.",
-        "DevOps Orchestration: Spearheaded infrastructure provisioning and environment setup using GCP (GKE, Compute Engine), utilizing Jenkins, Helm, and Ansible to maintain high availability and deployment velocity.",
-        "Infrastructure Optimization: Conducted self-initiated legacy upgrades and continuous drift detection, successfully maintaining zero configuration drift across multi-cloud environments.",
-      ],
-    },
-    {
-      company: "Monocept Consulting Pvt. Ltd.",
-      position: "Software Engineer",
-      startDate: "May 2023",
-      endDate: "Feb 2025",
-      description: [
-        "FinOps & Cost Optimization: Developed automated scripts and engineered resource allocation strategies on GCP, delivering a 34.56% reduction in cloud infrastructure costs via precision instance rightsizing and auto-scaling.",
-        "Database Reliability: Architected automated database maintenance blueprints and failover strategies utilizing Terraform and Ansible, decreasing database-related production incidents by 24%.",
-        "Infrastructure as Code (IaC): Orchestrated environment deployment for the Authentic Switch application across production and staging GCP environments using Terraform, establishing fully reproducible, scalable infrastructure.",
-      ],
-    },
-    {
-      company: "Monocept Consulting Pvt. Ltd.",
-      position: "Trainee Software Engineer",
-      startDate: "Jan 2023",
-      endDate: "Apr 2023",
-      description: [
-        "CI/CD Automation: Automated Jenkins-based deployment pipelines for the flagship Domino’s App (Jubilant Foods), radically minimizing manual interventions and reducing deployment cycle times.",
-        "Cloud Provisioning: Managed Linux virtual environments and leveraged AWS core services to dynamically provision scalable staging environments for cross-functional development teams.",
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Velocity",
-      description: "Developed a high-performance network diagnostic and credit monitoring tool hosted on Netlify, focusing on low-latency network telemetry and automated diagnostic reporting.",
-    },
-    {
-      name: "Promptly",
-      description: "Architected a privacy-focused, AI-driven resume builder application, implementing local model optimizations to securely generate tailored professional profiles without external data leaks.",
-    },
-  ],
-  education: [
-    { institution: "National Institute of Technology (NIT), Bhopal", degree: "Master of Computer Applications (MCA)", startDate: "", endDate: "2023" },
-    { institution: "Prestige Institute of Management and Research, Indore", degree: "Bachelor of Computer Applications (BCA)", startDate: "", endDate: "2020" },
-  ],
-  skills: [
-    "GCP (Compute Engine, GKE, Cloud SQL, IAM, VPC)",
-    "AWS",
-    "Azure",
-    "Terraform",
-    "Ansible",
-    "Docker",
-    "Kubernetes (GKE)",
-    "Helm",
-    "Jenkins",
-    "GitHub Actions",
-    "Java",
-    "Python",
-    "Groovy",
-    "Bash",
-    "Linux Shell",
-    "SQL",
-    "Prometheus",
-    "Grafana",
-    "System Design",
-    "Agile/Scrum",
-    "Git",
-    "JIRA",
-    "Maven",
-    "English",
-    "Hindi"
-  ],
-});
+const SOMESH_BASE_PROMPT = buildBasePromptFromProfile(SOMESH_PROFILE);
+
+const generatePlaceholderData = (): ResumeData => SOMESH_PROFILE;
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -167,6 +62,7 @@ function HomeContent() {
     accentColor: "",
     fontFamily: "",
     spacing: "normal",
+    fitToSinglePage: true,
   });
   const [jobBanner, setJobBanner] = useState<{ title: string; company: string } | null>(null);
 
@@ -254,7 +150,43 @@ Please tailor my resume summary and skill highlights to this specific role while
           <TemplateSwitcher currentTemplate={template} onTemplateChange={setTemplate} />
         </div>
 
-        <div className={styles.headerRight}>
+        <div className={styles.headerRight} style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          {/* Fit to 1 Page Toggle */}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              Fit to 1 Page
+            </span>
+            <button
+              type="button"
+              onClick={() => setFormatOptions({ ...formatOptions, fitToSinglePage: !formatOptions.fitToSinglePage })}
+              style={{
+                width: "38px",
+                height: "20px",
+                backgroundColor: formatOptions.fitToSinglePage ? "var(--primary)" : "var(--surface-border)",
+                borderRadius: "10px",
+                position: "relative",
+                transition: "background-color 0.2s ease",
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              <span
+                style={{
+                  width: "14px",
+                  height: "14px",
+                  backgroundColor: "#ffffff",
+                  borderRadius: "50%",
+                  position: "absolute",
+                  top: "3px",
+                  left: "3px",
+                  transition: "transform 0.2s ease",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
+                  transform: formatOptions.fitToSinglePage ? "translateX(18px)" : "translateX(0)"
+                }}
+              />
+            </button>
+          </div>
+
           <button className={styles.downloadButton} onClick={() => handlePrint()}>
             <Download size={18} />
             Download PDF
@@ -278,7 +210,10 @@ Please tailor my resume summary and skill highlights to this specific role while
         <section className={styles.previewPanel}>
           <div className={styles.resumeWrapper}>
             <div ref={resumeRef} style={resumeStyle}>
-              <AutoFitWrapper contentDependencies={[resumeData, template, isGenerating, formatOptions]}>
+              <AutoFitWrapper
+                contentDependencies={[resumeData, template, isGenerating, formatOptions]}
+                fitToSinglePage={formatOptions.fitToSinglePage}
+              >
                 {isGenerating ? (
                   <ResumeSkeleton />
                 ) : (
