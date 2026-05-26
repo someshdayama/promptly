@@ -60,6 +60,68 @@ const SOMESH_PROFILE = {
   allSkills: ['GCP', 'AWS', 'Azure', 'Kubernetes', 'Docker', 'Terraform', 'Ansible', 'Jenkins', 'Helm', 'GitHub Actions', 'Prometheus', 'Grafana', 'Python', 'Java', 'Bash', 'SQL', 'Groovy', 'Linux', 'Scrum (CSM)', 'JIRA', 'CI/CD', 'IaC', 'Incident Management', 'Release Management', 'FinOps', 'SRE'],
 };
 
+const resumeSchema = {
+  type: "OBJECT",
+  properties: {
+    personalInfo: {
+      type: "OBJECT",
+      properties: {
+        fullName: { type: "STRING" },
+        email: { type: "STRING" },
+        phone: { type: "STRING" },
+        location: { type: "STRING" },
+        linkedinUrl: { type: "STRING" },
+        portfolioUrl: { type: "STRING" }
+      },
+      required: ["fullName", "email"]
+    },
+    summary: { type: "STRING" },
+    experience: {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          company: { type: "STRING" },
+          position: { type: "STRING" },
+          startDate: { type: "STRING" },
+          endDate: { type: "STRING" },
+          description: {
+            type: "ARRAY",
+            items: { type: "STRING" }
+          }
+        },
+        required: ["company", "position", "description"]
+      }
+    },
+    education: {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          institution: { type: "STRING" },
+          degree: { type: "STRING" },
+          startDate: { type: "STRING" },
+          endDate: { type: "STRING" }
+        },
+        required: ["institution", "degree"]
+      }
+    },
+    skills: {
+      type: "ARRAY",
+      items: { type: "STRING" }
+    }
+  },
+  required: ["personalInfo", "summary", "experience", "education", "skills"]
+};
+
+function cleanAndParseJSON(text: string) {
+  let cleanText = text.trim();
+  if (cleanText.startsWith('```')) {
+    cleanText = cleanText.replace(/^```[a-zA-Z]*\n/, '').replace(/\n```$/, '').trim();
+  }
+  return JSON.parse(cleanText);
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -130,15 +192,6 @@ MANDATORY RULES — follow each one precisely:
 3. SKILLS: Reorder the skills array so the most relevant skills to "${jobContext.title}" appear first.
 
 4. Do NOT change any dates, company names, or personal info.
-
-Respond ONLY with valid JSON in exactly this schema — no markdown, no explanation:
-{
-  "personalInfo": { "fullName": "...", "email": "...", "phone": "...", "location": "...", "linkedinUrl": "...", "portfolioUrl": "..." },
-  "summary": "...",
-  "experience": [ { "company": "...", "position": "...", "startDate": "...", "endDate": "...", "description": ["bullet 1", "bullet 2"] } ],
-  "education": [ { "institution": "...", "degree": "...", "startDate": "...", "endDate": "..." } ],
-  "skills": ["most relevant first", "..."]
-}
       `.trim();
 
     } else {
@@ -149,18 +202,8 @@ You are an expert resume parser and writer.
 The user will provide raw, unstructured text containing their work history, education, skills, and personal details.
 Structure this data into a clean, professional JSON format.
 
-Respond ONLY with valid JSON matching the following schema:
-{
-  "personalInfo": { "fullName": "...", "email": "...", "phone": "...", "location": "...", "linkedinUrl": "...", "portfolioUrl": "..." },
-  "summary": "...",
-  "experience": [ { "company": "...", "position": "...", "startDate": "...", "endDate": "...", "description": ["bullet point 1", "bullet point 2"] } ],
-  "education": [ { "institution": "...", "degree": "...", "startDate": "...", "endDate": "..." } ],
-  "skills": ["skill 1", "skill 2"]
-}
-
 Write a compelling 2-3 sentence professional summary if one is not given.
 Make bullet points action-oriented with quantified outcomes where possible.
-No markdown codeblocks. Return raw JSON only.
       `.trim();
     }
 
@@ -171,6 +214,7 @@ No markdown codeblocks. Return raw JSON only.
         systemInstruction,
         temperature: 0.1,
         responseMimeType: 'application/json',
+        responseSchema: resumeSchema,
       },
     });
 
@@ -180,7 +224,7 @@ No markdown codeblocks. Return raw JSON only.
       throw new Error('No output generated from Gemini');
     }
 
-    const parsedData = JSON.parse(outputText);
+    const parsedData = cleanAndParseJSON(outputText);
 
     return NextResponse.json({ data: parsedData });
   } catch (error) {
