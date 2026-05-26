@@ -1,100 +1,125 @@
+/* ── Swiss Minimalist Premium Template ──
+   High-quality typography, precise weights, and balanced whitespace.
+   Optimized for ATS and single-page A4 printing.
+*/
+
 .page {
   width: 100%;
   min-height: 297mm;
-  padding: 15mm 18mm;
+  padding: 24px 32px;
   margin: 0 auto;
   background-color: white;
-  color: #1a1a1a;
-  font-family: var(--resume-font, 'Inter', -apple-system, sans-serif);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  color: #1e293b;
+  font-family: var(--resume-font, 'Inter', sans-serif);
   box-sizing: border-box;
   line-height: 1.5;
 }
 
 .header {
   text-align: left;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.8rem;
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 1.2rem;
 }
 
 .name {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 800;
-  margin: 0 0 0.75rem 0;
-  color: #000;
+  margin: 0 0 0.5rem 0;
+  color: #0f172a;
   letter-spacing: -0.04em;
-  line-height: 1;
+  line-height: 1.1;
+  text-transform: uppercase;
 }
 
 .contact {
-  font-size: 0.9rem;
-  color: #666;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #64748b;
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
-}
-
-.dot {
-  display: none;
+  gap: 0.5rem 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .contact a {
-  color: #000;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 1px;
+  color: #0f172a;
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed #64748b;
+}
+
+.contact a:hover {
+  border-bottom: 1px solid #0f172a;
+}
+
+.dot {
+  color: #cbd5e1;
 }
 
 .section {
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.6rem;
 }
 
 .sectionTitle {
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #999;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #eee;
+  letter-spacing: 0.15em;
+  color: #0f172a;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .summary {
-  font-size: 1.05rem;
+  font-size: 0.84rem;
   line-height: 1.6;
-  color: #333;
+  color: #334155;
+  margin: 0;
+  text-align: justify;
 }
 
 .experienceList {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.2rem;
+}
+
+.job {
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .jobHeader {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
 }
 
 .jobTitle {
-  font-size: 1.15rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #000;
+  color: #0f172a;
   margin: 0;
 }
 
 .jobDate {
-  font-size: 0.9rem;
-  color: #999;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
 }
 
 .company {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #666;
-  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .descriptionList {
@@ -104,65 +129,78 @@
 }
 
 .descriptionList li {
-  margin-bottom: 0.6rem;
-  font-size: 0.95rem;
-  color: #444;
+  margin-bottom: 0.25rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #334155;
   position: relative;
-  padding-left: 1rem;
+  padding-left: 0.95rem;
 }
 
 .descriptionList li::before {
   content: '—';
   position: absolute;
   left: 0;
-  color: #ccc;
+  color: #94a3b8;
+  font-weight: bold;
+}
+
+.educationList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
 .educationItem {
-  margin-bottom: 1.5rem;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .educationHeader {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  margin-bottom: 0.15rem;
 }
 
 .degree {
-  font-size: 1.1rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  color: #000;
+  color: #0f172a;
   margin: 0;
 }
 
 .educationDate {
-  font-size: 0.9rem;
-  color: #999;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #64748b;
 }
 
 .institution {
-  font-size: 1rem;
-  color: #666;
+  font-size: 0.8rem;
+  color: #475569;
+  font-weight: 500;
 }
 
 .skillsList {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.4rem;
 }
 
 .skillTag {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #000;
-  background-color: #f9f9f9;
-  padding: 0.35rem 0.75rem;
-  border: 1px solid #eee;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #334155;
+  background-color: #f8fafc;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
 }
 
 @media print {
   .page {
     box-shadow: none;
-    padding: 10mm 15mm;
+    padding: 10mm 12mm;
   }
 }
