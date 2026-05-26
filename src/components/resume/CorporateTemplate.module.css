@@ -1,139 +1,191 @@
+/* ── Executive / Corporate Template ──
+   Clean single-column, ATS-optimised.
+   Strong typography hierarchy, left-aligned, professional.
+*/
+
 .page {
   width: 100%;
   min-height: 297mm;
-  padding: 12mm 15mm;
+  padding: 14mm 18mm 14mm 18mm;
   margin: 0 auto;
-  background-color: white;
-  color: #000;
-  font-family: var(--resume-font, "Times New Roman", Times, serif);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background: white;
+  color: #111827;
+  font-family: var(--resume-font, 'Georgia', 'Times New Roman', serif);
+  box-shadow: 0 0 16px rgba(0,0,0,0.10);
   box-sizing: border-box;
 }
 
+/* ── Header ── */
 .header {
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 3px solid var(--resume-accent, #1d4ed8);
 }
 
-.headerCore {
-  text-align: center;
-  border-bottom: 1px solid #000;
-  padding-bottom: 0.5rem;
+.nameRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .name {
-  font-size: 2.25rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #111827;
+  letter-spacing: -0.01em;
 }
 
-.contactRow {
-  font-size: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+.contactBlock {
+  font-size: 0.8rem;
+  color: #4b5563;
+  text-align: right;
+  line-height: 1.7;
 }
 
-.divider {
-  margin: 0 0.25rem;
-  color: #000;
-}
-
-.contactRow a {
-  color: #000;
+.contactBlock a {
+  color: var(--resume-accent, #1d4ed8);
   text-decoration: none;
 }
 
+/* ── Sections ── */
 .section {
-  margin-bottom: calc(0.75rem * var(--resume-spacing, 1));
+  margin-bottom: calc(0.9rem * var(--resume-spacing, 1));
   page-break-inside: avoid;
 }
 
 .sectionTitle {
-  font-size: 1.15rem;
-  font-weight: bold;
+  font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
-  border-bottom: 1px solid #000;
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.15rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.14em;
+  color: var(--resume-accent, #1d4ed8);
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.25rem;
+  margin: 0 0 0.6rem;
 }
 
 .summary {
-  font-size: 1rem;
-  line-height: 1.4;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #374151;
   margin: 0;
   text-align: justify;
+  min-height: 1.5rem;
 }
 
-.jobItem, .eduItem {
-  margin-bottom: calc(1rem * var(--resume-spacing, 1));
+/* ── Experience ── */
+.job {
+  margin-bottom: calc(1.2rem * var(--resume-spacing, 1));
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
-.jobHeader, .eduHeader {
+.jobHeader {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.05rem;
+  gap: 0.5rem;
 }
 
-.jobTitleGroup {
-  display: flex;
-  align-items: baseline;
-}
-
-.jobTitle, .degree {
-  font-size: 1.05rem;
-  font-weight: bold;
+.jobTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
   margin: 0;
 }
 
-.companyName {
-  font-size: 1.05rem;
-  font-style: italic;
+.jobDate {
+  font-size: 0.78rem;
+  color: #6b7280;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.dateRange {
-  font-size: 1rem;
-  font-weight: normal;
+.company {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #4b5563;
+  margin-bottom: 0.3rem;
 }
 
 .bulletList {
   margin: 0;
-  padding-left: 1.5rem;
-  font-size: 1rem;
-  line-height: 1.4;
+  padding-left: 1.25rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #374151;
 }
 
 .bulletList li {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
   text-align: justify;
 }
 
-.institution {
-  font-size: 1rem;
-  font-style: italic;
+.bulletList li::marker {
+  color: var(--resume-accent, #1d4ed8);
 }
 
+/* ── Education ── */
+.eduItem {
+  margin-bottom: calc(0.6rem * var(--resume-spacing, 1));
+  page-break-inside: avoid;
+}
+
+.eduHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.degree {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.eduDate {
+  font-size: 0.76rem;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.institution {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: #4b5563;
+}
+
+/* ── Skills ── */
 .skillsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem 1rem;
-  font-size: 1rem;
+  gap: 0.3rem 1.5rem;
+  font-size: 0.83rem;
+  color: #374151;
+}
+
+.skillItem::before {
+  content: '▸ ';
+  color: var(--resume-accent, #1d4ed8);
 }
 
 @media print {
   .page {
     box-shadow: none;
     margin: 0;
-    padding: 12mm 15mm;
+    padding: 12mm 16mm;
     min-height: 297mm;
     width: 100%;
     display: block !important;
+  }
+  .header {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }

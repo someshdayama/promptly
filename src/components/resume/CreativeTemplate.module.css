@@ -1,80 +1,71 @@
 .page {
   width: 100%;
   min-height: 297mm;
+  display: grid;
+  grid-template-columns: 300px 1fr;
   margin: 0 auto;
   background-color: white;
-  color: #333;
   font-family: var(--resume-font, 'Inter', sans-serif);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  box-sizing: border-box;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar {
-  width: 32%;
-  background-color: #1e293b; /* Deep slate blue for high creative contrast */
-  color: #f8fafc;
-  padding: 2.5rem 1.5rem;
+  background-color: #2d3436;
+  color: #dfe6e9;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 
 .sidebarHeader {
   text-align: center;
-  margin-bottom: 1.5rem;
 }
 
 .avatarPlaceholder {
-  width: 90px;
-  height: 90px;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #00cec9 0%, #0984e3 100%);
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--resume-accent, #3b82f6), #8b5cf6);
-  color: white;
-  font-size: 2.5rem;
+  margin: 0 auto 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1.5rem auto;
-  font-weight: 700;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .name {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #ffffff;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+  line-height: 1.2;
 }
 
 .sidebarTitle {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: #94a3b8;
-  margin-bottom: 1.25rem;
-  border-bottom: 1px solid #334155;
+  letter-spacing: 0.2em;
+  color: #00cec9;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-.contactBlock, .skillsBlock {
-  margin-bottom: 2rem;
 }
 
 .contactBlock p {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   margin-bottom: 0.75rem;
-  color: #cbd5e1;
-  word-wrap: break-word;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .contactBlock a {
-  color: #60a5fa;
+  color: #00cec9;
   text-decoration: none;
-  transition: color 0.2s;
-}
-
-.contactBlock a:hover {
-  color: #93c5fd;
 }
 
 .skillsList {
@@ -84,147 +75,137 @@
 }
 
 .skillsList li {
-  font-size: 0.85rem;
-  background-color: #334155;
-  padding: 0.35rem 0.85rem;
-  border-radius: 4px; /* More modern, slight curve instead of pill */
+  font-size: 0.9rem;
   margin-bottom: 0.5rem;
-  color: #f1f5f9;
-  display: inline-block;
-  margin-right: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
 }
 
-/* Main Area */
 .mainContent {
-  width: 68%;
-  padding: 3rem 2.5rem;
+  padding: 3rem;
+  color: #2d3436;
 }
 
 .section {
-  margin-bottom: calc(1.5rem * var(--resume-spacing, 1));
-  page-break-inside: avoid;
+  margin-bottom: 3rem;
 }
 
 .sectionTitle {
   font-size: 1.5rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin-bottom: 1rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #2d3436;
   position: relative;
-  display: inline-block;
 }
 
-/* Add an energetic underline to main headers */
 .sectionTitle::after {
   content: '';
   position: absolute;
   left: 0;
-  bottom: -4px;
-  height: 3px;
+  bottom: -0.5rem;
   width: 40px;
-  background: linear-gradient(90deg, var(--resume-accent, #3b82f6), #8b5cf6);
-  border-radius: 2px;
+  height: 4px;
+  background-color: #00cec9;
 }
 
 .summary {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #334155;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #636e72;
 }
 
-/* Timeline */
 .timeline {
   position: relative;
-  padding-left: 1.5rem;
-  border-left: 2px solid #e2e8f0;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  bottom: 0;
+  width: 2px;
+  background-color: #dfe6e9;
 }
 
 .timelineItem {
   position: relative;
-  margin-bottom: 1.25rem;
-  page-break-inside: avoid;
-  break-inside: avoid;
+  margin-bottom: 2.5rem;
 }
 
 .timelineDot {
   position: absolute;
-  left: -1.75rem;
-  top: 0.35rem;
-  width: 10px;
-  height: 10px;
+  left: -2rem;
+  top: 0.5rem;
+  width: 12px;
+  height: 12px;
+  background-color: #00cec9;
+  border: 3px solid white;
   border-radius: 50%;
-  background-color: var(--resume-accent, #8b5cf6);
-  box-shadow: 0 0 0 4px white;
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 3px #dfe6e9;
 }
 
 .jobTitle {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.5rem 0;
 }
 
 .companyMeta {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.company {
+  font-size: 0.95rem;
+  color: #0984e3;
   font-weight: 600;
-  color: var(--resume-accent, #3b82f6);
-}
-
-.date {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  font-weight: 500;
+  margin-bottom: 1rem;
 }
 
 .descriptionList {
+  list-style-type: none;
+  padding: 0;
   margin: 0;
-  padding-left: 1.25rem;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: #475569;
 }
 
 .descriptionList li {
-  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #636e72;
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.descriptionList li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: #00cec9;
 }
 
 .educationItem {
-  margin-bottom: 1rem;
-  page-break-inside: avoid;
-  break-inside: avoid;
+  margin-bottom: 2rem;
 }
 
 .degree {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #0f172a;
   margin: 0 0 0.25rem 0;
 }
 
 .institutionMeta {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-  color: #475569;
+  color: #636e72;
+  font-size: 0.95rem;
 }
 
 @media print {
   .page {
     box-shadow: none;
-    margin: 0;
-    min-height: 297mm;
-    width: 100%;
-    display: flex;
-    align-items: stretch;
-    overflow: visible;
+    display: grid !important;
+    grid-template-columns: 300px 1fr !important;
   }
-
-  /* .sidebar heights are natively handled by flex-stretch on .page */
 }

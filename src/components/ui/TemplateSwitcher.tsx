@@ -13,10 +13,10 @@ export default function TemplateSwitcher({
 }: TemplateSwitcherProps) {
   const templates = [
     { id: "minimalist", label: "Minimalist" },
-    { id: "creative", label: "Creative" },
-    { id: "corporate", label: "Corporate" },
-    { id: "startup", label: "Startup" },
-    { id: "elegant", label: "Elegant" },
+    { id: "corporate",  label: "Corporate" },
+    { id: "startup",    label: "Startup" },
+    { id: "creative",   label: "Creative" },
+    { id: "elegant",    label: "Elegant" },
   ];
 
   return (

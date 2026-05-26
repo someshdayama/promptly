@@ -1,87 +1,101 @@
 .page {
   width: 100%;
   min-height: 297mm;
+  padding: 0;
   margin: 0 auto;
-  background-color: #fafafa;
-  color: #1a1a1a;
-  font-family: var(--resume-font, 'Inter', sans-serif);
-  box-sizing: border-box;
-  padding: 2.5rem;
+  background-color: white;
+  color: #2d3748;
+  font-family: var(--resume-font, 'Inter', -apple-system, sans-serif);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
-  position: relative;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid #e5e5e5;
+  background-color: #1a202c;
+  color: white;
+  padding: 3rem 2rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.headerContent {
+  position: relative;
+  z-index: 1;
 }
 
 .name {
-  font-size: 3rem;
-  font-weight: 900;
-  letter-spacing: -0.04em;
+  font-size: 2.5rem;
+  font-weight: 800;
   margin: 0 0 0.5rem 0;
-  color: #000;
-  text-transform: lowercase;
+  letter-spacing: -0.025em;
 }
 
 .contact {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 1rem;
   font-size: 0.9rem;
-  color: #666;
-  font-weight: 500;
+  opacity: 0.8;
 }
 
 .contact a {
-  color: #2563eb;
+  color: #63b3ed;
   text-decoration: none;
 }
 
 .accentShape {
   position: absolute;
-  top: -2.5rem;
-  right: -2.5rem;
-  width: 120px;
-  height: 120px;
-  background: radial-gradient(circle, #facc15 0%, transparent 70%);
-  opacity: 0.5;
+  right: -5%;
+  top: -20%;
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, rgba(99, 179, 237, 0.2) 0%, rgba(129, 230, 217, 0.1) 100%);
+  border-radius: 50%;
   z-index: 0;
 }
 
 .summarySection {
-  margin-bottom: 2.5rem;
-  padding-left: 1rem;
-  border-left: 4px solid #000;
+  padding: 2rem;
+  background-color: #f7fafc;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .summary {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   line-height: 1.6;
-  font-weight: 400;
-  color: #333;
   margin: 0;
+  color: #4a5568;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 3rem;
+  grid-template-columns: 1fr 280px;
+  flex: 1;
+}
+
+.mainColumn {
+  padding: 2rem;
+}
+
+.sideColumn {
+  padding: 2rem;
+  background-color: #f8fafc;
+  border-left: 1px solid #e2e8f0;
 }
 
 .section {
-  margin-bottom: calc(2rem * var(--resume-spacing, 1));
-  page-break-inside: avoid;
+  margin-bottom: 2.5rem;
 }
 
 .sectionTitle {
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-size: 0.8rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  color: #a0aec0;
   margin-bottom: 1.25rem;
   display: flex;
   align-items: center;
@@ -89,14 +103,12 @@
 }
 
 .slash {
-  color: var(--resume-accent, #2563eb);
+  color: #3182ce;
   font-weight: 900;
 }
 
 .job {
-  margin-bottom: calc(1.5rem * var(--resume-spacing, 1));
-  page-break-inside: avoid;
-  break-inside: avoid;
+  margin-bottom: 2rem;
 }
 
 .jobHeader {
@@ -107,40 +119,34 @@
 }
 
 .jobTitle {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
+  color: #2d3748;
   margin: 0;
 }
 
 .jobDate {
   font-size: 0.85rem;
-  color: #888;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: #718096;
 }
 
 .company {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--resume-accent, #2563eb);
-  margin-bottom: 0.5rem;
+  color: #3182ce;
+  margin-bottom: 0.75rem;
 }
 
 .descriptionList {
   margin: 0;
-  padding-left: 1rem;
+  padding-left: 1.25rem;
   font-size: 0.95rem;
   line-height: 1.6;
-  color: #444;
+  color: #4a5568;
 }
 
 .descriptionList li {
-  margin-bottom: 0.4rem;
-}
-
-.descriptionList li::marker {
-  color: var(--resume-accent, #2563eb);
+  margin-bottom: 0.5rem;
 }
 
 .skillsList {
@@ -153,44 +159,39 @@
 }
 
 .skillsList li {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
   font-size: 0.85rem;
   font-weight: 600;
-  background-color: #000;
-  color: #fff;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
+  border: 1px solid #bee3f8;
 }
 
 .educationItem {
-  margin-bottom: 1.25rem;
-  page-break-inside: avoid;
-  break-inside: avoid;
+  margin-bottom: 1.5rem;
 }
 
 .degree {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
+  color: #2d3748;
   margin: 0 0 0.25rem 0;
 }
 
 .institution {
-  font-size: 0.95rem;
-  color: #444;
-  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  color: #4a5568;
 }
 
 .educationDate {
-  font-size: 0.85rem;
-  color: #888;
-  font-weight: 500;
+  font-size: 0.8rem;
+  color: #a0aec0;
 }
 
 @media print {
   .page {
-    padding: 15mm;
-    margin: 0;
+    box-shadow: none;
     width: 100%;
-    min-height: 297mm;
-    display: block !important;
   }
 }

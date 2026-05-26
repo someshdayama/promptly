@@ -8,9 +8,10 @@ import { ResumeData } from "@/types/resume";
 interface PromptInputProps {
   onDataGenerated: (data: ResumeData) => void;
   onLoading?: (isLoading: boolean) => void;
+  jobContext?: { title: string; company: string };
 }
 
-export default function PromptInput({ onDataGenerated, onLoading }: PromptInputProps) {
+export default function PromptInput({ onDataGenerated, onLoading, jobContext }: PromptInputProps) {
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -29,7 +30,7 @@ export default function PromptInput({ onDataGenerated, onLoading }: PromptInputP
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, ...(jobContext ? { jobContext } : {}) }),
       });
 
       const json = await res.json();
@@ -53,7 +54,31 @@ export default function PromptInput({ onDataGenerated, onLoading }: PromptInputP
   };
 
   const handleInsertExample = () => {
-    setPrompt("My name is Jane Smith.\n\nI am a Senior Product Manager based in Austin, TX. (jane.smith@email.com). I have over 6 years of experience driving cross-functional teams to launch B2B SaaS products.\n\nFrom Jan 2021 to Present, I worked at CloudCore Industries as a Senior Product Manager. I launched a new analytics dashboard that increased enterprise retention by 15%, guided a team of 4 designers and 8 engineers, and managed a $2M annual budget.\n\nBefore that (June 2018 - Dec 2020), I was a Product Owner at NexaTech. I mapped user journeys, wrote agile stories, and reduced time-to-market for key features by 20%.\n\nI went to the University of Texas at Austin and got my B.S. in Business Administration (May 2018).\n\nMy skills include: Agile Strategy, JIRA, SQL, User Research, Wireframing, and Cross-functional Leadership.");
+    setPrompt(`My name is Somesh Dayama. I am based in Mumbai, India. Phone: 7049614849. Email: someshdayama2@gmail.com.
+
+I am a Software Engineer with over 3 years of experience in DevOps, Cloud Infrastructure, and SRE roles.
+
+SKILLS:
+- Cloud Platforms: GCP (Compute Engine, GKE, Cloud SQL, IAM, VPC), AWS, Azure
+- DevOps Tools: Jenkins, Docker, Kubernetes, Terraform, Ansible, Helm, GitHub Actions
+- Programming & Scripting: Java, Python, SQL, Groovy, Bash, Linux Shell
+- Monitoring & CI/CD: Prometheus, Grafana, CI/CD Pipelines, Maven, Git
+- Agile & Project Management: Scrum (CSM certified), Agile Methodologies, JIRA
+
+WORK EXPERIENCE:
+
+NCR Atleos Corporation | Mumbai, India — DevOps Engineer / Release Lead — Feb 2025 to Present
+- Managed release lifecycles and CI/CD coordination for an 11-member engineering squad on the AMP Services Product in Azure.
+- Primary Incident Commander for production outages, coordinating Dev and Ops teams to significantly reduce Mean Time to Resolution.
+- Orchestrated end-to-end cloud infrastructure using GCP (GKE, Compute Engine).
+
+Monocept Consulting Pvt. Ltd. | Hyderabad — Software Engineer / Cloud & SRE — May 2023 to Feb 2025
+- FinOps/Cost Optimisation: Achieved a 34.56% reduction in GCP cloud infrastructure costs.
+- Database Reliability: Reduced database-related production incidents by 24% using automated maintenance.
+
+EDUCATION:
+Master of Computer Applications (MCA) — National Institute of Technology, Bhopal - 2020 to 2023
+Bachelor of Computer Applications (BCA) — Prestige Institute of Management and Research, Indore - 2017 to 2020`);
     setError("");
   };
 

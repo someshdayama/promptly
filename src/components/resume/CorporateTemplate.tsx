@@ -8,61 +8,44 @@ interface CorporateTemplateProps {
 }
 
 export default function CorporateTemplate({ data }: CorporateTemplateProps) {
+  const { personalInfo, summary, experience, education, skills } = data;
+
   return (
     <div className={styles.page}>
       {/* Header */}
       <header className={styles.header}>
-        <div className={styles.headerCore}>
-          <h1 className={styles.name}>{data.personalInfo?.fullName || "Your Name"}</h1>
-          <div className={styles.contactRow}>
-            {data.personalInfo?.email && <span>{data.personalInfo.email}</span>}
-            {data.personalInfo?.phone && (
-              <>
-                <span className={styles.divider}>|</span>
-                <span>{data.personalInfo.phone}</span>
-              </>
-            )}
-            {data.personalInfo?.location && (
-              <>
-                <span className={styles.divider}>|</span>
-                <span>{data.personalInfo.location}</span>
-              </>
-            )}
-            {data.personalInfo?.linkedinUrl && (
-              <>
-                <span className={styles.divider}>|</span>
-                <a href={data.personalInfo.linkedinUrl}>LinkedIn</a>
-              </>
+        <div className={styles.nameRow}>
+          <h1 className={styles.name}>{personalInfo?.fullName || "Your Name"}</h1>
+          <div className={styles.contactBlock}>
+            {personalInfo?.email && <div>{personalInfo.email}</div>}
+            {personalInfo?.phone && <div>{personalInfo.phone}</div>}
+            {personalInfo?.location && <div>{personalInfo.location}</div>}
+            {personalInfo?.linkedinUrl && (
+              <div><a href={personalInfo.linkedinUrl}>LinkedIn ↗</a></div>
             )}
           </div>
         </div>
       </header>
 
       {/* Summary */}
-      {data.summary && (
+      {summary && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Professional Summary</h2>
-          <p className={styles.summary}>{data.summary}</p>
+          <p className={styles.summary}>{summary}</p>
         </section>
       )}
 
       {/* Experience */}
-      {data.experience && data.experience.length > 0 && (
+      {experience && experience.length > 0 && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Professional Experience</h2>
-          
-          {data.experience.map((exp, index) => (
-            <div key={index} className={styles.jobItem}>
+          {experience.map((exp, index) => (
+            <div key={index} className={styles.job}>
               <div className={styles.jobHeader}>
-                <div className={styles.jobTitleGroup}>
-                  <h3 className={styles.jobTitle}>{exp.position}</h3>
-                  <span className={styles.companyName}>, {exp.company}</span>
-                </div>
-                <span className={styles.dateRange}>
-                  {exp.startDate} – {exp.endDate}
-                </span>
+                <h3 className={styles.jobTitle}>{exp.position}</h3>
+                <span className={styles.jobDate}>{exp.startDate} – {exp.endDate}</span>
               </div>
-              
+              <div className={styles.company}>{exp.company}</div>
               {exp.description && exp.description.length > 0 && (
                 <ul className={styles.bulletList}>
                   {exp.description.map((desc, i) => (
@@ -76,17 +59,16 @@ export default function CorporateTemplate({ data }: CorporateTemplateProps) {
       )}
 
       {/* Education */}
-      {data.education && data.education.length > 0 && (
+      {education && education.length > 0 && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Education</h2>
-          
-          {data.education.map((edu, index) => (
+          {education.map((edu, index) => (
             <div key={index} className={styles.eduItem}>
               <div className={styles.eduHeader}>
                 <h3 className={styles.degree}>{edu.degree}</h3>
-                <span className={styles.dateRange}>
-                  {edu.startDate} – {edu.endDate}
-                </span>
+                {(edu.startDate || edu.endDate) && (
+                  <span className={styles.eduDate}>{edu.startDate} – {edu.endDate}</span>
+                )}
               </div>
               <div className={styles.institution}>{edu.institution}</div>
             </div>
@@ -95,14 +77,12 @@ export default function CorporateTemplate({ data }: CorporateTemplateProps) {
       )}
 
       {/* Skills */}
-      {data.skills && data.skills.length > 0 && (
+      {skills && skills.length > 0 && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Core Competencies</h2>
           <div className={styles.skillsGrid}>
-            {data.skills.map((skill, index) => (
-              <div key={index} className={styles.skillItem}>
-                • {skill}
-              </div>
+            {skills.map((skill, index) => (
+              <div key={index} className={styles.skillItem}>{skill}</div>
             ))}
           </div>
         </section>
