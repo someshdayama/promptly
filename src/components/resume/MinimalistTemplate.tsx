@@ -70,6 +70,23 @@ export default function MinimalistTemplate({ data }: MinimalistTemplateProps) {
         </section>
       )}
 
+      {/* Projects */}
+      {data.projects && data.projects.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Projects</h2>
+          <div className={styles.experienceList}>
+            {data.projects.map((proj, index) => (
+              <div key={index} className={styles.job}>
+                <div className={styles.jobHeader}>
+                  <h3 className={styles.jobTitle}>{proj.name}</h3>
+                </div>
+                <p className={styles.summary} style={{ marginTop: '0.25rem' }}>{proj.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Education */}
       {data.education && data.education.length > 0 && (
         <section className={styles.section}>

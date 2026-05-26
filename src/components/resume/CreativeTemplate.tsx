@@ -79,6 +79,20 @@ export default function CreativeTemplate({ data }: CreativeTemplateProps) {
           </section>
         )}
 
+        {data.projects && data.projects.length > 0 && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Projects</h2>
+            <div className={styles.educationList}>
+              {data.projects.map((proj, index) => (
+                <div key={index} className={styles.educationItem}>
+                  <h3 className={styles.degree}>{proj.name}</h3>
+                  <p className={styles.summary} style={{ marginTop: '0.25rem', fontSize: '0.8rem', color: '#4b5563', lineHeight: '1.5' }}>{proj.description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {data.education && data.education.length > 0 && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Education</h2>

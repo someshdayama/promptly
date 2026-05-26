@@ -14,32 +14,33 @@ const SOMESH_PROFILE = {
     email: 'someshdayama2@gmail.com',
     phone: '7049614849',
     location: 'Mumbai, India',
-    linkedinUrl: '',
-    portfolioUrl: '',
+    linkedinUrl: 'https://linkedin.com',
+    githubUrl: 'https://github.com',
+    portfolioUrl: 'https://portfolio.com',
   },
   experience: [
     {
       company: 'NCR Atleos Corporation',
-      position: 'DevOps Engineer / Release Lead',
+      position: 'Software Engineer',
       startDate: 'Feb 2025',
       endDate: 'Present',
       bullets: [
-        'Managed release lifecycles and CI/CD coordination for an 11-member engineering squad on the AMP Services Product in Azure.',
-        'Acted as primary Incident Commander for production outages, coordinating Dev and Ops teams to significantly reduce Mean Time to Resolution (MTTR).',
-        'Orchestrated end-to-end cloud infrastructure using GCP (GKE, Compute Engine).',
-        'Maintained and optimised CI/CD pipelines using Jenkins, Helm, and Ansible, ensuring high availability and deployment frequency.',
-        'Led self-initiated legacy infrastructure upgrades and drift detection using Terraform, ensuring zero configuration drift.',
+        'Release Train Engineer (RTE): Managed release lifecycles and cross-functional CI/CD coordination for the AMP Services Product on Azure, aligning delivery timelines and mitigating operational risks.',
+        'Scrum Master: Facilitated agile ceremonies and cleared blockers for an 11-member engineering squad, driving sprint predictability and process optimization.',
+        'Incident Response & Release Lead: Functioned as primary Incident Commander for mission-critical production outages, architecting coordination strategies between Dev and Ops teams to significantly reduce Mean Time to Resolution.',
+        'DevOps Orchestration: Spearheaded infrastructure provisioning and environment setup using GCP (GKE, Compute Engine), utilizing Jenkins, Helm, and Ansible to maintain high availability and deployment velocity.',
+        'Infrastructure Optimization: Conducted self-initiated legacy upgrades and drift detection, successfully maintaining zero configuration drift across multi-cloud environments.',
       ],
     },
     {
       company: 'Monocept Consulting Pvt. Ltd.',
-      position: 'Software Engineer / Cloud & SRE',
+      position: 'Software Engineer',
       startDate: 'May 2023',
       endDate: 'Feb 2025',
       bullets: [
-        'FinOps: Achieved a 34.56% reduction in GCP cloud infrastructure costs by rightsizing instances and implementing auto-scaling policies.',
-        'Database Reliability: Reduced database-related production incidents by 24% using automated maintenance and failover strategies with Terraform and Ansible.',
-        'Infrastructure as Code: Deployed the "Authentic Switch" application across multiple GCP environments using Terraform, ensuring reproducible and scalable infrastructure provisioning.',
+        'FinOps & Cost Optimization: Developed automated scripts and engineered resource allocation strategies on GCP, delivering a 34.56% reduction in cloud infrastructure costs via precision instance rightsizing and auto-scaling.',
+        'Database Reliability: Architected automated database maintenance blueprints and failover strategies utilizing Terraform and Ansible, decreasing database-related production incidents by 24%.',
+        'Infrastructure as Code (IaC): Orchestrated environment deployment for the Authentic Switch application across production and staging GCP environments using Terraform, establishing fully reproducible, scalable infrastructure.',
       ],
     },
     {
@@ -48,16 +49,33 @@ const SOMESH_PROFILE = {
       startDate: 'Jan 2023',
       endDate: 'Apr 2023',
       bullets: [
-        'Automated Jenkins-based deployment pipelines for the Domino\'s App (Jubilant Foods), reducing manual deployment time.',
-        'Managed Linux VMs and utilised AWS services to provision scalable testing environments.',
+        'CI/CD Automation: Automated Jenkins-based deployment pipelines for the flagship Domino’s App (Jubilant Foods), radically minimizing manual interventions and reducing deployment cycle times.',
+        'Cloud Provisioning: Managed Linux virtual environments and leveraged AWS core services to dynamically provision scalable staging environments for cross-functional development teams.',
       ],
     },
   ],
-  education: [
-    { institution: 'National Institute of Technology, Bhopal', degree: 'Master of Computer Applications (MCA)', startDate: '2020', endDate: '2022' },
-    { institution: 'Prestige Institute of Management and Research, Indore', degree: 'Bachelor of Computer Applications (BCA)', startDate: '2017', endDate: '2020' },
+  projects: [
+    {
+      name: 'Velocity',
+      description: 'Developed a high-performance network diagnostic and credit monitoring tool hosted on Netlify, focusing on low-latency network telemetry and automated diagnostic reporting.',
+    },
+    {
+      name: 'Promptly',
+      description: 'Architected a privacy-focused, AI-driven resume builder application, implementing local model optimizations to securely generate tailored professional profiles without external data leaks.',
+    },
   ],
-  allSkills: ['GCP', 'AWS', 'Azure', 'Kubernetes', 'Docker', 'Terraform', 'Ansible', 'Jenkins', 'Helm', 'GitHub Actions', 'Prometheus', 'Grafana', 'Python', 'Java', 'Bash', 'SQL', 'Groovy', 'Linux', 'Scrum (CSM)', 'JIRA', 'CI/CD', 'IaC', 'Incident Management', 'Release Management', 'FinOps', 'SRE'],
+  education: [
+    { institution: 'National Institute of Technology (NIT), Bhopal', degree: 'Master of Computer Applications (MCA)', startDate: '', endDate: '2023' },
+    { institution: 'Prestige Institute of Management and Research, Indore', degree: 'Bachelor of Computer Applications (BCA)', startDate: '', endDate: '2020' },
+  ],
+  allSkills: [
+    'GCP (Compute Engine, GKE, Cloud SQL, IAM, VPC)', 'AWS', 'Azure',
+    'Terraform', 'Ansible', 'Docker', 'Kubernetes (GKE)', 'Helm', 'Jenkins', 'GitHub Actions',
+    'Java', 'Python', 'Groovy', 'Bash', 'Linux Shell', 'SQL',
+    'Prometheus', 'Grafana',
+    'System Design', 'Agile/Scrum', 'Git', 'JIRA', 'Maven',
+    'English', 'Hindi'
+  ],
 };
 
 const resumeSchema = {
@@ -71,6 +89,7 @@ const resumeSchema = {
         phone: { type: "STRING" },
         location: { type: "STRING" },
         linkedinUrl: { type: "STRING" },
+        githubUrl: { type: "STRING" },
         portfolioUrl: { type: "STRING" }
       },
       required: ["fullName", "email"]
@@ -93,6 +112,17 @@ const resumeSchema = {
         required: ["company", "position", "description"]
       }
     },
+    projects: {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          name: { type: "STRING" },
+          description: { type: "STRING" }
+        },
+        required: ["name", "description"]
+      }
+    },
     education: {
       type: "ARRAY",
       items: {
@@ -111,7 +141,7 @@ const resumeSchema = {
       items: { type: "STRING" }
     }
   },
-  required: ["personalInfo", "summary", "experience", "education", "skills"]
+  required: ["personalInfo", "summary", "experience", "projects", "education", "skills"]
 };
 
 function cleanAndParseJSON(text: string) {
@@ -143,7 +173,6 @@ export async function POST(req: Request) {
 
     if (jobContext) {
       // JOB-TAILORED MODE: very specific instructions per role
-      // Pick 3 bullets from each experience that best match the target role
       const expJson = JSON.stringify(SOMESH_PROFILE.experience.map(e => ({
         company: e.company,
         position: e.position,
@@ -164,6 +193,9 @@ ${JSON.stringify(SOMESH_PROFILE.personalInfo)}
 
 Work Experience (choose and rewrite the most relevant bullets per role):
 ${expJson}
+
+Projects (factual, do not invent projects):
+${JSON.stringify(SOMESH_PROFILE.projects)}
 
 All Available Skills: ${SOMESH_PROFILE.allSkills.join(', ')}
 
@@ -189,9 +221,11 @@ MANDATORY RULES — follow each one precisely:
    - If the job is release/program management: emphasise release coordination, squad management, stakeholder communication.
    - NEVER fabricate new bullet points — only select and reword from the provided bullets.
 
-3. SKILLS: Reorder the skills array so the most relevant skills to "${jobContext.title}" appear first.
+3. PROJECTS: Include the projects exactly as provided, but you may rephrase or emphasize aspects matching the target job description if appropriate.
 
-4. Do NOT change any dates, company names, or personal info.
+4. SKILLS: Reorder the skills array so the most relevant skills to "${jobContext.title}" appear first.
+
+5. Do NOT change any dates, company names, or personal info.
       `.trim();
 
     } else {
@@ -199,8 +233,8 @@ MANDATORY RULES — follow each one precisely:
       finalPrompt = prompt;
       systemInstruction = `
 You are an expert resume parser and writer.
-The user will provide raw, unstructured text containing their work history, education, skills, and personal details.
-Structure this data into a clean, professional JSON format.
+The user will provide raw, unstructured text containing their work history, education, skills, projects, and personal details.
+Structure this data into a clean, professional JSON format matching the schema.
 
 Write a compelling 2-3 sentence professional summary if one is not given.
 Make bullet points action-oriented with quantified outcomes where possible.

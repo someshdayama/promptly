@@ -29,39 +29,43 @@ const TEMPLATES: Record<string, ComponentType<{ data: ResumeData }>> = {
 // Somesh's real resume — pre-filled when Career Radar launches Promptly
 const SOMESH_BASE_PROMPT = `My name is Somesh Dayama. I am based in Mumbai, India. Phone: 7049614849. Email: someshdayama2@gmail.com.
 
-I am a Software Engineer with a deep foundation in DevOps and Cloud Infrastructure, currently serving as a Release Train Engineer (RTE) for a 17-member team. I blend technical expertise from cloud side with Scrum Master role to bridge the gap between complex engineering requirements.
+I am a Software Engineer with over 3 years of experience specializing in cloud infrastructure, high-performance CI/CD automation, and site reliability engineering.
 
 SKILLS:
 - Cloud Platforms: GCP (Compute Engine, GKE, Cloud SQL, IAM, VPC), AWS, Azure
-- DevOps Tools: Jenkins, Docker, Kubernetes, Terraform, Ansible, Helm, GitHub Actions
-- Programming & Scripting: Java, Python, SQL, Groovy, Bash, Linux Shell
-- Monitoring & CI/CD: Prometheus, Grafana, CI/CD Pipelines, Maven, Git
-- Agile & Project Management: Scrum (CSM certified), Agile Methodologies, JIRA
-- Other: Infrastructure as Code (IaC), System Design, Data Visualisation
+- DevOps & IaC: Terraform, Ansible, Docker, Kubernetes (GKE), Helm, Jenkins, GitHub Actions
+- Programming & Scripting: Java, Python, Groovy, Bash, Linux Shell, SQL
+- Monitoring & Observability: Prometheus, Grafana
+- Methodologies & Tools: System Design, Agile/Scrum, Git, JIRA, Maven
 
 WORK EXPERIENCE:
 
 NCR Atleos Corporation | Mumbai, India — Software Engineer — Feb 2025 to Present
-- Managed release lifecycles and CI/CD coordination for an 11-member engineering squad on the AMP Services Product in Azure.
-- Primary Incident Commander for production outages, coordinating Dev and Ops teams to significantly reduce Mean Time to Resolution.
-- Orchestrated end-to-end cloud infrastructure using GCP (GKE, Compute Engine).
-- Maintained and optimised CI/CD pipelines using Jenkins, Helm, and Ansible, ensuring high availability and deployment frequency.
-- Led self-initiated legacy infrastructure upgrades and drift detection using Terraform, ensuring zero configuration drift.
+- Release Train Engineer (RTE): Managed release lifecycles and cross-functional CI/CD coordination for the AMP Services Product on Azure, aligning delivery timelines and mitigating operational risks.
+- Scrum Master: Facilitated agile ceremonies and cleared blockers for an 11-member engineering squad, driving sprint predictability and process optimization.
+- Incident Response & Release Lead: Functioned as primary Incident Commander for mission-critical production outages, architecting coordination strategies between Dev and Ops teams to significantly reduce Mean Time to Resolution.
+- DevOps Orchestration: Spearheaded infrastructure provisioning and environment setup using GCP (GKE, Compute Engine), utilizing Jenkins, Helm, and Ansible to maintain high availability and deployment velocity.
+- Infrastructure Optimization: Conducted self-initiated legacy upgrades and continuous drift detection, successfully maintaining zero configuration drift across multi-cloud environments.
 
-Monocept Consulting Pvt. Ltd. | Hyderabad — Software Engineer — May 2023 to Feb 2025
-- FinOps/Cost Optimisation: Achieved a 34.56% reduction in GCP cloud infrastructure costs by rightsizing instances and implementing auto-scaling policies.
-- Database Reliability: Reduced database-related production incidents by 24% using automated maintenance and failover strategies with Terraform and Ansible.
-- Infrastructure as Code: Deployed the "Authentic Switch" application across multiple GCP environments using Terraform.
+Monocept Consulting Pvt. Ltd. | Hyderabad, India — Software Engineer — May 2023 to Feb 2025
+- FinOps & Cost Optimization: Developed automated scripts and engineered resource allocation strategies on GCP, delivering a 34.56% reduction in cloud infrastructure costs via precision instance rightsizing and auto-scaling.
+- Database Reliability: Architected automated database maintenance blueprints and failover strategies utilizing Terraform and Ansible, decreasing database-related production incidents by 24%.
+- Infrastructure as Code (IaC): Orchestrated environment deployment for the Authentic Switch application across production and staging GCP environments using Terraform, establishing fully reproducible, scalable infrastructure.
 
 Monocept Consulting Pvt. Ltd. | Remote — Trainee Software Engineer — Jan 2023 to Apr 2023
-- Automated Jenkins-based deployment pipelines for the Domino's App (Jubilant Foods), reducing manual deployment time.
-- Managed Linux VMs and utilised AWS services to provision scalable testing environments.
+- CI/CD Automation: Automated Jenkins-based deployment pipelines for the flagship Domino’s App (Jubilant Foods), radically minimizing manual interventions and reducing deployment cycle times.
+- Cloud Provisioning: Managed Linux virtual environments and leveraged AWS core services to dynamically provision scalable staging environments for cross-functional development teams.
+
+PROJECTS:
+- Velocity: Developed a high-performance network diagnostic and credit monitoring tool hosted on Netlify, focusing on low-latency network telemetry and automated diagnostic reporting.
+- Promptly: Architected a privacy-focused, AI-driven resume builder application, implementing local model optimizations to securely generate tailored professional profiles without external data leaks.
 
 EDUCATION:
-Master of Computer Applications (MCA) — National Institute of Technology, Bhopal - 2020 to 2023
-Bachelor of Computer Applications (BCA) — Prestige Institute of Management and Research, Indore - 2017 to 2020
+- Master of Computer Applications (MCA) — National Institute of Technology (NIT), Bhopal — 2023
+- Bachelor of Computer Applications (BCA) — Prestige Institute of Management and Research, Indore — 2020
 
-Languages: Hindi, English`;
+OTHER:
+- Languages: English, Hindi`;
 
 const generatePlaceholderData = (): ResumeData => ({
   personalInfo: {
@@ -69,10 +73,12 @@ const generatePlaceholderData = (): ResumeData => ({
     email: "someshdayama2@gmail.com",
     phone: "7049614849",
     location: "Mumbai, India",
-    linkedinUrl: "",
+    linkedinUrl: "https://linkedin.com",
+    githubUrl: "https://github.com",
+    portfolioUrl: "https://portfolio.com",
   },
   summary:
-    "A Software Engineer with a deep foundation in DevOps and Cloud Infrastructure, currently serving as a Release Train Engineer (RTE) for a 17-member team. I blend technical expertise from cloud side with Scrum Master role to bridge the gap between complex engineering requirements.",
+    "Results-driven Software Engineer with over 3 years of experience specializing in cloud infrastructure, high-performance CI/CD automation, and site reliability engineering. Adept at optimizing system architecture across GCP, Azure, and AWS to drive down cloud expenditures and maximize deployment frequencies. Leverages automated tooling and agile practices as a force multiplier to streamline complex release management, eliminate technical debt, and ensure zero-drift infrastructure stability.",
   experience: [
     {
       company: "NCR Atleos Corporation",
@@ -80,9 +86,11 @@ const generatePlaceholderData = (): ResumeData => ({
       startDate: "Feb 2025",
       endDate: "Present",
       description: [
-        "Managed release lifecycles and CI/CD coordination for an 11-member engineering squad on the AMP Services Product in Azure.",
-        "Primary Incident Commander for production outages, reducing MTTR significantly.",
-        "Orchestrated GCP cloud infrastructure (GKE, Compute Engine) and optimised Jenkins/Helm/Ansible pipelines.",
+        "Release Train Engineer (RTE): Managed release lifecycles and cross-functional CI/CD coordination for the AMP Services Product on Azure, aligning delivery timelines and mitigating operational risks.",
+        "Scrum Master: Facilitated agile ceremonies and cleared blockers for an 11-member engineering squad, driving sprint predictability and process optimization.",
+        "Incident Response & Release Lead: Functioned as primary Incident Commander for mission-critical production outages, architecting coordination strategies between Dev and Ops teams to significantly reduce Mean Time to Resolution.",
+        "DevOps Orchestration: Spearheaded infrastructure provisioning and environment setup using GCP (GKE, Compute Engine), utilizing Jenkins, Helm, and Ansible to maintain high availability and deployment velocity.",
+        "Infrastructure Optimization: Conducted self-initiated legacy upgrades and continuous drift detection, successfully maintaining zero configuration drift across multi-cloud environments.",
       ],
     },
     {
@@ -91,9 +99,9 @@ const generatePlaceholderData = (): ResumeData => ({
       startDate: "May 2023",
       endDate: "Feb 2025",
       description: [
-        "Achieved 34.56% reduction in GCP infrastructure costs through rightsizing and auto-scaling.",
-        "Reduced database-related production incidents by 24% via Terraform/Ansible automation.",
-        "Deployed \"Authentic Switch\" across multiple GCP environments using Terraform.",
+        "FinOps & Cost Optimization: Developed automated scripts and engineered resource allocation strategies on GCP, delivering a 34.56% reduction in cloud infrastructure costs via precision instance rightsizing and auto-scaling.",
+        "Database Reliability: Architected automated database maintenance blueprints and failover strategies utilizing Terraform and Ansible, decreasing database-related production incidents by 24%.",
+        "Infrastructure as Code (IaC): Orchestrated environment deployment for the Authentic Switch application across production and staging GCP environments using Terraform, establishing fully reproducible, scalable infrastructure.",
       ],
     },
     {
@@ -102,16 +110,52 @@ const generatePlaceholderData = (): ResumeData => ({
       startDate: "Jan 2023",
       endDate: "Apr 2023",
       description: [
-        "Automated Jenkins-based deployment pipelines for the Domino's App (Jubilant Foods).",
-        "Managed Linux VMs and provisioned AWS testing environments.",
+        "CI/CD Automation: Automated Jenkins-based deployment pipelines for the flagship Domino’s App (Jubilant Foods), radically minimizing manual interventions and reducing deployment cycle times.",
+        "Cloud Provisioning: Managed Linux virtual environments and leveraged AWS core services to dynamically provision scalable staging environments for cross-functional development teams.",
       ],
     },
   ],
-  education: [
-    { institution: "National Institute of Technology, Bhopal", degree: "Master of Computer Applications (MCA)", startDate: "", endDate: "" },
-    { institution: "Prestige Institute of Management and Research, Indore", degree: "Bachelor of Computer Applications (BCA)", startDate: "", endDate: "" },
+  projects: [
+    {
+      name: "Velocity",
+      description: "Developed a high-performance network diagnostic and credit monitoring tool hosted on Netlify, focusing on low-latency network telemetry and automated diagnostic reporting.",
+    },
+    {
+      name: "Promptly",
+      description: "Architected a privacy-focused, AI-driven resume builder application, implementing local model optimizations to securely generate tailored professional profiles without external data leaks.",
+    },
   ],
-  skills: ["GCP", "AWS", "Azure", "Kubernetes", "Docker", "Terraform", "Ansible", "Jenkins", "Helm", "GitHub Actions", "Prometheus", "Grafana", "Python", "Bash", "Scrum (CSM)", "JIRA", "CI/CD", "IaC"],
+  education: [
+    { institution: "National Institute of Technology (NIT), Bhopal", degree: "Master of Computer Applications (MCA)", startDate: "", endDate: "2023" },
+    { institution: "Prestige Institute of Management and Research, Indore", degree: "Bachelor of Computer Applications (BCA)", startDate: "", endDate: "2020" },
+  ],
+  skills: [
+    "GCP (Compute Engine, GKE, Cloud SQL, IAM, VPC)",
+    "AWS",
+    "Azure",
+    "Terraform",
+    "Ansible",
+    "Docker",
+    "Kubernetes (GKE)",
+    "Helm",
+    "Jenkins",
+    "GitHub Actions",
+    "Java",
+    "Python",
+    "Groovy",
+    "Bash",
+    "Linux Shell",
+    "SQL",
+    "Prometheus",
+    "Grafana",
+    "System Design",
+    "Agile/Scrum",
+    "Git",
+    "JIRA",
+    "Maven",
+    "English",
+    "Hindi"
+  ],
 });
 
 function HomeContent() {

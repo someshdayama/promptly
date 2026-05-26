@@ -18,6 +18,7 @@ export default function AutoFitWrapper({ children, contentDependencies }: AutoFi
   const contentRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [virtualWidth, setVirtualWidth] = useState("100%");
+  const [canvasHeight, setCanvasHeight] = useState("297mm");
 
   useEffect(() => {
     const calculateScale = () => {
@@ -27,37 +28,45 @@ export default function AutoFitWrapper({ children, contentDependencies }: AutoFi
       contentRef.current.style.transform = `scale(1)`;
       contentRef.current.style.width = `100%`;
       
-      const targetHeight = containerRef.current.clientHeight;
+      const canvasWidth = containerRef.current.clientWidth;
+      const targetHeight = (canvasWidth / 210) * 297; // Exact A4 height in px based on container width
+      
+      // Temporarily remove height constraints to measure true unconstrained height
+      contentRef.current.style.minHeight = 'auto';
+      containerRef.current.style.height = 'auto';
+      
       let contentHeight = contentRef.current.scrollHeight;
+      
+      // Reset DOM overrides so React state styles can take over
+      contentRef.current.style.minHeight = '';
+      containerRef.current.style.height = '';
 
-      // If content is too long -> Scale DOWN
-      if (contentHeight > targetHeight) {
+      if (contentHeight >= targetHeight * 0.85 && contentHeight <= targetHeight * 1.15) {
+        // Close to A4: scale to fit exactly 1 page
         let s = targetHeight / contentHeight;
         
         // Iteratively find perfect virtual aspect ratio (2 passes is usually enough)
-        for(let i=0; i<2; i++) {
+        for (let i = 0; i < 2; i++) {
           contentRef.current.style.width = `${(1 / s) * 100}%`;
           contentHeight = contentRef.current.scrollHeight;
           const virtualTargetHeight = targetHeight / s;
-          s = s * (virtualTargetHeight / contentHeight); 
+          s = s * (virtualTargetHeight / contentHeight);
         }
         
         const finalScale = Math.max(s * 0.98, 0.4); // 2% safety margin
         setScale(finalScale);
         setVirtualWidth(`${(1 / finalScale) * 100}%`);
-      } 
-      // If content is too short -> Scale UP to fill the page (max 1.25x to avoid looking "blown up")
-      else if (contentHeight < targetHeight * 0.9) {
-        let s = targetHeight / contentHeight;
-        const cappedScale = Math.min(s * 0.95, 1.25); // Cap at 1.25x
-        
-        setScale(cappedScale);
-        setVirtualWidth(`${(1 / cappedScale) * 100}%`);
-      }
-      // Otherwise, stay at 1x
-      else {
+        setCanvasHeight(`${targetHeight}px`);
+      } else if (contentHeight < targetHeight * 0.85) {
+        // Short content: keep 1.0 scale, shrink page height to fit content
         setScale(1);
         setVirtualWidth("100%");
+        setCanvasHeight(`${contentHeight + 20}px`);
+      } else {
+        // Tall content: keep 1.0 scale to maintain legibility, let page grow tall
+        setScale(1);
+        setVirtualWidth("100%");
+        setCanvasHeight(`${contentHeight + 20}px`);
       }
     };
 
@@ -76,7 +85,11 @@ export default function AutoFitWrapper({ children, contentDependencies }: AutoFi
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.canvas} ref={containerRef}>
+      <div 
+        className={styles.canvas} 
+        ref={containerRef}
+        style={{ "--canvas-height": canvasHeight } as React.CSSProperties}
+      >
         <div 
           className={styles.scaler} 
           ref={contentRef}

@@ -64,6 +64,24 @@ export default function StartupTemplate({ data }: StartupTemplateProps) {
               </div>
             </section>
           )}
+
+          {data.projects && data.projects.length > 0 && (
+            <section className={styles.section} style={{ marginTop: '1.5rem' }}>
+              <h2 className={styles.sectionTitle}>
+                <span className={styles.slash}>/</span> Projects
+              </h2>
+              <div className={styles.experienceList}>
+                {data.projects.map((proj, index) => (
+                  <div key={index} className={styles.job}>
+                    <div className={styles.jobHeader}>
+                      <h3 className={styles.jobTitle}>{proj.name}</h3>
+                    </div>
+                    <p className={styles.summary} style={{ marginTop: '0.25rem', fontSize: '0.8rem', color: '#475569', lineHeight: '1.5' }}>{proj.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
 
         {/* Right Column: Skills & Edu */}

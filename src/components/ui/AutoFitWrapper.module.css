@@ -9,9 +9,9 @@
 /* The actual white A4 canvas */
 .canvas {
   width: 210mm;
-  height: 297mm;
+  height: var(--canvas-height, 297mm);
   position: relative;
-  overflow: hidden; /* Ensure nothing goes past 1 page */
+  overflow: hidden; /* Ensure nothing goes past on screen */
   background: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -45,13 +45,9 @@
   .canvas {
     box-shadow: none;
     margin: 0;
-    /* Strict 1 page size for PDF engine */
     width: 210mm;
-    height: 297mm;
-    page-break-after: avoid;
-    page-break-before: avoid;
-    page-break-inside: avoid;
-    overflow: hidden !important;
+    height: var(--canvas-height, auto) !important;
+    overflow: visible !important;
   }
   
   .scaler {

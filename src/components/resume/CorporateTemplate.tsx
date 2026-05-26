@@ -8,7 +8,7 @@ interface CorporateTemplateProps {
 }
 
 export default function CorporateTemplate({ data }: CorporateTemplateProps) {
-  const { personalInfo, summary, experience, education, skills } = data;
+  const { personalInfo, summary, experience, projects, education, skills } = data;
 
   return (
     <div className={styles.page}>
@@ -53,6 +53,21 @@ export default function CorporateTemplate({ data }: CorporateTemplateProps) {
                   ))}
                 </ul>
               )}
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* Projects */}
+      {projects && projects.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Key Projects</h2>
+          {projects.map((proj, index) => (
+            <div key={index} className={styles.job}>
+              <div className={styles.jobHeader}>
+                <h3 className={styles.jobTitle}>{proj.name}</h3>
+              </div>
+              <p className={styles.summary} style={{ marginTop: '0.2rem' }}>{proj.description}</p>
             </div>
           ))}
         </section>

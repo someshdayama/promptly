@@ -16,6 +16,10 @@ export interface ResumeData {
     endDate: string;
     description: string[];
   }[];
+  projects?: {
+    name: string;
+    description: string;
+  }[];
   education: {
     institution: string;
     degree: string;
