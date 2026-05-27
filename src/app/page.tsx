@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, ComponentType, Suspense } from "react";
+import { useState, useRef, useEffect, useCallback, ComponentType, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useReactToPrint } from "react-to-print";
 import { Download, Sparkles } from "lucide-react";
@@ -53,10 +53,14 @@ const SOMESH_BASE_PROMPT = buildBasePromptFromProfile(SOMESH_PROFILE);
 
 const generatePlaceholderData = (): ResumeData => SOMESH_PROFILE;
 
+// A4 dimensions in mm
+const A4_WIDTH_MM = 210;
+const A4_HEIGHT_MM = 297;
+
 function HomeContent() {
   const searchParams = useSearchParams();
   const [resumeData, setResumeData] = useState<ResumeData>(generatePlaceholderData());
-  const [template, setTemplate] = useState("corporate");
+  const [template, setTemplate] = useState("minimalist");
   const [isGenerating, setIsGenerating] = useState(false);
   const [formatOptions, setFormatOptions] = useState<FormatOptions>({
     accentColor: "",
@@ -66,11 +70,40 @@ function HomeContent() {
   });
   const [jobBanner, setJobBanner] = useState<{ title: string; company: string } | null>(null);
 
-  const resumeRef = useRef<HTMLDivElement>(null);
+  // Tracks zoom from AutoFitWrapper + fitToSinglePage to build the print pageStyle
+  const printZoomRef = useRef<number>(1);
+
+  const buildPrintStyle = useCallback((zoom: number, fitToPage: boolean) => {
+    const effectiveZoom = fitToPage ? zoom : 1;
+    return (
+      `@page { size: ${A4_WIDTH_MM}mm ${A4_HEIGHT_MM}mm; margin: 0; }` +
+      `html, body { margin: 0; padding: 0; background: white;` +
+      `-webkit-print-color-adjust: exact; print-color-adjust: exact; }` +
+      `body { zoom: ${effectiveZoom}; width: ${A4_WIDTH_MM}mm; }`
+    );
+  }, []);
+
+  const [printPageStyle, setPrintPageStyle] = useState<string>(
+    () => buildPrintStyle(1, true)
+  );
+
+  const handleZoomChange = useCallback((zoom: number) => {
+    printZoomRef.current = zoom;
+    setPrintPageStyle(buildPrintStyle(zoom, formatOptions.fitToSinglePage));
+  }, [formatOptions.fitToSinglePage, buildPrintStyle]);
+
+  // Re-compute pageStyle when fitToSinglePage toggle changes
+  useEffect(() => {
+    setPrintPageStyle(buildPrintStyle(printZoomRef.current, formatOptions.fitToSinglePage));
+  }, [formatOptions.fitToSinglePage, buildPrintStyle]);
+
+  // Hidden print target — renders template at natural A4 width, no zoom wrapper
+  const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
-    contentRef: resumeRef,
+    contentRef: printRef,
     documentTitle: `${resumeData.personalInfo?.fullName || "Resume"}_CV`,
+    pageStyle: printPageStyle,
   });
 
   // Auto-generate when Career Radar deep-links with job params
@@ -209,10 +242,12 @@ Please tailor my resume summary and skill highlights to this specific role while
         {/* Right Side: Preview & Export Area */}
         <section className={styles.previewPanel}>
           <div className={styles.resumeWrapper}>
-            <div ref={resumeRef} style={resumeStyle}>
+            {/* Screen preview — uses zoom for visual scaling */}
+            <div style={resumeStyle}>
               <AutoFitWrapper
                 contentDependencies={[resumeData, template, isGenerating, formatOptions]}
                 fitToSinglePage={formatOptions.fitToSinglePage}
+                onZoomChange={handleZoomChange}
               >
                 {isGenerating ? (
                   <ResumeSkeleton />
@@ -220,6 +255,28 @@ Please tailor my resume summary and skill highlights to this specific role while
                   <TemplateComponent data={resumeData} />
                 )}
               </AutoFitWrapper>
+            </div>
+
+            {/*
+              Hidden print target wrapper — rendered offscreen so layout computes correctly
+              (unlike display:none which skips layout), but not visible to the user.
+              The printRef itself has NO hiding styles — react-to-print copies it to an
+              iframe and anything on printRef.current would carry over (causing blank pages).
+            */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "fixed",
+                top: "-9999px",
+                left: "-9999px",
+                width: `${A4_WIDTH_MM}mm`,
+                overflow: "visible",
+                pointerEvents: "none",
+              }}
+            >
+              <div ref={printRef} style={resumeStyle}>
+                <TemplateComponent data={resumeData} />
+              </div>
             </div>
           </div>
         </section>

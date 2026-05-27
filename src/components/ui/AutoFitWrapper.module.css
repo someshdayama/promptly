@@ -1,58 +1,47 @@
 .wrapper {
-  /* No fixed w/h here, let it fill the parent Flex container naturally */
   display: flex;
   justify-content: center;
   align-items: flex-start;
   width: 100%;
 }
 
-/* The actual white A4 canvas */
+/* A4 canvas shell — clips overflow on screen, presents the A4 white page */
 .canvas {
   width: 210mm;
   height: var(--canvas-height, 297mm);
   position: relative;
-  overflow: hidden; /* Ensure nothing goes past on screen */
+  overflow: hidden;
   background: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+  /* Smooth height transitions when toggling fit-to-page */
+  transition: height 0.25s ease;
 }
 
+/* zoom applied inline by JS */
 .scaler {
   width: 100%;
-  min-height: 100%; 
-  transform-origin: top left;
-  /* Smooth scale transition so it doesn't snap jarringly */
-  transition: transform 0.2s ease-out;
-  /* Smooth template swap fade */
-  animation: fadeIn 0.4s ease-out;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(var(--current-scale, 1));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(var(--current-scale, 1));
-  }
-}
-
+/* ─────────────────────────────────────────────
+   PRINT / PDF
+   
+   The AutoFitWrapper canvas is NOT what gets printed — we use a separate
+   hidden printRef div in page.tsx. These rules are just a safety net to
+   prevent the canvas element from appearing if it ever ends up in the
+   print context.
+───────────────────────────────────────────── */
 @media print {
-  .wrapper {
-    display: block;
-  }
-  
-  .canvas {
-    box-shadow: none;
+  @page {
+    size: A4 portrait;
     margin: 0;
-    width: 210mm;
-    height: var(--canvas-height, auto) !important;
-    overflow: visible !important;
   }
-  
-  .scaler {
-    /* Keep scaling intact during print */
-    width: 210mm;
-    box-shadow: none !important;
+
+  .wrapper {
+    display: none !important;
+  }
+
+  .canvas {
+    display: none !important;
   }
 }

@@ -102,6 +102,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  position: relative;
 }
 
 /* ── Tablet (≤ 1024px) ── */
@@ -173,35 +174,40 @@
 
 /* ── Print ── */
 @media print {
-  .appHeader, .editorPanel {
+  /* Hide all UI chrome */
+  .appHeader,
+  .editorPanel {
     display: none !important;
   }
 
-  .previewPanel {
-    background-color: white !important;
-    overflow: visible !important;
-    display: block !important;
-  }
-
-  .container, .main {
-    height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
-    display: block !important;
-  }
-
+  /* Unclip and flatten all layout wrappers */
+  .container,
+  .main,
+  .previewPanel,
   .resumeWrapper {
-    overflow: visible !important;
-    padding: 0 !important;
+    all: initial !important;
     display: block !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
+  /* Full-fidelity colour output (backgrounds, sidebar colours, etc.) */
   :global(*) {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  :global(html), :global(body) {
-    background-color: white !important;
+  :global(html),
+  :global(body) {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 }
+
