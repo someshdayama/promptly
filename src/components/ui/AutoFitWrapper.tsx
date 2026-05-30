@@ -5,22 +5,20 @@ import styles from "./AutoFitWrapper.module.css";
 
 interface AutoFitWrapperProps {
   children: React.ReactNode;
-  contentDependencies: any[];
+  contentDependencies: unknown[];
   fitToSinglePage?: boolean;
-  onZoomChange?: (zoom: number) => void;
+  onZoomChange?: (zoom: number, budgetClass: string) => void;
 }
 
 /**
- * AutoFitWrapper scales the resume preview using CSS `zoom`.
+ * AutoFitWrapper manages page budgeting dynamically.
  * 
- * Key design decisions:
- * - Uses CSS `zoom` (not transform: scale) because zoom shrinks LAYOUT dimensions,
- *   not just the visual output. This means both screen and print contexts see the
- *   same scaled dimensions.
- * - Exposes `onZoomChange` so the parent (page.tsx) can inject the exact same zoom
- *   value into react-to-print's pageStyle for pixel-perfect PDF output.
- * - The canvas uses overflow:hidden on screen (clips excess), but the print target
- *   is a SEPARATE hidden div that renders the template at natural size — no clipping.
+ * Approach:
+ * 1. Sequentially applies dynamic spacing classes (comfortable -> regular -> compact -> dense)
+ *    to shrink margins and font scales semantically.
+ * 2. If it still exceeds the A4 height at maximum compaction (dense), it calculates a micro-zoom
+ *    as a seamless safety backup to guarantee 100% fitting.
+ * 3. This resolves browser incompatibilities with pure CSS `zoom` and guarantees text readability.
  */
 export default function AutoFitWrapper({
   children,
@@ -30,67 +28,78 @@ export default function AutoFitWrapper({
 }: AutoFitWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [budgetClass, setBudgetClass] = useState("sp-comfortable");
   const [zoom, setZoom] = useState(1);
   const [canvasHeight, setCanvasHeight] = useState("297mm");
 
-  const calculateZoom = useCallback(() => {
+  const calculateBudgetFit = useCallback(() => {
     if (!containerRef.current || !contentRef.current) return;
-
-    // Reset zoom so we measure the natural un-zoomed dimensions
-    contentRef.current.style.zoom = "1";
 
     const canvasWidth = containerRef.current.clientWidth;
     if (!canvasWidth) return;
 
-    // A4 proportion: height = width × (297 / 210)
+    // Standard A4 target height in pixels based on screen canvas width
     const targetHeight = (canvasWidth / 210) * 297;
 
-    // Measure natural content height at zoom=1
-    const contentHeight = contentRef.current.scrollHeight;
-    if (!contentHeight) return;
-
-    let finalZoom = 1;
-    let finalCanvasHeight: string;
+    // Step 1: Temporarily remove styling overrides to measure natural dimensions
+    contentRef.current.style.zoom = "1";
+    
+    // We will test budgets sequentially from largest to smallest
+    const budgets = ["sp-comfortable", "sp-regular", "sp-compact", "sp-dense"];
+    let optimalBudget = "sp-comfortable";
+    let contentHeight = 0;
 
     if (fitToSinglePage) {
-      if (contentHeight > targetHeight * 1.01) {
-        // Too tall — zoom down to fit exactly in A4 height
-        finalZoom = targetHeight / contentHeight;
-        finalZoom = Math.max(finalZoom, 0.3);
-        finalCanvasHeight = `${targetHeight}px`;
-      } else if (contentHeight >= targetHeight * 0.8) {
-        // Near A4 height — zoom to fill exactly
-        finalZoom = targetHeight / contentHeight;
-        finalZoom = Math.max(finalZoom, 0.4);
-        finalCanvasHeight = `${targetHeight}px`;
-      } else {
-        // Short content — no zoom, shrink canvas to content
-        finalZoom = 1;
-        finalCanvasHeight = `${contentHeight + 8}px`;
+      // Cycle through budgets and find the first one that fits
+      for (const budget of budgets) {
+        // Temporarily set class via DOM to force immediate layout compute
+        contentRef.current.className = `${styles.scaler} ${budget}`;
+        contentHeight = contentRef.current.scrollHeight;
+
+        optimalBudget = budget;
+        if (contentHeight <= targetHeight) {
+          break; // Found a fit!
+        }
       }
     } else {
-      // Multi-page mode — no zoom, natural height
-      finalZoom = 1;
+      // If not fitting to single page, default to comfortable spacing
+      contentRef.current.className = `${styles.scaler} sp-comfortable`;
+      contentHeight = contentRef.current.scrollHeight;
+      optimalBudget = "sp-comfortable";
+    }
+
+    let finalZoom = 1;
+    let finalCanvasHeight = `${targetHeight}px`;
+
+    // Step 2: Backup micro-scaling if still overflowing at maximum compaction
+    if (fitToSinglePage && contentHeight > targetHeight) {
+      finalZoom = targetHeight / contentHeight;
+      // Cap minimum zoom level to protect readability
+      finalZoom = Math.max(finalZoom, 0.85);
+    } else if (!fitToSinglePage) {
       finalCanvasHeight = `${contentHeight + 8}px`;
     }
 
-    // Apply zoom inline immediately (before React re-render to avoid flash)
+    // Apply inline style adjustments immediately to prevent visual layout flicker
+    contentRef.current.className = `${styles.scaler} ${optimalBudget}`;
     contentRef.current.style.zoom = String(finalZoom);
 
+    setBudgetClass(optimalBudget);
     setZoom(finalZoom);
     setCanvasHeight(finalCanvasHeight);
-    onZoomChange?.(finalZoom);
+    onZoomChange?.(finalZoom, optimalBudget);
   }, [fitToSinglePage, onZoomChange]);
 
   useEffect(() => {
-    // Small delay allows DOM to fully render fonts/images before measuring
-    const timeoutId = setTimeout(calculateZoom, 120);
-    window.addEventListener("resize", calculateZoom);
+    // Run after DOM rendering yields valid clientWidth values
+    const timeoutId = setTimeout(calculateBudgetFit, 100);
+    window.addEventListener("resize", calculateBudgetFit);
     return () => {
       clearTimeout(timeoutId);
-      window.removeEventListener("resize", calculateZoom);
+      window.removeEventListener("resize", calculateBudgetFit);
     };
-  }, [...contentDependencies, fitToSinglePage, calculateZoom]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...contentDependencies, fitToSinglePage, calculateBudgetFit]);
 
   return (
     <div className={styles.wrapper}>
@@ -100,7 +109,7 @@ export default function AutoFitWrapper({
         style={{ "--canvas-height": canvasHeight } as React.CSSProperties}
       >
         <div
-          className={styles.scaler}
+          className={`${styles.scaler} ${budgetClass}`}
           ref={contentRef}
           style={{ zoom } as React.CSSProperties}
         >

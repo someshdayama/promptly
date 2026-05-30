@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, Loader2 } from "lucide-react";
 import styles from "./PromptInput.module.css";
 import { ResumeData } from "@/types/resume";
@@ -11,10 +11,30 @@ interface PromptInputProps {
   jobContext?: { title: string; company: string };
 }
 
+import { SOMESH_PROFILE } from "@/data/someshProfile";
+import { serializeProfileToPrompt } from "@/utils/promptSerializer";
+
+const DEFAULT_PROFILE_TEXT = serializeProfileToPrompt(SOMESH_PROFILE);
+
+const STORAGE_KEY = "promptly_saved_prompt";
+
 export default function PromptInput({ onDataGenerated, onLoading, jobContext }: PromptInputProps) {
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Load saved prompt on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      setPrompt(saved);
+    }
+  }, []);
+
+  const handlePromptChange = (val: string) => {
+    setPrompt(val);
+    localStorage.setItem(STORAGE_KEY, val);
+  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -40,8 +60,9 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext }: 
       }
 
       onDataGenerated(json.data);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setError(error.message || "An unexpected error occurred.");
     } finally {
       setIsLoading(false);
       onLoading?.(false);
@@ -49,36 +70,12 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext }: 
   };
 
   const handleClear = () => {
-    setPrompt("");
+    handlePromptChange("");
     setError("");
   };
 
   const handleInsertExample = () => {
-    setPrompt(`My name is Somesh Dayama. I am based in Mumbai, India. Phone: 7049614849. Email: someshdayama2@gmail.com.
-
-I am a Software Engineer with over 3 years of experience in DevOps, Cloud Infrastructure, and SRE roles.
-
-SKILLS:
-- Cloud Platforms: GCP (Compute Engine, GKE, Cloud SQL, IAM, VPC), AWS, Azure
-- DevOps Tools: Jenkins, Docker, Kubernetes, Terraform, Ansible, Helm, GitHub Actions
-- Programming & Scripting: Java, Python, SQL, Groovy, Bash, Linux Shell
-- Monitoring & CI/CD: Prometheus, Grafana, CI/CD Pipelines, Maven, Git
-- Agile & Project Management: Scrum (CSM certified), Agile Methodologies, JIRA
-
-WORK EXPERIENCE:
-
-NCR Atleos Corporation | Mumbai, India — DevOps Engineer / Release Lead — Feb 2025 to Present
-- Managed release lifecycles and CI/CD coordination for an 11-member engineering squad on the AMP Services Product in Azure.
-- Primary Incident Commander for production outages, coordinating Dev and Ops teams to significantly reduce Mean Time to Resolution.
-- Orchestrated end-to-end cloud infrastructure using GCP (GKE, Compute Engine).
-
-Monocept Consulting Pvt. Ltd. | Hyderabad — Software Engineer / Cloud & SRE — May 2023 to Feb 2025
-- FinOps/Cost Optimisation: Achieved a 34.56% reduction in GCP cloud infrastructure costs.
-- Database Reliability: Reduced database-related production incidents by 24% using automated maintenance.
-
-EDUCATION:
-Master of Computer Applications (MCA) — National Institute of Technology, Bhopal - 2020 to 2023
-Bachelor of Computer Applications (BCA) — Prestige Institute of Management and Research, Indore - 2017 to 2020`);
+    handlePromptChange(DEFAULT_PROFILE_TEXT);
     setError("");
   };
 
@@ -91,7 +88,7 @@ Bachelor of Computer Applications (BCA) — Prestige Institute of Management and
           <button className={styles.helperButton} onClick={handleInsertExample} disabled={isLoading}>Example</button>
         </div>
       </div>
-      
+
       <p className={styles.subtitle}>
         Dump your work history, education, skills, and contact info below. Our AI will instantly format it into a professional resume.
       </p>
@@ -100,7 +97,7 @@ Bachelor of Computer Applications (BCA) — Prestige Institute of Management and
         className={styles.textarea}
         placeholder="e.g. My name is John Doe. I've worked as a Software Engineer at Acme Corp since Jan 2020 where I migrated the database to PostgreSQL and increased performance by 40%. Before that, I was at..."
         value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
+        onChange={(e) => handlePromptChange(e.target.value)}
       />
 
       {error && <p className={styles.error}>{error}</p>}

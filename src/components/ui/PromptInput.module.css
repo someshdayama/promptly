@@ -27,21 +27,22 @@
 }
 
 .helperButton {
-  background: transparent;
-  border: 1px solid var(--surface-border);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-muted);
   font-size: 0.75rem;
-  padding: 0.25rem 0.75rem;
+  padding: 0.35rem 0.85rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
 }
 
 .helperButton:hover:not(:disabled) {
-  background-color: var(--background);
+  background-color: rgba(255, 255, 255, 0.08);
   color: var(--foreground);
-  border-color: var(--primary-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 }
 
 .subtitle {
@@ -54,24 +55,26 @@
   flex: 1;
   min-height: 240px;
   padding: 1rem;
-  background-color: var(--background);
+  background-color: rgba(20, 20, 25, 0.5);
   color: var(--foreground);
-  border: 1px solid var(--surface-border);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-md);
   resize: vertical;
   font-size: 0.9rem;
-  line-height: 1.6;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  line-height: 1.65;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .textarea:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: rgba(99, 102, 241, 0.6);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.6), 0 0 25px rgba(99, 102, 241, 0.15), inset 0 2px 8px rgba(0, 0, 0, 0.4);
+  background-color: rgba(20, 20, 25, 0.7);
 }
 
 .textarea::placeholder {
-  color: rgba(161, 161, 170, 0.5);
+  color: rgba(148, 163, 184, 0.4);
 }
 
 .error {
@@ -85,24 +88,29 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0.85rem 1.5rem;
   background: var(--gradient-brand);
+  background-size: 200% auto;
+  background-position: left center;
   color: #ffffff;
   border-radius: var(--radius-md);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.95rem;
-  transition: all 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: none;
+  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.25);
 }
 
 .button:hover:not(:disabled) {
-  transform: translateY(-1px);
+  background-position: right center;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 24px rgba(217, 70, 239, 0.45);
   filter: brightness(1.1);
 }
 
 .button:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -142,3 +150,46 @@
     font-size: 0.875rem;
   }
 }
+
+.focusContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.focusLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.focusButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.focusBtn {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.focusBtn:hover {
+  background-color: var(--background);
+  color: var(--foreground);
+  border-color: var(--primary-hover);
+}
+
