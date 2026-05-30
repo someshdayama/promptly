@@ -1,0 +1,202 @@
+/* ── Strict ATS Optimized Template ──
+   Legacy-parser friendly, single column, strict serif typography.
+   No icons, no columns, standard bullet points.
+*/
+
+.page {
+  /* Default fallbacks */
+  --page-padding: 24px 48px;
+  --section-gap: 0.8rem;
+  --item-list-gap: 0.6rem;
+  --text-base-size: 0.85rem;
+  --text-title-size: 0.95rem;
+  --name-size: 2.2rem;
+  
+  width: 100%;
+  padding: var(--page-padding);
+  margin: 0 auto;
+  background-color: white;
+  color: black;
+  font-family: 'Times New Roman', Times, serif;
+  box-sizing: border-box;
+  line-height: 1.4;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Global Spacing variables applied dynamically by the wrapper */
+.page:global(.sp-comfortable) {
+  --page-padding: 24px 48px;
+  --section-gap: 0.8rem;
+  --item-list-gap: 0.6rem;
+  --text-base-size: 0.85rem;
+  --text-title-size: 0.95rem;
+  --name-size: 2.2rem;
+}
+
+.page:global(.sp-regular) {
+  --page-padding: 20px 42px;
+  --section-gap: 0.7rem;
+  --item-list-gap: 0.5rem;
+  --text-base-size: 0.82rem;
+  --text-title-size: 0.9rem;
+  --name-size: 2.0rem;
+}
+
+.page:global(.sp-compact) {
+  --page-padding: 16px 32px;
+  --section-gap: 0.6rem;
+  --item-list-gap: 0.4rem;
+  --text-base-size: 0.8rem;
+  --text-title-size: 0.86rem;
+  --name-size: 1.8rem;
+}
+
+.page:global(.sp-dense) {
+  --page-padding: 12px 24px;
+  --section-gap: 0.5rem;
+  --item-list-gap: 0.35rem;
+  --text-base-size: 0.76rem;
+  --text-title-size: 0.82rem;
+  --name-size: 1.6rem;
+}
+
+/* Base text */
+.text {
+  font-size: var(--text-base-size);
+  color: black;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Editable fields */
+.editable {
+  outline: none;
+  cursor: text;
+  border-radius: 2px;
+  transition: background-color 0.2s;
+}
+
+.editable:hover,
+.editable:focus {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: var(--section-gap);
+}
+
+.name {
+  font-size: var(--name-size);
+  font-weight: bold;
+  line-height: 1.1;
+  margin: 0 0 0.4rem 0;
+  text-transform: uppercase;
+}
+
+.contactInfo {
+  font-size: var(--text-base-size);
+}
+
+.contactSeparator {
+  margin: 0 0.5rem;
+  color: #666;
+}
+
+/* Sections */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: var(--section-gap);
+}
+
+.sectionTitle {
+  font-size: var(--text-title-size);
+  font-weight: bold;
+  text-transform: uppercase;
+  color: black;
+  margin: 0;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid black;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.summary {
+  font-size: var(--text-base-size);
+  line-height: 1.5;
+  text-align: justify;
+}
+
+/* Skills */
+.skillsList {
+  font-size: var(--text-base-size);
+  line-height: 1.5;
+}
+
+/* Item Lists (Experience, Education) */
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--item-list-gap);
+}
+
+.item {
+  page-break-inside: avoid;
+  break-inside: avoid;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.company {
+  font-size: var(--text-title-size);
+  font-weight: bold;
+}
+
+.location {
+  font-size: var(--text-base-size);
+}
+
+.positionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: var(--text-base-size);
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.position {
+  font-weight: bold;
+}
+
+.itemDate {
+  white-space: nowrap;
+}
+
+.bulletList {
+  margin: 0.1rem 0 0 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.bulletList li {
+  font-size: var(--text-base-size);
+  line-height: 1.4;
+  text-align: justify;
+  list-style-type: disc;
+}

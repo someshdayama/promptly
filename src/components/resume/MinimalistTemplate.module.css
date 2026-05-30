@@ -6,9 +6,9 @@
 .page {
   /* Default fallbacks */
   --page-padding: 36px 40px;
-  --section-gap: 1.2rem;
-  --item-list-gap: 0.8rem;
-  --header-gap: 1.2rem;
+  --section-gap: 1.0rem;
+  --item-list-gap: 0.6rem;
+  --header-gap: 0.8rem;
   --text-base-size: 0.84rem;
   --text-title-size: 0.94rem;
   --name-size: 2.4rem;
@@ -30,9 +30,9 @@
 /* Global Spacing variables applied dynamically by the wrapper */
 .page:global(.sp-comfortable) {
   --page-padding: 36px 40px;
-  --section-gap: 1.2rem;
-  --item-list-gap: 0.8rem;
-  --header-gap: 1.2rem;
+  --section-gap: 1.0rem;
+  --item-list-gap: 0.6rem;
+  --header-gap: 0.8rem;
   --text-base-size: 0.84rem;
   --text-title-size: 0.94rem;
   --name-size: 2.4rem;
@@ -40,9 +40,9 @@
 
 .page:global(.sp-regular) {
   --page-padding: 30px 36px;
-  --section-gap: 1.0rem;
-  --item-list-gap: 0.7rem;
-  --header-gap: 1.0rem;
+  --section-gap: 0.8rem;
+  --item-list-gap: 0.5rem;
+  --header-gap: 0.7rem;
   --text-base-size: 0.82rem;
   --text-title-size: 0.9rem;
   --name-size: 2.1rem;
@@ -50,9 +50,9 @@
 
 .page:global(.sp-compact) {
   --page-padding: 24px 32px;
-  --section-gap: 0.85rem;
-  --item-list-gap: 0.6rem;
-  --header-gap: 0.8rem;
+  --section-gap: 0.6rem;
+  --item-list-gap: 0.4rem;
+  --header-gap: 0.6rem;
   --text-base-size: 0.8rem;
   --text-title-size: 0.86rem;
   --name-size: 1.85rem;
@@ -60,9 +60,9 @@
 
 .page:global(.sp-dense) {
   --page-padding: 16px 24px;
-  --section-gap: 0.7rem;
-  --item-list-gap: 0.5rem;
-  --header-gap: 0.65rem;
+  --section-gap: 0.5rem;
+  --item-list-gap: 0.35rem;
+  --header-gap: 0.5rem;
   --text-base-size: 0.76rem;
   --text-title-size: 0.82rem;
   --name-size: 1.65rem;
@@ -96,7 +96,6 @@
   color: #0f172a;
   text-decoration: none;
   font-weight: 600;
-  border-bottom: 1px dashed #64748b;
 }
 
 .contact a:hover {

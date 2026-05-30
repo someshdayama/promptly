@@ -37,12 +37,14 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
         />
         <div className={styles.contact}>
           {data.personalInfo?.email && (
-            <span
-              contentEditable={isEditable}
-              suppressContentEditableWarning
-              onBlur={(e) => updatePersonalInfo("email", e.currentTarget.innerText)}
-              dangerouslySetInnerHTML={{ __html: data.personalInfo.email }}
-            />
+            <a href={`mailto:${data.personalInfo.email}`} style={{ color: "inherit", textDecoration: "none" }}>
+              <span
+                contentEditable={isEditable}
+                suppressContentEditableWarning
+                onBlur={(e) => updatePersonalInfo("email", e.currentTarget.innerText)}
+                dangerouslySetInnerHTML={{ __html: data.personalInfo.email }}
+              />
+            </a>
           )}
           {data.personalInfo?.phone && (
             <>

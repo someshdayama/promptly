@@ -20,6 +20,7 @@ const STORAGE_KEY = "promptly_saved_prompt";
 
 export default function PromptInput({ onDataGenerated, onLoading, jobContext }: PromptInputProps) {
   const [prompt, setPrompt] = useState("");
+  const [jobDesc, setJobDesc] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -47,10 +48,16 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext }: 
     setError("");
 
     try {
+      const finalPrompt = jobDesc.trim() 
+        ? `${prompt}\n\n--- TARGET JOB DESCRIPTION ---\n${jobDesc}\n\nPlease tailor my resume summary, skills, and bullet points to match the keywords and requirements in this job description.` 
+        : prompt;
+        
+      const contextToSend = jobContext || (jobDesc.trim() ? { title: "Target Role", company: "Target Company" } : undefined);
+
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, ...(jobContext ? { jobContext } : {}) }),
+        body: JSON.stringify({ prompt: finalPrompt, ...(contextToSend ? { jobContext: contextToSend } : {}) }),
       });
 
       const json = await res.json();
@@ -98,6 +105,17 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext }: 
         placeholder="e.g. My name is John Doe. I've worked as a Software Engineer at Acme Corp since Jan 2020 where I migrated the database to PostgreSQL and increased performance by 40%. Before that, I was at..."
         value={prompt}
         onChange={(e) => handlePromptChange(e.target.value)}
+      />
+
+      <h3 className={styles.subtitle} style={{ marginTop: '1.5rem', marginBottom: '0.5rem', fontWeight: 600 }}>
+        Optional: Target Job Description
+      </h3>
+      <textarea
+        className={styles.textarea}
+        style={{ minHeight: '100px' }}
+        placeholder="Paste the job description here. Our AI will analyze the keywords and tailor your resume specifically for this role..."
+        value={jobDesc}
+        onChange={(e) => setJobDesc(e.target.value)}
       />
 
       {error && <p className={styles.error}>{error}</p>}

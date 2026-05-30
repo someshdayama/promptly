@@ -11,6 +11,7 @@ import { SOMESH_PROFILE } from "@/data/someshProfile";
 import EditorPanel from "@/components/ui/EditorPanel";
 import MinimalistTemplate from "@/components/resume/MinimalistTemplate";
 import ModernTemplate from "@/components/resume/ModernTemplate";
+import AtsTemplate from "@/components/resume/AtsTemplate";
 import AutoFitWrapper from "@/components/ui/AutoFitWrapper";
 import ResumeSkeleton from "@/components/ui/ResumeSkeleton";
 
@@ -43,7 +44,7 @@ function HomeContent() {
   const [resumeData, setResumeData] = useState<ResumeData>(WELCOME_PROFILE);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeBudgetClass, setActiveBudgetClass] = useState("sp-comfortable");
-  const [activeTemplate, setActiveTemplate] = useState<"minimalist" | "modern">("minimalist");
+  const [activeTemplate, setActiveTemplate] = useState<"minimalist" | "modern" | "ats">("minimalist");
   const [jobBanner, setJobBanner] = useState<{ title: string; company: string } | null>(null);
 
   const handleZoomAndClassChange = useCallback((zoom: number, budgetClass: string) => {
@@ -122,6 +123,12 @@ Please tailor my resume summary and skill highlights to this specific role while
             >
               Modern
             </button>
+            <button
+              className={`${styles.switcherButton} ${activeTemplate === "ats" ? styles.active : ""}`}
+              onClick={() => setActiveTemplate("ats")}
+            >
+              ATS
+            </button>
           </div>
 
           {/* Job context banner — shown when launched from Career Radar */}
@@ -181,6 +188,8 @@ Please tailor my resume summary and skill highlights to this specific role while
                   <ResumeSkeleton />
                 ) : activeTemplate === "modern" ? (
                   <ModernTemplate data={resumeData} onChange={handleResumeDataChange} />
+                ) : activeTemplate === "ats" ? (
+                  <AtsTemplate data={resumeData} onChange={handleResumeDataChange} />
                 ) : (
                   <MinimalistTemplate data={resumeData} onChange={handleResumeDataChange} />
                 )}
@@ -206,6 +215,8 @@ Please tailor my resume summary and skill highlights to this specific role while
               >
                 {activeTemplate === "modern" ? (
                   <ModernTemplate data={resumeData} className={activeBudgetClass} />
+                ) : activeTemplate === "ats" ? (
+                  <AtsTemplate data={resumeData} className={activeBudgetClass} />
                 ) : (
                   <MinimalistTemplate data={resumeData} className={activeBudgetClass} />
                 )}

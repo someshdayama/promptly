@@ -46,13 +46,15 @@ export default function ModernTemplate({ data, className = "", onChange }: Moder
             {data.personalInfo?.email && (
               <div className={styles.contactItem}>
                 <span className={styles.contactLabel}>Email</span>
-                <span
-                  className={styles.contactValue}
-                  contentEditable={isEditable}
-                  suppressContentEditableWarning
-                  onBlur={(e) => updatePersonalInfo("email", e.currentTarget.innerText)}
-                  dangerouslySetInnerHTML={{ __html: data.personalInfo.email }}
-                />
+                <a href={`mailto:${data.personalInfo.email}`} style={{ color: "inherit", textDecoration: "none" }}>
+                  <span
+                    className={styles.contactValue}
+                    contentEditable={isEditable}
+                    suppressContentEditableWarning
+                    onBlur={(e) => updatePersonalInfo("email", e.currentTarget.innerText)}
+                    dangerouslySetInnerHTML={{ __html: data.personalInfo.email }}
+                  />
+                </a>
               </div>
             )}
             {data.personalInfo?.phone && (
@@ -83,6 +85,7 @@ export default function ModernTemplate({ data, className = "", onChange }: Moder
               <div className={styles.contactItem}>
                 <span className={styles.contactLabel}>LinkedIn</span>
                 <a
+                  href={data.personalInfo.linkedinUrl.startsWith("http") ? data.personalInfo.linkedinUrl : `https://${data.personalInfo.linkedinUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleLinkedinClick}
