@@ -66,7 +66,7 @@ function HomeContent() {
     pageStyle: `@page { size: ${A4_WIDTH_MM}mm ${A4_HEIGHT_MM}mm; margin: 0; } html, body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }`,
   });
 
-  // Auto-generate when Career Radar deep-links with job params
+  // Pre-fill job context when Career Radar deep-links with job params
   useEffect(() => {
     const jobTitle = searchParams.get("jobTitle");
     const company = searchParams.get("company");
@@ -77,30 +77,6 @@ function HomeContent() {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setJobBanner({ title: jobTitle, company });
-
-    const jobContext = { title: jobTitle, company, location: location || "India", description: description || "" };
-
-    const tailoredPrompt = `${SOMESH_BASE_PROMPT}
-
---- TARGET JOB ---
-I am applying for the role of ${jobTitle} at ${company} (${location || "India"}).
-${description ? `Role context: ${description}` : ""}
-
-Please tailor my resume summary and skill highlights to this specific role while keeping all information truthful and based only on my actual background above.`;
-
-    setIsGenerating(true);
-
-    fetch("/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: tailoredPrompt, jobContext }),
-    })
-      .then(res => res.json())
-      .then(json => {
-        if (json.data) setResumeData(json.data);
-      })
-      .catch(console.error)
-      .finally(() => setIsGenerating(false));
   }, [searchParams]); // Run when searchParams change
 
   return (
@@ -171,6 +147,7 @@ Please tailor my resume summary and skill highlights to this specific role while
             onDataChange={handleResumeDataChange}
             onLoading={setIsGenerating}
             jobContext={jobBanner ? { title: jobBanner.title, company: jobBanner.company } : undefined}
+            initialJobDesc={searchParams.get("description") || undefined}
           />
         </section>
 

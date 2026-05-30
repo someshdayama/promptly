@@ -9,6 +9,7 @@ interface PromptInputProps {
   onDataGenerated: (data: ResumeData) => void;
   onLoading?: (isLoading: boolean) => void;
   jobContext?: { title: string; company: string };
+  initialJobDesc?: string;
 }
 
 import { SOMESH_PROFILE } from "@/data/someshProfile";
@@ -18,9 +19,9 @@ const DEFAULT_PROFILE_TEXT = serializeProfileToPrompt(SOMESH_PROFILE);
 
 const STORAGE_KEY = "promptly_saved_prompt";
 
-export default function PromptInput({ onDataGenerated, onLoading, jobContext }: PromptInputProps) {
+export default function PromptInput({ onDataGenerated, onLoading, jobContext, initialJobDesc }: PromptInputProps) {
   const [prompt, setPrompt] = useState("");
-  const [jobDesc, setJobDesc] = useState("");
+  const [jobDesc, setJobDesc] = useState(initialJobDesc || "");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 

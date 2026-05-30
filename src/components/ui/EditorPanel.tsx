@@ -8,12 +8,14 @@ interface EditorPanelProps {
   onDataChange: (data: ResumeData) => void;
   onLoading?: (isLoading: boolean) => void;
   jobContext?: { title: string; company: string };
+  initialJobDesc?: string;
 }
 
 export default function EditorPanel({
   onDataChange,
   onLoading,
   jobContext,
+  initialJobDesc,
 }: EditorPanelProps) {
   const handleGeneratedData = (updatedData: ResumeData) => {
     onDataChange(updatedData);
@@ -26,6 +28,7 @@ export default function EditorPanel({
           onDataGenerated={handleGeneratedData}
           onLoading={onLoading}
           jobContext={jobContext}
+          initialJobDesc={initialJobDesc}
         />
       </div>
     </div>
