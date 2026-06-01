@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import MinimalistTemplate from "@/components/resume/MinimalistTemplate";
 import { ResumeData } from "@/types/resume";
 
@@ -38,7 +39,9 @@ describe("MinimalistTemplate Component", () => {
     expect(screen.getByText("john.doe@example.com")).toBeInTheDocument();
     expect(screen.getByText("123-456-7890")).toBeInTheDocument();
     expect(screen.getByText("San Francisco, CA")).toBeInTheDocument();
-    expect(screen.getByText("https://linkedin.com/in/johndoe")).toBeInTheDocument();
+    const linkedinLink = screen.getByRole("link", { name: /linkedin/i });
+    expect(linkedinLink).toBeInTheDocument();
+    expect(linkedinLink).toHaveAttribute("href", "https://linkedin.com/in/johndoe");
   });
 
   it("renders summary section when present", () => {
@@ -65,8 +68,6 @@ describe("MinimalistTemplate Component", () => {
   it("renders skill tags", () => {
     render(<MinimalistTemplate data={mockResumeData} />);
     expect(screen.getByText("Skills")).toBeInTheDocument();
-    expect(screen.getByText("React")).toBeInTheDocument();
-    expect(screen.getByText("Node.js")).toBeInTheDocument();
-    expect(screen.getByText("Docker")).toBeInTheDocument();
+    expect(screen.getByText("React • Node.js • Docker")).toBeInTheDocument();
   });
 });

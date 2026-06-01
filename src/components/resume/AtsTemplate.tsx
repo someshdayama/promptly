@@ -1,7 +1,10 @@
-import React, { Fragment } from "react";
+"use client";
+
+import React from "react";
 import styles from "./AtsTemplate.module.css";
 import { ResumeData } from "@/types/resume";
 import { useResumeEditor } from "@/hooks/useResumeEditor";
+import { sanitizeHtml } from "@/utils/sanitize";
 
 interface AtsTemplateProps {
   data: ResumeData;
@@ -16,7 +19,6 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
     updateJobField,
     updateJobBullet,
     updateEduField,
-    updateSkill,
   } = useResumeEditor(data, onChange);
 
   return (
@@ -27,10 +29,9 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
           className={`${styles.name} ${styles.editable}`}
           contentEditable={!!onChange}
           suppressContentEditableWarning
-          onBlur={(e) => updatePersonalInfo("fullName", e.currentTarget.textContent || "")}
-        >
-          {data.personalInfo?.fullName || "Your Name"}
-        </h1>
+          onBlur={(e) => updatePersonalInfo("fullName", e.currentTarget.innerText)}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo?.fullName || "Your Name") }}
+        />
 
         <div className={styles.contactInfo}>
           {data.personalInfo?.location && (
@@ -39,10 +40,9 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
                 className={styles.editable}
                 contentEditable={!!onChange}
                 suppressContentEditableWarning
-                onBlur={(e) => updatePersonalInfo("location", e.currentTarget.textContent || "")}
-              >
-                {data.personalInfo.location}
-              </span>
+                onBlur={(e) => updatePersonalInfo("location", e.currentTarget.innerText)}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.location) }}
+              />
               <span className={styles.contactSeparator}>|</span>
             </>
           )}
@@ -52,24 +52,28 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
                 className={styles.editable}
                 contentEditable={!!onChange}
                 suppressContentEditableWarning
-                onBlur={(e) => updatePersonalInfo("phone", e.currentTarget.textContent || "")}
-              >
-                {data.personalInfo.phone}
-              </span>
+                onBlur={(e) => updatePersonalInfo("phone", e.currentTarget.innerText)}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.phone) }}
+              />
               <span className={styles.contactSeparator}>|</span>
             </>
           )}
           {data.personalInfo?.email && (
             <>
-              <a href={`mailto:${data.personalInfo.email}`} style={{ color: "inherit", textDecoration: "none" }}>
+              <a
+                href={`mailto:${data.personalInfo.email}`}
+                onClick={(e) => {
+                  if (onChange) e.preventDefault();
+                }}
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
                 <span
                   className={styles.editable}
                   contentEditable={!!onChange}
                   suppressContentEditableWarning
-                  onBlur={(e) => updatePersonalInfo("email", e.currentTarget.textContent || "")}
-                >
-                  {data.personalInfo.email}
-                </span>
+                  onBlur={(e) => updatePersonalInfo("email", e.currentTarget.innerText)}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.email) }}
+                />
               </a>
             </>
           )}
@@ -80,16 +84,18 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
                 href={data.personalInfo.linkedinUrl.startsWith("http") ? data.personalInfo.linkedinUrl : `https://${data.personalInfo.linkedinUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (onChange) e.preventDefault();
+                }}
                 style={{ color: "inherit", textDecoration: "none" }}
               >
                 <span
                   className={styles.editable}
                   contentEditable={!!onChange}
                   suppressContentEditableWarning
-                  onBlur={(e) => updatePersonalInfo("linkedinUrl", e.currentTarget.textContent || "")}
-                >
-                  {data.personalInfo.linkedinUrl.replace("https://www.", "")}
-                </span>
+                  onBlur={(e) => updatePersonalInfo("linkedinUrl", e.currentTarget.innerText)}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.linkedinUrl.replace("https://www.", "")) }}
+                />
               </a>
             </>
           )}
@@ -104,10 +110,9 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
             className={`${styles.summary} ${styles.editable}`}
             contentEditable={!!onChange}
             suppressContentEditableWarning
-            onBlur={(e) => updateSummary(e.currentTarget.textContent || "")}
-          >
-            {data.summary}
-          </p>
+            onBlur={(e) => updateSummary(e.currentTarget.innerText)}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.summary) }}
+          />
         </div>
       )}
 
@@ -115,21 +120,23 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
       {data.skills && data.skills.length > 0 && (
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>Skills</h2>
-          <div className={styles.skillsList}>
-            {data.skills.map((skill, index) => (
-              <Fragment key={index}>
-                <span
-                  className={styles.editable}
-                  contentEditable={!!onChange}
-                  suppressContentEditableWarning
-                  onBlur={(e) => updateSkill(index, e.currentTarget.textContent || "")}
-                >
-                  {skill}
-                </span>
-                {index < data.skills!.length - 1 && <span>, </span>}
-              </Fragment>
-            ))}
-          </div>
+          <div
+            className={`${styles.skillsList} ${styles.editable}`}
+            contentEditable={!!onChange}
+            suppressContentEditableWarning
+            onBlur={(e) => {
+              const text = e.currentTarget.textContent || "";
+              const updatedSkills = text
+                .split(/[•,]/)
+                .map((s) => s.trim())
+                .filter((s) => s.length > 0);
+              onChange?.({
+                ...data,
+                skills: updatedSkills,
+              });
+            }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.skills.join(", ")) }}
+          />
         </div>
       )}
 
@@ -145,10 +152,9 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
                     className={`${styles.company} ${styles.editable}`}
                     contentEditable={!!onChange}
                     suppressContentEditableWarning
-                    onBlur={(e) => updateJobField(index, "company", e.currentTarget.textContent || "")}
-                  >
-                    {exp.company}
-                  </span>
+                    onBlur={(e) => updateJobField(index, "company", e.currentTarget.innerText)}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.company) }}
+                  />
                 </div>
                 
                 <div className={styles.positionHeader}>
@@ -156,28 +162,29 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
                     className={`${styles.position} ${styles.editable}`}
                     contentEditable={!!onChange}
                     suppressContentEditableWarning
-                    onBlur={(e) => updateJobField(index, "position", e.currentTarget.textContent || "")}
-                  >
-                    {exp.position}
-                  </span>
+                    onBlur={(e) => updateJobField(index, "position", e.currentTarget.innerText)}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.position) }}
+                  />
                   <span className={styles.itemDate}>
-                    <span
-                      className={styles.editable}
-                      contentEditable={!!onChange}
-                      suppressContentEditableWarning
-                      onBlur={(e) => updateJobField(index, "startDate", e.currentTarget.textContent || "")}
-                    >
-                      {exp.startDate}
-                    </span>{" "}
-                    -{" "}
-                    <span
-                      className={styles.editable}
-                      contentEditable={!!onChange}
-                      suppressContentEditableWarning
-                      onBlur={(e) => updateJobField(index, "endDate", e.currentTarget.textContent || "")}
-                    >
-                      {exp.endDate}
-                    </span>
+                    {exp.startDate && (
+                      <span
+                        className={styles.editable}
+                        contentEditable={!!onChange}
+                        suppressContentEditableWarning
+                        onBlur={(e) => updateJobField(index, "startDate", e.currentTarget.innerText)}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.startDate) }}
+                      />
+                    )}
+                    {exp.startDate && exp.endDate && <span> - </span>}
+                    {exp.endDate && (
+                      <span
+                        className={styles.editable}
+                        contentEditable={!!onChange}
+                        suppressContentEditableWarning
+                        onBlur={(e) => updateJobField(index, "endDate", e.currentTarget.innerText)}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.endDate) }}
+                      />
+                    )}
                   </span>
                 </div>
                 
@@ -188,10 +195,9 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
                       className={styles.editable}
                       contentEditable={!!onChange}
                       suppressContentEditableWarning
-                      onBlur={(e) => updateJobBullet(index, dIndex, e.currentTarget.textContent || "")}
-                    >
-                      {desc}
-                    </li>
+                      onBlur={(e) => updateJobBullet(index, dIndex, e.currentTarget.innerText)}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(desc) }}
+                    />
                   ))}
                 </ul>
               </div>
@@ -212,10 +218,9 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
                     className={`${styles.company} ${styles.editable}`}
                     contentEditable={!!onChange}
                     suppressContentEditableWarning
-                    onBlur={(e) => updateEduField(index, "institution", e.currentTarget.textContent || "")}
-                  >
-                    {edu.institution}
-                  </span>
+                    onBlur={(e) => updateEduField(index, "institution", e.currentTarget.innerText)}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.institution) }}
+                  />
                 </div>
                 
                 <div className={styles.positionHeader}>
@@ -223,19 +228,17 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
                     className={`${styles.position} ${styles.editable}`}
                     contentEditable={!!onChange}
                     suppressContentEditableWarning
-                    onBlur={(e) => updateEduField(index, "degree", e.currentTarget.textContent || "")}
-                  >
-                    {edu.degree}
-                  </span>
+                    onBlur={(e) => updateEduField(index, "degree", e.currentTarget.innerText)}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.degree) }}
+                  />
                   <span className={styles.itemDate}>
                     <span
                       className={styles.editable}
                       contentEditable={!!onChange}
                       suppressContentEditableWarning
-                      onBlur={(e) => updateEduField(index, "endDate", e.currentTarget.textContent || "")}
-                    >
-                      {edu.endDate}
-                    </span>
+                      onBlur={(e) => updateEduField(index, "endDate", e.currentTarget.innerText)}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.endDate) }}
+                    />
                   </span>
                 </div>
               </div>

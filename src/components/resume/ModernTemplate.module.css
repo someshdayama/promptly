@@ -15,7 +15,6 @@
   --name-size: 2.2rem;
 
   width: 100%;
-  min-height: 297mm;
   margin: 0 auto;
   background-color: white;
   color: #1e293b;
@@ -182,19 +181,11 @@
 
 /* Skills styling */
 .skillsList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.skillTag {
-  font-size: calc(var(--text-base-size) - 0.08rem);
+  font-size: calc(var(--text-base-size) - 0.04rem);
   font-weight: 600;
   color: #1e293b;
-  background-color: #ffffff;
-  padding: 0.2rem 0.55rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
+  line-height: 1.6;
+  outline: none;
 }
 
 .header {

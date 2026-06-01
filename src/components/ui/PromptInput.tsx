@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Sparkles, Loader2 } from "lucide-react";
 import styles from "./PromptInput.module.css";
 import { ResumeData } from "@/types/resume";
@@ -24,19 +24,32 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
   const [jobDesc, setJobDesc] = useState(initialJobDesc || "");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const isInitialMount = useRef(true);
 
-  // Load saved prompt on mount
+  // Load saved prompt and job description on mount
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      setPrompt(saved);
+    const savedPrompt = localStorage.getItem(STORAGE_KEY);
+    const savedJobDesc = localStorage.getItem("promptly_saved_job_desc");
+    if (savedPrompt) {
+      setPrompt(savedPrompt);
     }
-  }, []);
+    if (savedJobDesc && !initialJobDesc) {
+      setJobDesc(savedJobDesc);
+    }
+    isInitialMount.current = false;
+  }, [initialJobDesc]);
 
-  const handlePromptChange = (val: string) => {
-    setPrompt(val);
-    localStorage.setItem(STORAGE_KEY, val);
-  };
+  // Handle autosave with debounce
+  useEffect(() => {
+    if (isInitialMount.current) return;
+
+    const timeoutId = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, prompt);
+      localStorage.setItem("promptly_saved_job_desc", jobDesc);
+    }, 600);
+
+    return () => clearTimeout(timeoutId);
+  }, [prompt, jobDesc]);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -78,12 +91,13 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
   };
 
   const handleClear = () => {
-    handlePromptChange("");
+    setPrompt("");
+    setJobDesc("");
     setError("");
   };
 
   const handleInsertExample = () => {
-    handlePromptChange(DEFAULT_PROFILE_TEXT);
+    setPrompt(DEFAULT_PROFILE_TEXT);
     setError("");
   };
 
@@ -105,7 +119,7 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
         className={styles.textarea}
         placeholder="e.g. My name is John Doe. I've worked as a Software Engineer at Acme Corp since Jan 2020 where I migrated the database to PostgreSQL and increased performance by 40%. Before that, I was at..."
         value={prompt}
-        onChange={(e) => handlePromptChange(e.target.value)}
+        onChange={(e) => setPrompt(e.target.value)}
       />
 
       <h3 className={styles.subtitle} style={{ marginTop: '1.5rem', marginBottom: '0.5rem', fontWeight: 600 }}>

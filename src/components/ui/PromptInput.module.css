@@ -198,3 +198,20 @@
   border-color: var(--primary-hover);
 }
 
+.saveStatus {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.saveStatusDone {
+  color: #10b981; /* Emerald Green */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

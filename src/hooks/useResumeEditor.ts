@@ -3,12 +3,13 @@ import { ResumeData } from "@/types/resume";
 export function useResumeEditor(data: ResumeData, onChange?: (updated: ResumeData) => void) {
   const isEditable = !!onChange;
 
-  const updatePersonalInfo = (field: keyof ResumeData["personalInfo"], value: string) => {
-    if (!onChange || !data.personalInfo) return;
+  const updatePersonalInfo = (field: keyof NonNullable<ResumeData["personalInfo"]>, value: string) => {
+    if (!onChange) return;
+    const personalInfo = data.personalInfo || { fullName: "", email: "" };
     onChange({
       ...data,
       personalInfo: {
-        ...data.personalInfo,
+        ...personalInfo,
         [field]: value,
       },
     });
@@ -23,8 +24,12 @@ export function useResumeEditor(data: ResumeData, onChange?: (updated: ResumeDat
   };
 
   const updateJobField = (index: number, field: string, value: string) => {
-    if (!onChange || !data.experience) return;
-    const updatedExp = [...data.experience];
+    if (!onChange) return;
+    const experience = data.experience || [];
+    const updatedExp = [...experience];
+    if (!updatedExp[index]) {
+      updatedExp[index] = { company: "", position: "", startDate: "", endDate: "", description: [] };
+    }
     updatedExp[index] = {
       ...updatedExp[index],
       [field]: value,
@@ -36,8 +41,12 @@ export function useResumeEditor(data: ResumeData, onChange?: (updated: ResumeDat
   };
 
   const updateJobBullet = (jobIndex: number, bulletIndex: number, value: string) => {
-    if (!onChange || !data.experience) return;
-    const updatedExp = [...data.experience];
+    if (!onChange) return;
+    const experience = data.experience || [];
+    const updatedExp = [...experience];
+    if (!updatedExp[jobIndex]) {
+      updatedExp[jobIndex] = { company: "", position: "", startDate: "", endDate: "", description: [] };
+    }
     const bullets = [...(updatedExp[jobIndex].description || [])];
     bullets[bulletIndex] = value;
     updatedExp[jobIndex] = {
@@ -51,8 +60,12 @@ export function useResumeEditor(data: ResumeData, onChange?: (updated: ResumeDat
   };
 
   const updateEduField = (index: number, field: string, value: string) => {
-    if (!onChange || !data.education) return;
-    const updatedEdu = [...data.education];
+    if (!onChange) return;
+    const education = data.education || [];
+    const updatedEdu = [...education];
+    if (!updatedEdu[index]) {
+      updatedEdu[index] = { institution: "", degree: "", startDate: "", endDate: "" };
+    }
     updatedEdu[index] = {
       ...updatedEdu[index],
       [field]: value,
@@ -64,8 +77,9 @@ export function useResumeEditor(data: ResumeData, onChange?: (updated: ResumeDat
   };
 
   const updateSkill = (index: number, value: string) => {
-    if (!onChange || !data.skills) return;
-    const updatedSkills = [...data.skills];
+    if (!onChange) return;
+    const skills = data.skills || [];
+    const updatedSkills = [...skills];
     updatedSkills[index] = value;
     onChange({
       ...data,
@@ -84,12 +98,16 @@ export function useResumeEditor(data: ResumeData, onChange?: (updated: ResumeDat
   };
 
   const handleJobDateBlur = (index: number, text: string) => {
-    if (!onChange || !data.experience) return;
+    if (!onChange) return;
     const parts = text.split(/\s*[-–—]|\s+to\s+/i);
     const start = parts[0]?.trim() || "";
     const end = parts[1]?.trim() || "";
     
-    const updatedExp = [...data.experience];
+    const experience = data.experience || [];
+    const updatedExp = [...experience];
+    if (!updatedExp[index]) {
+      updatedExp[index] = { company: "", position: "", startDate: "", endDate: "", description: [] };
+    }
     updatedExp[index] = {
       ...updatedExp[index],
       startDate: start,
@@ -102,12 +120,16 @@ export function useResumeEditor(data: ResumeData, onChange?: (updated: ResumeDat
   };
 
   const handleEduDateBlur = (index: number, text: string) => {
-    if (!onChange || !data.education) return;
+    if (!onChange) return;
     const parts = text.split(/\s*[-–—]|\s+to\s+/i);
     const start = parts[0]?.trim() || "";
     const end = parts[1]?.trim() || "";
     
-    const updatedEdu = [...data.education];
+    const education = data.education || [];
+    const updatedEdu = [...education];
+    if (!updatedEdu[index]) {
+      updatedEdu[index] = { institution: "", degree: "", startDate: "", endDate: "" };
+    }
     updatedEdu[index] = {
       ...updatedEdu[index],
       startDate: start,

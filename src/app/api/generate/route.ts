@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { rateLimit } from '@/utils/rateLimit';
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY || '',
@@ -38,7 +39,7 @@ const resumeSchema = {
             items: { type: "STRING" }
           }
         },
-        required: ["company", "position", "description"]
+        required: ["company", "position", "startDate", "endDate", "description"]
       }
     },
 
@@ -52,7 +53,7 @@ const resumeSchema = {
           startDate: { type: "STRING" },
           endDate: { type: "STRING" }
         },
-        required: ["institution", "degree"]
+        required: ["institution", "degree", "startDate", "endDate"]
       }
     },
     skills: {
@@ -68,11 +69,35 @@ function cleanAndParseJSON(text: string) {
   if (cleanText.startsWith('```')) {
     cleanText = cleanText.replace(/^```[a-zA-Z]*\n/, '').replace(/\n```$/, '').trim();
   }
-  return JSON.parse(cleanText);
+  try {
+    return JSON.parse(cleanText);
+  } catch {
+    // Strip trailing commas from objects/arrays
+    const cleaned = cleanText.replace(/,(\s*[\]}])/g, '$1');
+    return JSON.parse(cleaned);
+  }
 }
 
 export async function POST(req: Request) {
   try {
+    const forwarded = req.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0].trim() : '127.0.0.1';
+    
+    const { success, limit, remaining, reset } = rateLimit(ip);
+    if (!success) {
+      return NextResponse.json(
+        { error: `Too many requests. Please try again in ${reset} seconds.` },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': String(limit),
+            'X-RateLimit-Remaining': String(remaining),
+            'X-RateLimit-Reset': String(reset),
+          }
+        }
+      );
+    }
+
     const body = await req.json();
     const { prompt, jobContext, candidateProfile } = body;
 

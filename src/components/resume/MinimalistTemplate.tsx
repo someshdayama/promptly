@@ -3,6 +3,7 @@
 import { ResumeData } from "@/types/resume";
 import styles from "./MinimalistTemplate.module.css";
 import { useResumeEditor } from "@/hooks/useResumeEditor";
+import { sanitizeHtml } from "@/utils/sanitize";
 
 interface MinimalistTemplateProps {
   data: ResumeData;
@@ -18,7 +19,6 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
     updateJobField,
     updateJobBullet,
     updateEduField,
-    updateSkill,
     handleLinkedinClick,
     handleJobDateBlur,
     handleEduDateBlur,
@@ -33,16 +33,22 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
           contentEditable={isEditable}
           suppressContentEditableWarning
           onBlur={(e) => updatePersonalInfo("fullName", e.currentTarget.innerText)}
-          dangerouslySetInnerHTML={{ __html: data.personalInfo?.fullName || "Your Name" }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo?.fullName || "Your Name") }}
         />
         <div className={styles.contact}>
           {data.personalInfo?.email && (
-            <a href={`mailto:${data.personalInfo.email}`} style={{ color: "inherit", textDecoration: "none" }}>
+            <a
+              href={`mailto:${data.personalInfo.email}`}
+              onClick={(e) => {
+                if (isEditable) e.preventDefault();
+              }}
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
               <span
                 contentEditable={isEditable}
                 suppressContentEditableWarning
                 onBlur={(e) => updatePersonalInfo("email", e.currentTarget.innerText)}
-                dangerouslySetInnerHTML={{ __html: data.personalInfo.email }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.email) }}
               />
             </a>
           )}
@@ -53,7 +59,7 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
                 contentEditable={isEditable}
                 suppressContentEditableWarning
                 onBlur={(e) => updatePersonalInfo("phone", e.currentTarget.innerText)}
-                dangerouslySetInnerHTML={{ __html: data.personalInfo.phone }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.phone) }}
               />
             </>
           )}
@@ -64,7 +70,7 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
                 contentEditable={isEditable}
                 suppressContentEditableWarning
                 onBlur={(e) => updatePersonalInfo("location", e.currentTarget.innerText)}
-                dangerouslySetInnerHTML={{ __html: data.personalInfo.location }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.location) }}
               />
             </>
           )}
@@ -94,7 +100,7 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
             contentEditable={isEditable}
             suppressContentEditableWarning
             onBlur={(e) => updateSummary(e.currentTarget.innerText)}
-            dangerouslySetInnerHTML={{ __html: data.summary }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.summary) }}
           />
         </section>
       )}
@@ -103,18 +109,23 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
       {data.skills && data.skills.length > 0 && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Skills</h2>
-          <div className={styles.skillsList}>
-            {data.skills.map((skill, index) => (
-              <span
-                key={index}
-                className={styles.skillTag}
-                contentEditable={isEditable}
-                suppressContentEditableWarning
-                onBlur={(e) => updateSkill(index, e.currentTarget.innerText)}
-                dangerouslySetInnerHTML={{ __html: skill }}
-              />
-            ))}
-          </div>
+          <div
+            className={styles.skillsList}
+            contentEditable={isEditable}
+            suppressContentEditableWarning
+            onBlur={(e) => {
+              const text = e.currentTarget.textContent || "";
+              const updatedSkills = text
+                .split(/[•,]/)
+                .map((s) => s.trim())
+                .filter((s) => s.length > 0);
+              onChange?.({
+                ...data,
+                skills: updatedSkills,
+              });
+            }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.skills.join(" • ")) }}
+          />
         </section>
       )}
 
@@ -131,14 +142,18 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
                     contentEditable={isEditable}
                     suppressContentEditableWarning
                     onBlur={(e) => updateJobField(index, "position", e.currentTarget.innerText)}
-                    dangerouslySetInnerHTML={{ __html: exp.position }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.position) }}
                   />
                   <span
                     className={styles.jobDate}
                     contentEditable={isEditable}
                     suppressContentEditableWarning
                     onBlur={(e) => handleJobDateBlur(index, e.currentTarget.innerText)}
-                    dangerouslySetInnerHTML={{ __html: `${exp.startDate} – ${exp.endDate}` }}
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHtml((exp.startDate && exp.endDate)
+                        ? `${exp.startDate} – ${exp.endDate}`
+                        : exp.startDate || exp.endDate || "")
+                    }}
                   />
                 </div>
                 <div
@@ -146,7 +161,7 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
                   contentEditable={isEditable}
                   suppressContentEditableWarning
                   onBlur={(e) => updateJobField(index, "company", e.currentTarget.innerText)}
-                  dangerouslySetInnerHTML={{ __html: exp.company }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(exp.company) }}
                 />
                 {exp.description && exp.description.length > 0 && (
                   <ul className={styles.descriptionList}>
@@ -156,7 +171,7 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
                         contentEditable={isEditable}
                         suppressContentEditableWarning
                         onBlur={(e) => updateJobBullet(index, i, e.currentTarget.innerText)}
-                        dangerouslySetInnerHTML={{ __html: desc }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(desc) }}
                       />
                     ))}
                   </ul>
@@ -180,14 +195,18 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
                     contentEditable={isEditable}
                     suppressContentEditableWarning
                     onBlur={(e) => updateEduField(index, "degree", e.currentTarget.innerText)}
-                    dangerouslySetInnerHTML={{ __html: edu.degree }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.degree) }}
                   />
                   <span
                     className={styles.educationDate}
                     contentEditable={isEditable}
                     suppressContentEditableWarning
                     onBlur={(e) => handleEduDateBlur(index, e.currentTarget.innerText)}
-                    dangerouslySetInnerHTML={{ __html: `${edu.startDate} – ${edu.endDate}` }}
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHtml((edu.startDate && edu.endDate)
+                        ? `${edu.startDate} – ${edu.endDate}`
+                        : edu.startDate || edu.endDate || "")
+                    }}
                   />
                 </div>
                 <div
@@ -195,7 +214,7 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
                   contentEditable={isEditable}
                   suppressContentEditableWarning
                   onBlur={(e) => updateEduField(index, "institution", e.currentTarget.innerText)}
-                  dangerouslySetInnerHTML={{ __html: edu.institution }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(edu.institution) }}
                 />
               </div>
             ))}

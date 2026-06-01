@@ -4,22 +4,34 @@ import { useState, useRef, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useReactToPrint } from "react-to-print";
 import { Download, Sparkles } from "lucide-react";
+import dynamic from "next/dynamic";
 import styles from "./page.module.css";
 import { ResumeData } from "@/types/resume";
-import { SOMESH_PROFILE } from "@/data/someshProfile";
 
 import EditorPanel from "@/components/ui/EditorPanel";
-import MinimalistTemplate from "@/components/resume/MinimalistTemplate";
-import ModernTemplate from "@/components/resume/ModernTemplate";
-import AtsTemplate from "@/components/resume/AtsTemplate";
 import AutoFitWrapper from "@/components/ui/AutoFitWrapper";
 import ResumeSkeleton from "@/components/ui/ResumeSkeleton";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
+
+const MinimalistTemplate = dynamic(() => import("@/components/resume/MinimalistTemplate"), {
+  ssr: false,
+  loading: () => <ResumeSkeleton />,
+});
+
+const ModernTemplate = dynamic(() => import("@/components/resume/ModernTemplate"), {
+  ssr: false,
+  loading: () => <ResumeSkeleton />,
+});
+
+const AtsTemplate = dynamic(() => import("@/components/resume/AtsTemplate"), {
+  ssr: false,
+  loading: () => <ResumeSkeleton />,
+});
 
 const STORAGE_KEY = "promptly_saved_prompt";
 
 import { serializeProfileToPrompt } from "@/utils/promptSerializer";
 
-const SOMESH_BASE_PROMPT = serializeProfileToPrompt(SOMESH_PROFILE);
 
 // A4 dimensions in mm
 const A4_WIDTH_MM = 210;
@@ -70,8 +82,6 @@ function HomeContent() {
   useEffect(() => {
     const jobTitle = searchParams.get("jobTitle");
     const company = searchParams.get("company");
-    const location = searchParams.get("location");
-    const description = searchParams.get("description");
 
     if (!jobTitle || !company) return;
 
@@ -161,15 +171,19 @@ function HomeContent() {
                 fitToSinglePage={false}
                 onZoomChange={(z, bc) => handleZoomAndClassChange(z, bc)}
               >
-                {isGenerating ? (
-                  <ResumeSkeleton />
-                ) : activeTemplate === "modern" ? (
-                  <ModernTemplate data={resumeData} onChange={handleResumeDataChange} />
-                ) : activeTemplate === "ats" ? (
-                  <AtsTemplate data={resumeData} onChange={handleResumeDataChange} />
-                ) : (
-                  <MinimalistTemplate data={resumeData} onChange={handleResumeDataChange} />
-                )}
+                <ErrorBoundary>
+                  <div key={activeTemplate} className={styles.templateFadeIn}>
+                    {isGenerating ? (
+                      <ResumeSkeleton />
+                    ) : activeTemplate === "modern" ? (
+                      <ModernTemplate data={resumeData} onChange={handleResumeDataChange} />
+                    ) : activeTemplate === "ats" ? (
+                      <AtsTemplate data={resumeData} onChange={handleResumeDataChange} />
+                    ) : (
+                      <MinimalistTemplate data={resumeData} onChange={handleResumeDataChange} />
+                    )}
+                  </div>
+                </ErrorBoundary>
               </AutoFitWrapper>
             </div>
 
@@ -190,13 +204,15 @@ function HomeContent() {
                   width: `${A4_WIDTH_MM}mm`,
                 }}
               >
-                {activeTemplate === "modern" ? (
-                  <ModernTemplate data={resumeData} className={activeBudgetClass} />
-                ) : activeTemplate === "ats" ? (
-                  <AtsTemplate data={resumeData} className={activeBudgetClass} />
-                ) : (
-                  <MinimalistTemplate data={resumeData} className={activeBudgetClass} />
-                )}
+                <ErrorBoundary>
+                  {activeTemplate === "modern" ? (
+                    <ModernTemplate data={resumeData} className={activeBudgetClass} />
+                  ) : activeTemplate === "ats" ? (
+                    <AtsTemplate data={resumeData} className={activeBudgetClass} />
+                  ) : (
+                    <MinimalistTemplate data={resumeData} className={activeBudgetClass} />
+                  )}
+                </ErrorBoundary>
               </div>
             </div>
           </div>

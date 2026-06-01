@@ -30,7 +30,7 @@ export default function AutoFitWrapper({
   const contentRef = useRef<HTMLDivElement>(null);
   const [budgetClass, setBudgetClass] = useState("sp-comfortable");
   const [zoom, setZoom] = useState(1);
-  const [canvasHeight, setCanvasHeight] = useState("297mm");
+  const [canvasHeight, setCanvasHeight] = useState(fitToSinglePage ? "297mm" : "auto");
 
   const calculateBudgetFit = useCallback(() => {
     if (!containerRef.current || !contentRef.current) return;
@@ -43,7 +43,7 @@ export default function AutoFitWrapper({
 
     // Step 1: Temporarily remove styling overrides to measure natural dimensions
     contentRef.current.style.zoom = "1";
-    
+
     // We will test budgets sequentially from largest to smallest
     const budgets = ["sp-comfortable", "sp-regular", "sp-compact", "sp-dense"];
     let optimalBudget = "sp-comfortable";
@@ -91,15 +91,36 @@ export default function AutoFitWrapper({
   }, [fitToSinglePage, onZoomChange]);
 
   useEffect(() => {
-    // Run after DOM rendering yields valid clientWidth values
-    const timeoutId = setTimeout(calculateBudgetFit, 100);
+    // Run immediately to handle layout updates
+    calculateBudgetFit();
+
+    if (!contentRef.current) return;
+
+    // Use MutationObserver to detect content modifications (character changes, children additions/removals)
+    // without triggering on style/class updates, preventing infinite loops.
+    const observer = new MutationObserver(() => {
+      calculateBudgetFit();
+    });
+
+    observer.observe(contentRef.current, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
     window.addEventListener("resize", calculateBudgetFit);
+
+    // Watch for font loads that could change element layout heights
+    if (typeof window !== "undefined" && "fonts" in document) {
+      document.fonts.ready.then(calculateBudgetFit);
+    }
+
     return () => {
-      clearTimeout(timeoutId);
+      observer.disconnect();
       window.removeEventListener("resize", calculateBudgetFit);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [...contentDependencies, fitToSinglePage, calculateBudgetFit]);
+  }, [calculateBudgetFit, fitToSinglePage, ...contentDependencies]);
 
   return (
     <div className={styles.wrapper}>
