@@ -9,7 +9,7 @@ export const SOMESH_PROFILE: ResumeData = {
     linkedinUrl: "https://www.linkedin.com/in/somesh-dayama/",
   },
   summary:
-    "Results-driven Software Engineer with over 3 years of experience specializing in cloud infrastructure, high-performance CI/CD automation, and site reliability engineering. Adept at optimizing system architecture across GCP, Azure, and AWS to drive down cloud expenditures and maximize deployment frequencies. Leverages automated tooling and agile practices as a force multiplier to streamline complex release management, eliminate technical debt, and ensure zero-drift infrastructure stability.",
+    "Software Engineer integrating cloud infrastructure, core development, and networking while using AI as his sidekick.",
   experience: [
     {
       company: "NCR Atleos Corporation",
