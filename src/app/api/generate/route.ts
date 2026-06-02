@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import { rateLimit } from '@/utils/rateLimit';
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY || '',
+const openai = new OpenAI({
+  baseURL: 'https://api.deepseek.com',
+  apiKey: process.env.DEEPSEEK_API_KEY || '',
 });
 
 export const maxDuration = 60;
@@ -105,9 +106,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Prompt or Job Context is required' }, { status: 400 });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.DEEPSEEK_API_KEY) {
       return NextResponse.json(
-        { error: 'GEMINI_API_KEY is not configured on the server.' },
+        { error: 'DEEPSEEK_API_KEY is not configured on the server.' },
         { status: 500 }
       );
     }
@@ -134,62 +135,64 @@ ${candidateSourceText}
 `.trim();
 
       systemInstruction = `
-You are an expert resume writer. Your job is to produce a TAILORED resume JSON matching the schema for the candidate applying to the specific TARGET JOB.
+You are a world-class executive resume writer and career coach. Your task is to produce a highly TAILORED resume JSON matching the provided schema for the candidate applying to the TARGET JOB.
 
-MANDATORY RULES — follow each one precisely:
+MANDATORY RULES — Follow each one precisely:
 
-1. CANDIDATE PROFILE: Read the CANDIDATE SOURCE PROFILE or CANDIDATE DATA JSON carefully. Extract their real name, email, phone, location, LinkedIn, work experience (companies, roles, dates, bullets), education, and skills. Do NOT invent new experiences, schools, or credentials.
+1. TRUTH & INTEGRITY: Extract real data from the CANDIDATE SOURCE. Do NOT invent new experiences, companies, metrics, schools, or credentials. Maintain 100% factual accuracy.
 
-2. SUMMARY: Write a compelling 2-3 sentence professional summary that:
-   - Mentions the company name "${jobContext.company}" and target role "${jobContext.title}" explicitly.
-   - Highlights only the experience or skills most relevant to this specific role.
-   - Uses keywords from the job title and description.
+2. PROFESSIONAL SUMMARY: Write a highly compelling, 2-3 sentence executive summary that:
+   - Explicitly names the target company ("${jobContext.company}") and target role ("${jobContext.title}").
+   - Synthesizes the candidate's most relevant background, emphasizing their unique value proposition for this exact role.
+   - Integrates core keywords from the job description naturally.
 
-3. EXPERIENCE BULLETS: For EACH work experience entry:
-   - Select or rewrite the 2-3 most relevant bullet points to align with "${jobContext.title}".
-   - Front-load keywords from the target job context.
-   - If the job is cloud-heavy: emphasize cloud engineering (e.g. GCP/AWS/Azure, Terraform, Kubernetes).
-   - If the job is SRE/reliability: emphasize MTTR, incident response, system uptime, and monitoring.
-   - If the job is CI/CD/DevOps: emphasize pipeline efficiency, test automation, and release flows.
-   - If the job is leadership-heavy: emphasize leadership, coordination, and team size/outcomes.
-   - Do NOT fabricate achievements or metrics not supported by the candidate's input.
-   - CRITICAL: You MUST include EVERY single job/experience listed in the input text. Do not drop older or less relevant jobs.
+3. EXPERIENCE OPTIMIZATION: For EVERY single work experience entry (Do NOT omit any jobs):
+   - Select or rewrite the 2-4 most relevant bullet points to strongly align with the target role.
+   - Use the XYZ formula (Accomplished [X] as measured by [Y], by doing [Z]) or STAR method, leveraging existing metrics.
+   - Begin every bullet point with a strong, high-impact action verb.
+   - Contextual Tailoring:
+     * If the job leans Cloud/Infrastructure: Emphasize provisioning (GCP/AWS/Azure), IaC (Terraform), and containerization (K8s/Docker).
+     * If the job leans SRE/DevOps: Highlight CI/CD efficiency, MTTR reduction, automation, and reliability.
+     * If the job leans Software Engineering: Focus on core development, system design, and cross-functional delivery.
+     * If the job leans Leadership/RTE: Showcase stakeholder management, unblocking teams, and release orchestration.
+   - Never fabricate data. If metrics do not exist in the source, focus on the qualitative impact and technical scope.
 
-4. SKILLS: Reorder the skills array so the most relevant skills to "${jobContext.title}" appear first.
+4. SKILLS CURATION: Reorder the skills array so the absolute most relevant technical and soft skills for "${jobContext.title}" appear first. Filter out irrelevant skills if the list is too long (keep max 15-20).
 
-5. Keep all dates, company names, and personal contact details completely factual based on the candidate's input.
+5. FORMAT & SCHEMA: Adhere strictly to the requested JSON schema. Validate that all dates, company names, and contact details match the input.
       `.trim();
 
     } else {
       // GENERIC MODE: parse raw text prompt into structured resume
       finalPrompt = prompt;
       systemInstruction = `
-You are an expert resume parser and writer.
-The user will provide raw, unstructured text containing their work history, education, skills, and personal details.
-Structure this data into a clean, professional JSON format matching the schema.
+You are a world-class executive resume writer and parser.
+Your task is to take raw, unstructured candidate text and structure it into a clean, professional JSON format matching the exact schema provided.
 
-CRITICAL INSTRUCTION: You MUST extract and include EVERY single work experience listed in the input. Do NOT omit, drop, or consolidate any jobs, even if they seem less relevant or older.
-
-Write a compelling 2-3 sentence professional summary if one is not given.
-Make bullet points action-oriented with quantified outcomes where possible.
+CRITICAL INSTRUCTIONS:
+1. Extract and include EVERY single work experience, education, and skill listed in the input. Do NOT omit or consolidate anything.
+2. If a professional summary is missing, write a compelling 2-3 sentence summary that highlights the candidate's core strengths based on their experience.
+3. Enhance the bullet points to be action-oriented, starting with strong verbs. Maintain all existing metrics and factual data; do NOT fabricate information.
+4. Output ONLY valid JSON.
       `.trim();
     }
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite',
-      contents: finalPrompt,
-      config: {
-        systemInstruction,
-        temperature: 0.1,
-        responseMimeType: 'application/json',
-        responseSchema: resumeSchema,
-      },
+    const fullSystemInstruction = systemInstruction + `\n\nYou MUST return ONLY valid JSON matching this schema:\n${JSON.stringify(resumeSchema, null, 2)}\n\nDo not include any other text, markdown formatting, or explanations. Just the JSON object.`;
+
+    const response = await openai.chat.completions.create({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: fullSystemInstruction },
+        { role: 'user', content: finalPrompt }
+      ],
+      temperature: 0.1,
+      response_format: { type: 'json_object' }
     });
 
-    const outputText = response.text;
+    const outputText = response.choices[0]?.message?.content;
 
     if (!outputText) {
-      throw new Error('No output generated from Gemini');
+      throw new Error('No output generated from Deepseek');
     }
 
     const parsedData = cleanAndParseJSON(outputText);
@@ -198,12 +201,12 @@ Make bullet points action-oriented with quantified outcomes where possible.
   } catch (error: unknown) {
     console.error('Error generating resume data:', error);
     
-    // Extract the Gemini API error message if it exists
+    // Extract the API error message if it exists
     const err = error as { message?: string; status?: number };
     let errorMessage = err?.message || 'Failed to generate resume data.';
     
-    if (errorMessage.includes('quota') || err?.status === 429) {
-      errorMessage = "Gemini API free tier quota exceeded. Please try again in a minute, or update your API key in .env.local.";
+    if (errorMessage.includes('quota') || errorMessage.includes('balance') || err?.status === 429) {
+      errorMessage = "Deepseek API quota/balance exceeded. Please try again in a minute, or update your API key in .env.local.";
     }
     
     return NextResponse.json(

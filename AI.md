@@ -1,12 +1,12 @@
 # Resume Builder
 
-> An AI-powered resume builder using Google Gemini AI to generate tailored resumes. Deployed on Vercel.
+> An AI-powered resume builder using Deepseek AI to generate tailored resumes. Deployed on Vercel.
 
 ## Tech Stack
 
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
-- **AI**: Google Gemini AI (`@google/genai`)
+- **AI**: Deepseek AI (`openai`)
 - **PDF/Print**: react-to-print
 - **Icons**: Lucide React
 - **Deployment**: Vercel
@@ -34,7 +34,7 @@ npm run lint     # ESLint check
 
 | Variable | Purpose | Required |
 |---|---|---|
-| `GEMINI_API_KEY` | Google Gemini AI API key | ✅ |
+| `DEEPSEEK_API_KEY` | Deepseek AI API key | ✅ |
 
 - **Local**: Set in `.env.local`
 - **Vercel**: Set in Vercel dashboard → Environment Variables

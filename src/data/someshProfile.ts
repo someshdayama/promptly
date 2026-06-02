@@ -9,7 +9,7 @@ export const SOMESH_PROFILE: ResumeData = {
     linkedinUrl: "https://www.linkedin.com/in/somesh-dayama/",
   },
   summary:
-    "Software Engineer integrating cloud infrastructure, core development, and networking while using AI as his sidekick.",
+    "Software Engineer with over 3 years of experience focusing on cloud infrastructure, site reliability and project management. Utilizes automation and agile workflows to streamline release processes, reducing technical debt, and maintaining multi-cloud infrastructure stability",
   experience: [
     {
       company: "NCR Atleos Corporation",
@@ -17,11 +17,11 @@ export const SOMESH_PROFILE: ResumeData = {
       startDate: "Feb 2025",
       endDate: "Present",
       description: [
-        "Release Train Engineer (RTE): Managed release lifecycles and cross-functional CI/CD coordination for the AMP Services Product on Azure, aligning delivery timelines and mitigating operational risks.",
-        "Scrum Master: Facilitated agile ceremonies and cleared blockers for an 18-member engineering squad, driving sprint predictability and process optimization.",
-        "Incident Response & Release Lead: Functioned as primary Incident Commander for mission-critical production outages, architecting coordination strategies between Dev and Ops teams to significantly reduce Mean Time to Resolution.",
-        "DevOps Orchestration: Spearheaded infrastructure provisioning and environment setup using GCP (GKE, Compute Engine), utilizing Jenkins, Helm, and Ansible to maintain high availability and deployment velocity.",
-        "Infrastructure Optimization: Conducted self-initiated legacy upgrades and continuous drift detection, successfully maintaining zero configuration drift across multi-cloud environments.",
+        "Release Train Engineer (RTE): Directed comprehensive release lifecycles and cross-functional CI/CD coordination for the AMP Services Product on Azure, ensuring strict alignment of delivery timelines while mitigating operational deployment risks.",
+        "Scrum Master: Orchestrated agile ceremonies and proactively eliminated operational blockers for a high-performing 18-member engineering squad, significantly enhancing sprint predictability and development velocity.",
+        "Incident Response & Release Lead: Served as primary Incident Commander during mission-critical production outages, designing and enforcing rapid-response protocols between Dev and Ops teams to drastically reduce Mean Time to Resolution (MTTR).",
+        "DevOps Orchestration: Architected robust infrastructure provisioning and automated environment setups across GCP (GKE, Compute Engine) using Jenkins, Helm, and Ansible, ensuring high availability and accelerated deployment cycles.",
+        "Infrastructure Optimization: Spearheaded self-initiated legacy system upgrades and automated continuous drift detection, successfully sustaining zero configuration drift across complex multi-cloud environments.",
       ],
     },
     {
@@ -30,9 +30,9 @@ export const SOMESH_PROFILE: ResumeData = {
       startDate: "May 2023",
       endDate: "Feb 2025",
       description: [
-        "FinOps & Cost Optimization: Developed automated scripts and engineered resource allocation strategies on GCP, delivering a 34.56% reduction in cloud infrastructure costs via precision instance rightsizing and auto-scaling.",
-        "Database Reliability: Architected automated database maintenance blueprints and failover strategies utilizing Terraform and Ansible, decreasing database-related production incidents by 24%.",
-        "Infrastructure as Code (IaC): Orchestrated environment deployment for the Authentic Switch application across production and staging GCP environments using Terraform, establishing fully reproducible, scalable infrastructure.",
+        "FinOps & Cost Optimization: Engineered data-driven resource allocation strategies and automated scaling scripts on GCP, successfully slashing cloud infrastructure costs by 34.56% through precision instance rightsizing.",
+        "Database Reliability: Designed and implemented robust automated database maintenance blueprints and seamless failover architectures utilizing Terraform and Ansible, driving down database-related production incidents by 24%.",
+        "Infrastructure as Code (IaC): Championed end-to-end environment deployment for the flagship Authentic Switch application across GCP production and staging environments using Terraform, cementing a fully reproducible and dynamically scalable infrastructure.",
       ],
     },
     {
@@ -41,8 +41,8 @@ export const SOMESH_PROFILE: ResumeData = {
       startDate: "Jan 2023",
       endDate: "Apr 2023",
       description: [
-        "CI/CD Automation: Automated Jenkins-based deployment pipelines for the flagship Domino’s App (Jubilant Foods), radically minimizing manual interventions and reducing deployment cycle times.",
-        "Cloud Provisioning: Managed Linux virtual environments and leveraged AWS core services to dynamically provision scalable staging environments for cross-functional development teams.",
+        "CI/CD Automation: Architected and automated sophisticated Jenkins-based deployment pipelines for the high-traffic Domino’s App (Jubilant Foods), virtually eliminating manual interventions and accelerating release cycles.",
+        "Cloud Provisioning: Administered complex Linux virtual environments and harnessed AWS core services to dynamically provision elastic, scalable staging environments tailored for cross-functional development teams.",
       ],
     },
   ],
