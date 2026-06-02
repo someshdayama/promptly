@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { rateLimit } from '@/utils/rateLimit';
 
-const openai = new OpenAI({
-  baseURL: 'https://api.deepseek.com',
-  apiKey: process.env.DEEPSEEK_API_KEY || '',
-});
+
 
 export const maxDuration = 60;
 
@@ -112,6 +109,11 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
+
+    const openai = new OpenAI({
+      baseURL: 'https://api.deepseek.com',
+      apiKey: process.env.DEEPSEEK_API_KEY,
+    });
 
     let finalPrompt: string;
     let systemInstruction: string;
