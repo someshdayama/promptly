@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType, type Schema } from '@google/generative-ai';
 import { rateLimit } from '@/utils/rateLimit';
 
 export const maxDuration = 60;
@@ -57,7 +57,7 @@ const resumeSchema = {
     },
   },
   required: ['personalInfo', 'summary', 'experience', 'education', 'skills'],
-};
+} as Schema;
 
 export async function POST(req: Request) {
   try {
