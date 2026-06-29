@@ -1,97 +1,80 @@
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { rateLimit } from '@/utils/rateLimit';
-
-
 
 export const maxDuration = 60;
 
 import { SOMESH_PROFILE } from '@/data/someshProfile';
 
 const resumeSchema = {
-  type: "OBJECT",
+  type: SchemaType.OBJECT,
   properties: {
     personalInfo: {
-      type: "OBJECT",
+      type: SchemaType.OBJECT,
       properties: {
-        fullName: { type: "STRING" },
-        email: { type: "STRING" },
-        phone: { type: "STRING" },
-        location: { type: "STRING" },
-        linkedinUrl: { type: "STRING" }
+        fullName: { type: SchemaType.STRING },
+        email: { type: SchemaType.STRING },
+        phone: { type: SchemaType.STRING },
+        location: { type: SchemaType.STRING },
+        linkedinUrl: { type: SchemaType.STRING },
       },
-      required: ["fullName", "email"]
+      required: ['fullName', 'email'],
     },
-    summary: { type: "STRING" },
+    summary: { type: SchemaType.STRING },
     experience: {
-      type: "ARRAY",
+      type: SchemaType.ARRAY,
       items: {
-        type: "OBJECT",
+        type: SchemaType.OBJECT,
         properties: {
-          company: { type: "STRING" },
-          position: { type: "STRING" },
-          startDate: { type: "STRING" },
-          endDate: { type: "STRING" },
+          company: { type: SchemaType.STRING },
+          position: { type: SchemaType.STRING },
+          startDate: { type: SchemaType.STRING },
+          endDate: { type: SchemaType.STRING },
           description: {
-            type: "ARRAY",
-            items: { type: "STRING" }
-          }
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING },
+          },
         },
-        required: ["company", "position", "startDate", "endDate", "description"]
-      }
+        required: ['company', 'position', 'startDate', 'endDate', 'description'],
+      },
     },
-
     education: {
-      type: "ARRAY",
+      type: SchemaType.ARRAY,
       items: {
-        type: "OBJECT",
+        type: SchemaType.OBJECT,
         properties: {
-          institution: { type: "STRING" },
-          degree: { type: "STRING" },
-          startDate: { type: "STRING" },
-          endDate: { type: "STRING" }
+          institution: { type: SchemaType.STRING },
+          degree: { type: SchemaType.STRING },
+          startDate: { type: SchemaType.STRING },
+          endDate: { type: SchemaType.STRING },
         },
-        required: ["institution", "degree", "startDate", "endDate"]
-      }
+        required: ['institution', 'degree', 'startDate', 'endDate'],
+      },
     },
     skills: {
-      type: "ARRAY",
-      items: { type: "STRING" }
-    }
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
+    },
   },
-  required: ["personalInfo", "summary", "experience", "education", "skills"]
+  required: ['personalInfo', 'summary', 'experience', 'education', 'skills'],
 };
-
-function cleanAndParseJSON(text: string) {
-  let cleanText = text.trim();
-  if (cleanText.startsWith('```')) {
-    cleanText = cleanText.replace(/^```[a-zA-Z]*\n/, '').replace(/\n```$/, '').trim();
-  }
-  try {
-    return JSON.parse(cleanText);
-  } catch {
-    // Strip trailing commas from objects/arrays
-    const cleaned = cleanText.replace(/,(\s*[\]}])/g, '$1');
-    return JSON.parse(cleaned);
-  }
-}
 
 export async function POST(req: Request) {
   try {
     const forwarded = req.headers.get('x-forwarded-for');
     const ip = forwarded ? forwarded.split(',')[0].trim() : '127.0.0.1';
-    
+
     const { success, limit, remaining, reset } = rateLimit(ip);
     if (!success) {
       return NextResponse.json(
         { error: `Too many requests. Please try again in ${reset} seconds.` },
-        { 
+        {
           status: 429,
           headers: {
             'X-RateLimit-Limit': String(limit),
             'X-RateLimit-Remaining': String(remaining),
             'X-RateLimit-Reset': String(reset),
-          }
+          },
         }
       );
     }
@@ -103,16 +86,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Prompt or Job Context is required' }, { status: 400 });
     }
 
-    if (!process.env.DEEPSEEK_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
-        { error: 'DEEPSEEK_API_KEY is not configured on the server.' },
+        { error: 'GEMINI_API_KEY is not configured on the server.' },
         { status: 500 }
       );
     }
 
-    const openai = new OpenAI({
-      baseURL: 'https://api.deepseek.com',
-      apiKey: process.env.DEEPSEEK_API_KEY,
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: resumeSchema,
+        temperature: 0.1,
+      },
     });
 
     let finalPrompt: string;
@@ -124,7 +112,9 @@ export async function POST(req: Request) {
       // JOB-TAILORED MODE: very specific instructions per role
       // If a custom prompt was entered by the user, we supply it as the candidate source text.
       // Otherwise, we use the active profile JSON.
-      const candidateSourceText = prompt ? `CANDIDATE SOURCE PROFILE (Raw Text):\n${prompt}` : `CANDIDATE DATA JSON:\n${JSON.stringify(activeProfile)}`;
+      const candidateSourceText = prompt
+        ? `CANDIDATE SOURCE PROFILE (Raw Text):\n${prompt}`
+        : `CANDIDATE DATA JSON:\n${JSON.stringify(activeProfile)}`;
 
       finalPrompt = `
 TARGET JOB:
@@ -163,7 +153,6 @@ MANDATORY RULES — Follow each one precisely:
 
 5. FORMAT & SCHEMA: Adhere strictly to the requested JSON schema. Validate that all dates, company names, and contact details match the input.
       `.trim();
-
     } else {
       // GENERIC MODE: parse raw text prompt into structured resume
       finalPrompt = prompt;
@@ -179,41 +168,29 @@ CRITICAL INSTRUCTIONS:
       `.trim();
     }
 
-    const fullSystemInstruction = systemInstruction + `\n\nYou MUST return ONLY valid JSON matching this schema:\n${JSON.stringify(resumeSchema, null, 2)}\n\nDo not include any other text, markdown formatting, or explanations. Just the JSON object.`;
+    const fullPrompt = `${systemInstruction}\n\n${finalPrompt}`;
 
-    const response = await openai.chat.completions.create({
-      model: 'deepseek-chat',
-      messages: [
-        { role: 'system', content: fullSystemInstruction },
-        { role: 'user', content: finalPrompt }
-      ],
-      temperature: 0.1,
-      response_format: { type: 'json_object' }
-    });
-
-    const outputText = response.choices[0]?.message?.content;
+    const result = await model.generateContent(fullPrompt);
+    const outputText = result.response.text();
 
     if (!outputText) {
-      throw new Error('No output generated from Deepseek');
+      throw new Error('No output generated from Gemini');
     }
 
-    const parsedData = cleanAndParseJSON(outputText);
+    // Gemini with responseMimeType: 'application/json' returns clean JSON directly
+    const parsedData = JSON.parse(outputText);
 
     return NextResponse.json({ data: parsedData });
   } catch (error: unknown) {
     console.error('Error generating resume data:', error);
-    
-    // Extract the API error message if it exists
+
     const err = error as { message?: string; status?: number };
     let errorMessage = err?.message || 'Failed to generate resume data.';
-    
-    if (errorMessage.includes('quota') || errorMessage.includes('balance') || err?.status === 429) {
-      errorMessage = "Deepseek API quota/balance exceeded. Please try again in a minute, or update your API key in .env.local.";
+
+    if (errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED') || err?.status === 429) {
+      errorMessage = 'Gemini API quota exceeded. Please try again in a moment.';
     }
-    
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
