@@ -28,7 +28,7 @@ export default function AutoFitWrapper({
 }: AutoFitWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [budgetClass, setBudgetClass] = useState("sp-comfortable");
+  const [budgetClass, setBudgetClass] = useState("sp-regular");
   const [zoom, setZoom] = useState(1);
   const [canvasHeight, setCanvasHeight] = useState(fitToSinglePage ? "297mm" : "auto");
 
@@ -45,8 +45,8 @@ export default function AutoFitWrapper({
     contentRef.current.style.zoom = "1";
 
     // We will test budgets sequentially from largest to smallest
-    const budgets = ["sp-comfortable", "sp-regular", "sp-compact", "sp-dense"];
-    let optimalBudget = "sp-comfortable";
+    const budgets = ["sp-regular", "sp-compact", "sp-dense"];
+    let optimalBudget = "sp-regular";
     let contentHeight = 0;
 
     if (fitToSinglePage) {
@@ -62,10 +62,10 @@ export default function AutoFitWrapper({
         }
       }
     } else {
-      // If not fitting to single page, default to comfortable spacing
-      contentRef.current.className = `${styles.scaler} sp-comfortable`;
+      // If not fitting to single page, default to regular spacing
+      contentRef.current.className = `${styles.scaler} sp-regular`;
       contentHeight = contentRef.current.scrollHeight;
-      optimalBudget = "sp-comfortable";
+      optimalBudget = "sp-regular";
     }
 
     let finalZoom = 1;

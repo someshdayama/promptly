@@ -24,6 +24,7 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
   const [jobDesc, setJobDesc] = useState(initialJobDesc || "");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState<"profile" | "job">("profile");
   const isInitialMount = useRef(true);
 
   // Load saved prompt and job description on mount
@@ -103,37 +104,62 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
 
   return (
     <div className={styles.container}>
-      <div className={styles.headerRow}>
-        <h2 className={styles.title}>Paste Your Info</h2>
-        <div className={styles.helperActions}>
-          <button className={styles.helperButton} onClick={handleClear} disabled={isLoading}>Clear</button>
-          <button className={styles.helperButton} onClick={handleInsertExample} disabled={isLoading}>Example</button>
-        </div>
+      <div className={styles.tabHeader}>
+        <button
+          type="button"
+          className={`${styles.tabButton} ${activeTab === "profile" ? styles.activeTab : ""}`}
+          onClick={() => setActiveTab("profile")}
+        >
+          1. Your Details
+        </button>
+        <button
+          type="button"
+          className={`${styles.tabButton} ${activeTab === "job" ? styles.activeTab : ""}`}
+          onClick={() => setActiveTab("job")}
+        >
+          2. Target Job {jobDesc.trim() ? <span className={styles.tabBadge}>Active</span> : null}
+        </button>
       </div>
 
-      <p className={styles.subtitle}>
-        Dump your work history, education, skills, and contact info below. Our AI will instantly format it into a professional resume.
-      </p>
+      <div className={styles.tabContent}>
+        {activeTab === "profile" ? (
+          <div className={styles.stepCard}>
+            <div className={styles.headerRow}>
+              <h2 className={styles.title}>Your Details</h2>
+              <div className={styles.helperActions}>
+                <button className={styles.helperButton} onClick={handleClear} disabled={isLoading}>Clear</button>
+                <button className={styles.helperButton} onClick={handleInsertExample} disabled={isLoading}>Example</button>
+              </div>
+            </div>
+            <p className={styles.subtitle}>
+              Dump your work history, education, skills, and contact info below. Our AI will instantly format it into a professional resume.
+            </p>
+            <textarea
+              className={styles.textarea}
+              placeholder="e.g. My name is John Doe. I've worked as a Software Engineer at Acme Corp since Jan 2020 where I migrated the database to PostgreSQL and increased performance by 40%. Before that, I was at..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+            />
+          </div>
+        ) : (
+          <div className={styles.stepCard}>
+            <div className={styles.headerRow}>
+              <h2 className={styles.title}>Target Job <span className={styles.optionalBadge}>Optional</span></h2>
+            </div>
+            <p className={styles.subtitle}>
+              Paste the job description here. Our AI will analyze the keywords and tailor your resume specifically for this role.
+            </p>
+            <textarea
+              className={styles.textarea}
+              placeholder="Paste the job description here..."
+              value={jobDesc}
+              onChange={(e) => setJobDesc(e.target.value)}
+            />
+          </div>
+        )}
+      </div>
 
-      <textarea
-        className={styles.textarea}
-        placeholder="e.g. My name is John Doe. I've worked as a Software Engineer at Acme Corp since Jan 2020 where I migrated the database to PostgreSQL and increased performance by 40%. Before that, I was at..."
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-      />
-
-      <h3 className={styles.subtitle} style={{ marginTop: '1.5rem', marginBottom: '0.5rem', fontWeight: 600 }}>
-        Optional: Target Job Description
-      </h3>
-      <textarea
-        className={styles.textarea}
-        style={{ minHeight: '100px' }}
-        placeholder="Paste the job description here. Our AI will analyze the keywords and tailor your resume specifically for this role..."
-        value={jobDesc}
-        onChange={(e) => setJobDesc(e.target.value)}
-      />
-
-      {error && <p className={styles.error}>{error}</p>}
+      {error && <div className={styles.errorBanner}>{error}</div>}
 
       <button
         className={styles.button}

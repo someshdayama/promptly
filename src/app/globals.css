@@ -15,13 +15,13 @@
   --background: #09090b;
   --foreground: #f8fafc;
 
-  --primary: #4f46e5; /* Premium Indigo */
-  --primary-hover: #6366f1;
-  --primary-foreground: #ffffff;
-  --accent: #d946ef; /* Magenta/Violet Accent */
+  --primary: #f1f5f9; /* Slate/White */
+  --primary-hover: #ffffff;
+  --primary-foreground: #080809;
+  --accent: #94a3b8; /* Slate Accent */
 
-  --surface: #121215;
-  --surface-border: #27272a;
+  --surface: #111113;
+  --surface-border: rgba(255,255,255,0.06);
 
   --text-muted: #94a3b8;
   --text-danger: #f43f5e;
@@ -30,8 +30,8 @@
   --radius-md: 0.75rem;
   --radius-lg: 1.25rem;
 
-  --gradient-brand: linear-gradient(135deg, #4f46e5 0%, #8b5cf6 50%, #d946ef 100%);
-  --gradient-glow: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(217, 70, 239, 0.15));
+  --gradient-brand: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 50%, #94a3b8 100%);
+  --gradient-glow: linear-gradient(135deg, rgba(241, 245, 249, 0.1), rgba(148, 163, 184, 0.05));
 }
 
 * {
