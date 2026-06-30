@@ -75,7 +75,14 @@ function BuilderApp({ onGoHome }: BuilderAppProps) {
   const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: `${resumeData.personalInfo?.fullName || "Resume"}_CV`,
-    pageStyle: `@page { size: ${A4_WIDTH_MM}mm ${A4_HEIGHT_MM}mm; margin: 0; } html, body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }`,
+    pageStyle: `
+      @page { size: ${A4_WIDTH_MM}mm ${A4_HEIGHT_MM}mm; margin: 10mm; }
+      html, body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      /* Safari fix — @page adds 10mm margin, so strip equivalent top/bottom padding from any template's
+         root element. This is centralized here so no individual template needs to handle it. */
+      [data-resume-print] > * { padding-top: 0 !important; padding-bottom: 0 !important; }
+      [data-resume-print] > * > * { padding-top: 0 !important; padding-bottom: 0 !important; }
+    `,
     onAfterPrint: () => setIsPrinting(false),
   });
 
@@ -203,6 +210,7 @@ function BuilderApp({ onGoHome }: BuilderAppProps) {
             <div
               className={styles.printOnly}
               ref={printRef}
+              data-resume-print="true"
               style={{
                 width: `${A4_WIDTH_MM}mm`,
               }}

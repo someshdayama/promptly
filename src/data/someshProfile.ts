@@ -47,8 +47,8 @@ export const SOMESH_PROFILE: ResumeData = {
   ],
 
   education: [
-    { institution: "National Institute of Technology (NIT), Bhopal", degree: "Master of Computer Applications (MCA)", startDate: "", endDate: "2023" },
-    { institution: "Prestige Institute of Management and Research, Indore", degree: "Bachelor of Computer Applications (BCA)", startDate: "", endDate: "2020" },
+    { institution: "National Institute of Technology (NIT), Bhopal", degree: "Master of Computer Applications (MCA)", startDate: "2021", endDate: "2023" },
+    { institution: "Prestige Institute of Management and Research, Indore", degree: "Bachelor of Computer Applications (BCA)", startDate: "2017", endDate: "2020" },
   ],
   skills: [
     "GCP",
