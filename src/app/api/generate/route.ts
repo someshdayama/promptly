@@ -95,7 +95,7 @@ export async function POST(req: Request) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json',
         responseSchema: resumeSchema,
@@ -139,7 +139,7 @@ MANDATORY RULES — Follow each one precisely:
    - Integrates core keywords from the job description naturally.
 
 3. EXPERIENCE OPTIMIZATION: For EVERY single work experience entry (Do NOT omit any jobs):
-   - Select or rewrite the 2-4 most relevant bullet points to strongly align with the target role.
+   - Select or rewrite the bullet points to strongly align with the target role, retaining all key achievements, details, and technical scope (do not artificially restrict content to force it onto a single page).
    - Use the XYZ formula (Accomplished [X] as measured by [Y], by doing [Z]) or STAR method, leveraging existing metrics.
    - Begin every bullet point with a strong, high-impact action verb.
    - Contextual Tailoring:
@@ -149,7 +149,7 @@ MANDATORY RULES — Follow each one precisely:
      * If the job leans Leadership/RTE: Showcase stakeholder management, unblocking teams, and release orchestration.
    - Never fabricate data. If metrics do not exist in the source, focus on the qualitative impact and technical scope.
 
-4. SKILLS CURATION: Reorder the skills array so the absolute most relevant technical and soft skills for "${jobContext.title}" appear first. Filter out irrelevant skills if the list is too long (keep max 15-20).
+4. SKILLS CURATION: Reorder the skills array so the absolute most relevant technical and soft skills for "${jobContext.title}" appear first. Retain all relevant skills that reflect the candidate's core competencies.
 
 5. FORMAT & SCHEMA: Adhere strictly to the requested JSON schema. Validate that all dates, company names, and contact details match the input.
       `.trim();
@@ -174,7 +174,7 @@ CRITICAL INSTRUCTIONS:
     const outputText = result.response.text();
 
     if (!outputText) {
-      throw new Error('No output generated from Gemini');
+      throw new Error('No output generated from AI');
     }
 
     // Gemini with responseMimeType: 'application/json' returns clean JSON directly
@@ -188,7 +188,7 @@ CRITICAL INSTRUCTIONS:
     let errorMessage = err?.message || 'Failed to generate resume data.';
 
     if (errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED') || err?.status === 429) {
-      errorMessage = 'Gemini API quota exceeded. Please try again in a moment.';
+      errorMessage = 'API quota exceeded. Please try again in a moment.';
     }
 
     return NextResponse.json({ error: errorMessage }, { status: 500 });

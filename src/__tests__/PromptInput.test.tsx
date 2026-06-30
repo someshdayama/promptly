@@ -12,7 +12,7 @@ describe("PromptInput Component", () => {
 
   it("renders elements correctly", () => {
     setup();
-    expect(screen.getByText("Paste Your Info")).toBeInTheDocument();
+    expect(screen.getByText("Your Details")).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/e.g. My name is John Doe/)).toBeInTheDocument();
     expect(screen.getByText("Generate Resume Now")).toBeInTheDocument();
   });

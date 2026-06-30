@@ -13,6 +13,7 @@
   --name-size: 2.2rem;
   
   width: 100%;
+  min-height: 297mm;
   padding: var(--page-padding);
   margin: 0 auto;
   background-color: white;
@@ -199,4 +200,13 @@
   line-height: 1.4;
   text-align: justify;
   list-style-type: disc;
+}
+
+@media print {
+  .page {
+    box-shadow: none !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
 }

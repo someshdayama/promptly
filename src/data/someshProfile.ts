@@ -17,11 +17,10 @@ export const SOMESH_PROFILE: ResumeData = {
       startDate: "Feb 2025",
       endDate: "Present",
       description: [
-        "Release Train Engineer (RTE): Directed comprehensive release lifecycles and cross-functional CI/CD coordination for the AMP Services Product on Azure, ensuring strict alignment of delivery timelines while mitigating operational deployment risks.",
-        "Scrum Master: Orchestrated agile ceremonies and proactively eliminated operational blockers for a high-performing 18-member engineering squad, significantly enhancing sprint predictability and development velocity.",
-        "Incident Response & Release Lead: Served as primary Incident Commander during mission-critical production outages, designing and enforcing rapid-response protocols between Dev and Ops teams to drastically reduce Mean Time to Resolution (MTTR).",
-        "DevOps Orchestration: Architected robust infrastructure provisioning and automated environment setups across GCP (GKE, Compute Engine) using Jenkins, Helm, and Ansible, ensuring high availability and accelerated deployment cycles.",
-        "Infrastructure Optimization: Spearheaded self-initiated legacy system upgrades and automated continuous drift detection, successfully sustaining zero configuration drift across complex multi-cloud environments.",
+        "Direct end-to-end product releases and deployment lifecycles for AMP Services (ATM Management Platform Services), ensuring stable, compliant, and timely software deliveries.",
+        "Oversee and manage all CI/CD pipeline automation tasks for the AMPS application, streamlining build, test, and release flows to minimize deployment risks.",
+        "Lead DevOps orchestration and infrastructure activities for AMPS to optimize operational efficiency and high system availability.",
+        "Architect and build robust workflows using GitHub Actions to automate release procedures, pipeline triggers, and cloud environment deployments.",
       ],
     },
     {

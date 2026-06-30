@@ -10,7 +10,6 @@ import styles from "@/app/build/page.module.css";
 import { ResumeData } from "@/types/resume";
 
 import EditorPanel from "@/components/ui/EditorPanel";
-import AutoFitWrapper from "@/components/ui/AutoFitWrapper";
 import ResumeSkeleton from "@/components/ui/ResumeSkeleton";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 
@@ -60,14 +59,9 @@ function BuilderApp({ onGoHome }: BuilderAppProps) {
   const searchParams = useSearchParams();
   const [resumeData, setResumeData] = useState<ResumeData>(WELCOME_PROFILE);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [activeBudgetClass, setActiveBudgetClass] = useState("sp-regular");
   const [activeTemplate, setActiveTemplate] = useState<"minimalist" | "modern" | "ats">("minimalist");
   const [jobBanner, setJobBanner] = useState<{ title: string; company: string } | null>(null);
   const [isPrinting, setIsPrinting] = useState(false);
-
-  const handleZoomAndClassChange = useCallback((zoom: number, budgetClass: string) => {
-    setActiveBudgetClass(budgetClass);
-  }, []);
 
   const handleResumeDataChange = (updatedData: ResumeData) => {
     setResumeData(updatedData);
@@ -131,13 +125,6 @@ function BuilderApp({ onGoHome }: BuilderAppProps) {
             </button>
           </div>
           
-          <div className={styles.fitStatusPill}>
-            <span className={styles.pulseDot} />
-            <span>
-              {activeBudgetClass === "sp-regular" ? "Regular Space" : activeBudgetClass === "sp-compact" ? "Compact Space" : "Dense Space"}
-            </span>
-          </div>
-
           {/* Job context banner — shown when launched from Career Radar */}
           {jobBanner && (
             <div style={{
@@ -186,27 +173,21 @@ function BuilderApp({ onGoHome }: BuilderAppProps) {
         <section className={styles.previewPanel}>
           <div className={styles.resumeWrapper}>
             
-            {/* Screen preview — uses zoom for visual scaling */}
-            <div>
-              <AutoFitWrapper
-                contentDependencies={[resumeData, isGenerating]}
-                fitToSinglePage={false}
-                onZoomChange={(z, bc) => handleZoomAndClassChange(z, bc)}
-              >
-                <ErrorBoundary>
-                  <div key={activeTemplate} className={styles.templateFadeIn}>
-                    {isGenerating ? (
-                      <ResumeSkeleton />
-                    ) : activeTemplate === "modern" ? (
-                      <ModernTemplate data={resumeData} onChange={handleResumeDataChange} />
-                    ) : activeTemplate === "ats" ? (
-                      <AtsTemplate data={resumeData} onChange={handleResumeDataChange} />
-                    ) : (
-                      <MinimalistTemplate data={resumeData} onChange={handleResumeDataChange} />
-                    )}
-                  </div>
-                </ErrorBoundary>
-              </AutoFitWrapper>
+            {/* Screen preview */}
+            <div className={styles.resumeCanvas}>
+              <ErrorBoundary>
+                <div key={activeTemplate} className={`${styles.templateFadeIn} sp-comfortable`}>
+                  {isGenerating ? (
+                    <ResumeSkeleton />
+                  ) : activeTemplate === "modern" ? (
+                    <ModernTemplate data={resumeData} onChange={handleResumeDataChange} />
+                  ) : activeTemplate === "ats" ? (
+                    <AtsTemplate data={resumeData} onChange={handleResumeDataChange} />
+                  ) : (
+                    <MinimalistTemplate data={resumeData} onChange={handleResumeDataChange} />
+                  )}
+                </div>
+              </ErrorBoundary>
             </div>
 
             {/* Generating Overlay */}
@@ -220,32 +201,21 @@ function BuilderApp({ onGoHome }: BuilderAppProps) {
             )}
 
             <div
-              aria-hidden="true"
+              className={styles.printOnly}
+              ref={printRef}
               style={{
-                position: "fixed",
-                top: "-9999px",
-                left: "-9999px",
                 width: `${A4_WIDTH_MM}mm`,
-                overflow: "visible",
-                pointerEvents: "none",
               }}
             >
-              <div
-                ref={printRef}
-                style={{
-                  width: `${A4_WIDTH_MM}mm`,
-                }}
-              >
-                <ErrorBoundary>
-                  {activeTemplate === "modern" ? (
-                    <ModernTemplate data={resumeData} className={activeBudgetClass} />
-                  ) : activeTemplate === "ats" ? (
-                    <AtsTemplate data={resumeData} className={activeBudgetClass} />
-                  ) : (
-                    <MinimalistTemplate data={resumeData} className={activeBudgetClass} />
-                  )}
-                </ErrorBoundary>
-              </div>
+              <ErrorBoundary>
+                {activeTemplate === "modern" ? (
+                  <ModernTemplate data={resumeData} className="sp-comfortable" />
+                ) : activeTemplate === "ats" ? (
+                  <AtsTemplate data={resumeData} className="sp-comfortable" />
+                ) : (
+                  <MinimalistTemplate data={resumeData} className="sp-comfortable" />
+                )}
+              </ErrorBoundary>
             </div>
           </div>
         </section>

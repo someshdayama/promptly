@@ -30,7 +30,7 @@ const TEMPLATES = [
 const FAQS = [
   { q: "Is this actually free?", a: "Yes. 100% free. No paywalls, no watermarks, no credit card required. We built this to help people get jobs." },
   { q: "Do I need an account?", a: "No sign-up is required. You just paste your text, generate the resume, and download the PDF. Your data stays in your browser session." },
-  { q: "What AI does it use?", a: "Promptly uses Google's Gemini Flash model to quickly structure and optimize your raw text into a professional format." },
+  { q: "What AI does it use?", a: "Promptly uses advanced AI models to quickly structure and optimize your raw text into a professional format." },
   { q: "Are the templates ATS-friendly?", a: "Yes. All templates are built with clean, semantic HTML before being converted to PDF, ensuring applicant tracking systems can parse your text perfectly." }
 ];
 
@@ -113,12 +113,12 @@ export default function HeroPage() {
                 </p>
 
                 <div className={styles.heroCtas}>
-                  <button onClick={() => setShowBuilder(true)} className={styles.heroPrimaryBtn}>
+                  <button onClick={() => setShowBuilder(true)} className={styles.ctaPrimary}>
                     Build My Resume →
                   </button>
                   <button 
                     onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })} 
-                    className={styles.heroSecondaryBtn}
+                    className={styles.ctaSecondary}
                   >
                     See how it works
                   </button>
@@ -130,43 +130,55 @@ export default function HeroPage() {
               <div className={styles.heroVisual}>
                 <div className={styles.mockupWrap}>
                   <div className={styles.mockup}>
+                    {/* Header */}
                     <div className={styles.mockupHeader}>
-                      <div className={styles.mockupName} />
-                      <div className={styles.mockupTitle} />
-                      <div className={styles.mockupMeta}>
-                        <div className={styles.mockupMetaItem} />
-                        <div className={styles.mockupMetaItem} />
-                        <div className={styles.mockupMetaItem} />
+                      <div className={styles.mockupResumeName}>Somesh Dayama</div>
+                      <div className={styles.mockupResumeTitle}>DevOps Engineer & SRE</div>
+                      <div className={styles.mockupResumeMeta}>
+                        <span>somesh@example.com</span>
+                        <span>•</span>
+                        <span>Mumbai, India</span>
                       </div>
                     </div>
 
-                    <div className={styles.mockupSection}>
-                      <div className={styles.mockupSectionLabel} />
-                      <div className={`${styles.mockupLine} ${styles.mockupLineLong}`} />
-                      <div className={`${styles.mockupLine} ${styles.mockupLineMed}`} />
-                      <div className={`${styles.mockupLine} ${styles.mockupLineShort}`} />
+                    {/* Summary */}
+                    <div className={styles.mockupResumeSection}>
+                      <div className={styles.mockupResumeLabel}>Profile Summary</div>
+                      <p className={styles.mockupResumeText}>
+                        Cloud Engineer with 3+ years experience optimizing GCP architectures, managing CI/CD lifecycles, and reducing system downtime by 24%.
+                      </p>
                     </div>
 
-                    <div className={styles.mockupSection}>
-                      <div className={styles.mockupSectionLabel} />
-                      <div className={`${styles.mockupLine} ${styles.mockupLineLong}`} />
-                      <div className={`${styles.mockupLine} ${styles.mockupLineLong}`} />
-                      <div className={`${styles.mockupLine} ${styles.mockupLineMed}`} />
+                    {/* Experience */}
+                    <div className={styles.mockupResumeSection}>
+                      <div className={styles.mockupResumeLabel}>Experience</div>
+                      <div className={styles.mockupJobHeader}>
+                        <strong>NCR Atleos Corporation</strong>
+                        <span>2025 - Pres.</span>
+                      </div>
+                      <div className={styles.mockupJobRole}>Release Train Engineer (RTE)</div>
+                      <ul className={styles.mockupBulletList}>
+                        <li>Managed product releases & CI/CD for AMP Services.</li>
+                        <li>Created GitHub Actions workflows to automate DevOps tasks.</li>
+                      </ul>
                     </div>
 
-                    <div className={styles.mockupSection}>
-                      <div className={styles.mockupSectionLabel} />
-                      <div className={styles.mockupTags}>
-                        {[...Array(6)].map((_, i) => (
-                          <div key={i} className={styles.mockupTag} />
-                        ))}
+                    {/* Skills */}
+                    <div className={styles.mockupResumeSection} style={{ marginBottom: 0 }}>
+                      <div className={styles.mockupResumeLabel}>Skills</div>
+                      <div className={styles.mockupResumeTags}>
+                        <span>GCP</span>
+                        <span>Kubernetes</span>
+                        <span>Terraform</span>
+                        <span>CI/CD</span>
+                        <span>Docker</span>
                       </div>
                     </div>
                   </div>
 
                   <div className={styles.aiBadge}>
                     <span className={styles.aiBadgeIcon}>✦</span>
-                    Generated by Gemini AI
+                    Generated by AI
                   </div>
                 </div>
               </div>
@@ -174,7 +186,7 @@ export default function HeroPage() {
           </section>
 
           {/* ── HOW IT WORKS ── */}
-          <section id="how-it-works" className={`${styles.section} ${styles.stepsSection}`}>
+          <section id="how-it-works" className={`${styles.section} ${styles.howSection}`}>
             <div className={styles.sectionInner}>
               <p
                 className={`${styles.sectionLabel} ${styles.reveal}`}
@@ -400,8 +412,7 @@ export default function HeroPage() {
 
           {/* ── FOOTER ── */}
           <footer className={styles.footer}>
-            <span className={styles.footerLogo}>promptly</span>
-            <span className={styles.footerCopy}>© {new Date().getFullYear()} Promptly. Built with Gemini AI.</span>
+            <span className={styles.footerCopy}>© {new Date().getFullYear()} Promptly. All rights reserved.</span>
           </footer>
 
         </div>

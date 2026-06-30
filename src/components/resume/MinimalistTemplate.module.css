@@ -14,6 +14,7 @@
   --name-size: 2.4rem;
 
   width: 100%;
+  min-height: 297mm;
   padding: var(--page-padding);
   margin: 0 auto;
   background-color: white;
