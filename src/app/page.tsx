@@ -39,6 +39,25 @@ export default function HeroPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const revealRefs = useRef<(HTMLElement | null)[]>([]);
 
+  // Persist statefulness across refreshes
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.hash === '#builder' || url.searchParams.has('jobTitle') || sessionStorage.getItem('promptly_builder_open') === 'true') {
+      setShowBuilder(true);
+    }
+  }, []);
+
+  const handleSetShowBuilder = (show: boolean) => {
+    setShowBuilder(show);
+    if (show) {
+      sessionStorage.setItem('promptly_builder_open', 'true');
+      window.history.replaceState(null, '', '#builder');
+    } else {
+      sessionStorage.removeItem('promptly_builder_open');
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -85,7 +104,7 @@ export default function HeroPage() {
               <button className={styles.navLink} onClick={() => document.getElementById("templates")?.scrollIntoView({ behavior: "smooth" })}>
                 Templates
               </button>
-              <button className={styles.navCta} onClick={() => setShowBuilder(true)}>
+              <button className={styles.navCta} onClick={() => handleSetShowBuilder(true)}>
                 Build Resume
               </button>
             </div>
@@ -113,7 +132,7 @@ export default function HeroPage() {
                 </p>
 
                 <div className={styles.heroCtas}>
-                  <button onClick={() => setShowBuilder(true)} className={styles.ctaPrimary}>
+                  <button onClick={() => handleSetShowBuilder(true)} className={styles.ctaPrimary}>
                     Build My Resume →
                   </button>
                   <button 
@@ -277,7 +296,7 @@ export default function HeroPage() {
               <div className={styles.templatesGrid}>
                 {TEMPLATES.map((t, i) => (
                   <button
-                    onClick={() => setShowBuilder(true)}
+                    onClick={() => handleSetShowBuilder(true)}
                     key={t.badge}
                     className={`${styles.templateCard} ${styles.reveal}`}
                     ref={(el) => addReveal(el, 23 + i)}
@@ -401,7 +420,7 @@ export default function HeroPage() {
               No sign-up. No credit card. Just paste and go.
             </p>
             <button
-              onClick={() => setShowBuilder(true)}
+              onClick={() => handleSetShowBuilder(true)}
               className={`${styles.ctaBannerBtn} ${styles.reveal}`}
               ref={(el) => addReveal(el, 52)}
               style={{ transitionDelay: "0.2s" }}
@@ -420,7 +439,7 @@ export default function HeroPage() {
 
       {/* ── BUILDER APP ── */}
       <div className={`${styles.builderView} ${showBuilder ? styles.slideInRight : ""}`}>
-        {showBuilder && <BuilderApp onGoHome={() => setShowBuilder(false)} />}
+        {showBuilder && <BuilderApp onGoHome={() => handleSetShowBuilder(false)} />}
       </div>
     </div>
   );

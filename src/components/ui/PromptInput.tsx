@@ -140,6 +140,16 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
             />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.4rem' }}>
+              <span style={{
+                fontSize: '0.72rem',
+                color: prompt.length > 4000 ? '#f43f5e' : prompt.length > 2000 ? '#fbbf24' : '#64748b',
+                fontVariantNumeric: 'tabular-nums',
+                transition: 'color 0.2s',
+              }}>
+                {prompt.length.toLocaleString()} chars{prompt.length > 2000 ? ' · great detail!' : ''}
+              </span>
+            </div>
           </div>
         ) : (
           <div className={styles.stepCard}>
@@ -155,6 +165,15 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
               value={jobDesc}
               onChange={(e) => setJobDesc(e.target.value)}
             />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.4rem' }}>
+              <span style={{
+                fontSize: '0.72rem',
+                color: jobDesc.length > 3000 ? '#f43f5e' : '#64748b',
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {jobDesc.length > 0 ? `${jobDesc.length.toLocaleString()} chars` : 'Paste a job posting for best results'}
+              </span>
+            </div>
           </div>
         )}
       </div>
