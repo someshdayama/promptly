@@ -109,63 +109,69 @@ export async function POST(req: Request) {
     const activeProfile = candidateProfile || SOMESH_PROFILE;
 
     if (jobContext) {
-      // JOB-TAILORED MODE: very specific instructions per role
-      // If a custom prompt was entered by the user, we supply it as the candidate source text.
-      // Otherwise, we use the active profile JSON.
+      // JOB-TAILORED MODE: High-impact ATS tailoring engine
       const candidateSourceText = prompt
-        ? `CANDIDATE SOURCE PROFILE (Raw Text):\n${prompt}`
+        ? `CANDIDATE SOURCE PROFILE (Raw Text / CV):\n${prompt}`
         : `CANDIDATE DATA JSON:\n${JSON.stringify(activeProfile)}`;
 
+      const targetTitle = jobContext.title && jobContext.title !== "Target Role" ? jobContext.title : "the target role";
+      const targetCompany = jobContext.company && jobContext.company !== "Target Company" ? jobContext.company : "the target company";
+
       finalPrompt = `
-TARGET JOB:
-Title: ${jobContext.title}
-Company: ${jobContext.company}
-Location: ${jobContext.location || 'India'}
-Job Description / Context: ${jobContext.description || 'Not provided'}
+TARGET JOB CONTEXT:
+Provided Title: ${jobContext.title || 'Unspecified'}
+Provided Company: ${jobContext.company || 'Unspecified'}
+Provided Location: ${jobContext.location || 'India'}
+Full Job Description: ${jobContext.description || 'See source text'}
 
 ${candidateSourceText}
 `.trim();
 
       systemInstruction = `
-You are a world-class executive resume writer and career coach. Your task is to produce a highly TAILORED resume JSON matching the provided schema for the candidate applying to the TARGET JOB.
+You are an elite executive resume writer, ATS optimization strategist, and tech recruiter.
+Your task is to transform the candidate's background into a world-class, ATS-optimized resume JSON matching the exact schema provided, specifically tailored for ${targetTitle} at ${targetCompany}.
 
-MANDATORY RULES — Follow each one precisely:
+CORE OPTIMIZATION RULES — Follow each precisely:
 
-1. TRUTH & INTEGRITY: Extract real data from the CANDIDATE SOURCE. Do NOT invent new experiences, companies, metrics, schools, or credentials. Maintain 100% factual accuracy.
+1. DYNAMIC JOB & COMPANY MATCHING:
+   - Analyze the target job description to extract the exact role title, target company name, core technical keywords, required skills, and domain focus.
+   - Use the extracted target company name and role title in the professional summary if they are clear from context.
 
-2. PROFESSIONAL SUMMARY: Write a highly compelling, 2-3 sentence executive summary that:
-   - Explicitly names the target company ("${jobContext.company}") and target role ("${jobContext.title}").
-   - Synthesizes the candidate's most relevant background, emphasizing their unique value proposition for this exact role.
-   - Integrates core keywords from the job description naturally.
+2. ATS KEYWORD OPTIMIZATION & RELEVANCE:
+   - Identify the top high-frequency technical keywords, frameworks, tools, and methodologies in the job description.
+   - Inject these matching keywords naturally into the Summary, Work Experience bullets, and Skills array.
 
-3. EXPERIENCE OPTIMIZATION: For EVERY single work experience entry (Do NOT omit any jobs):
-   - Select or rewrite the bullet points to strongly align with the target role, retaining all key achievements, details, and technical scope (do not artificially restrict content to force it onto a single page).
-   - Use the XYZ formula (Accomplished [X] as measured by [Y], by doing [Z]) or STAR method, leveraging existing metrics.
-   - Begin every bullet point with a strong, high-impact action verb.
-   - Contextual Tailoring:
-     * If the job leans Cloud/Infrastructure: Emphasize provisioning (GCP/AWS/Azure), IaC (Terraform), and containerization (K8s/Docker).
-     * If the job leans SRE/DevOps: Highlight CI/CD efficiency, MTTR reduction, automation, and reliability.
-     * If the job leans Software Engineering: Focus on core development, system design, and cross-functional delivery.
-     * If the job leans Leadership/RTE: Showcase stakeholder management, unblocking teams, and release orchestration.
-   - Never fabricate data. If metrics do not exist in the source, focus on the qualitative impact and technical scope.
+3. HIGH-IMPACT BULLET POINT REWRITING (Google XYZ Formula):
+   - For EVERY work experience entry, rewrite bullet points using the XYZ formula: "Accomplished [X], as measured by [Y], by doing [Z]".
+   - Begin EVERY bullet point with a powerful active verb (e.g., Spearheaded, Architected, Engineered, Optimized, Orchestrated, Automated, Reduced).
+   - Retain 100% of existing quantitative metrics (percentages, cost savings, downtime reductions, team sizes). If metrics are absent, highlight technical complexity, scale, and business impact.
+   - Never fabricate non-existent companies, degrees, dates, or credentials.
 
-4. SKILLS CURATION: Reorder the skills array so the absolute most relevant technical and soft skills for "${jobContext.title}" appear first. Retain all relevant skills that reflect the candidate's core competencies.
+4. EXECUTIVE PROFESSIONAL SUMMARY:
+   - Draft a crisp 2-3 sentence executive summary tailored for the target job.
+   - Explicitly highlight core competencies, key metrics, and value proposition for the target role.
 
-5. FORMAT & SCHEMA: Adhere strictly to the requested JSON schema. Validate that all dates, company names, and contact details match the input.
-      `.trim();
+5. SKILLS CURATION & ORDERING:
+   - Reorder the skills array so the technical and soft skills most relevant to the target job description appear FIRST.
+   - Retain all authentic skills from the candidate profile.
+
+6. STRICT SCHEMA ADHERENCE:
+   - Return valid JSON matching the schema. Ensure fullName, email, phone, location, linkedinUrl, experience, education, and skills are populated cleanly.
+`.trim();
     } else {
-      // GENERIC MODE: parse raw text prompt into structured resume
+      // GENERIC MODE: Parse & optimize raw text into structured resume JSON
       finalPrompt = prompt;
       systemInstruction = `
-You are a world-class executive resume writer and parser.
-Your task is to take raw, unstructured candidate text and structure it into a clean, professional JSON format matching the exact schema provided.
+You are a world-class executive resume writer and ATS parser.
+Your task is to parse raw candidate text and structure it into a clean, highly polished JSON format matching the schema provided.
 
-CRITICAL INSTRUCTIONS:
-1. Extract and include EVERY single work experience, education, and skill listed in the input. Do NOT omit or consolidate anything.
-2. If a professional summary is missing, write a compelling 2-3 sentence summary that highlights the candidate's core strengths based on their experience.
-3. Enhance the bullet points to be action-oriented, starting with strong verbs. Maintain all existing metrics and factual data; do NOT fabricate information.
-4. Output ONLY valid JSON.
-      `.trim();
+INSTRUCTIONS:
+1. Extract all personal contact info (name, email, phone, location, LinkedIn URL) accurately.
+2. Extract and preserve EVERY work experience, job title, company, start/end dates, education, and skill.
+3. Enhance work experience bullet points to start with strong active verbs (e.g. Engineered, Spearheaded, Optimized, Automated) while preserving all facts and metrics.
+4. Craft a compelling 2-3 sentence professional summary highlighting core engineering strengths.
+5. Return ONLY valid JSON matching the schema.
+`.trim();
     }
 
     const fullPrompt = `${systemInstruction}\n\n${finalPrompt}`;
@@ -177,8 +183,9 @@ CRITICAL INSTRUCTIONS:
       throw new Error('No output generated from AI');
     }
 
-    // Gemini with responseMimeType: 'application/json' returns clean JSON directly
-    const parsedData = JSON.parse(outputText);
+    // Clean JSON response string (strip markdown code fences if present)
+    const cleanedText = outputText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+    const parsedData = JSON.parse(cleanedText);
 
     return NextResponse.json({ data: parsedData });
   } catch (error: unknown) {

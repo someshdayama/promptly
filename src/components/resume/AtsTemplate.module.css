@@ -206,7 +206,12 @@
   .page {
     box-shadow: none !important;
     width: 100% !important;
+    min-height: auto !important;
     height: auto !important;
     overflow: visible !important;
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }

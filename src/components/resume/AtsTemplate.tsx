@@ -34,33 +34,30 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
         />
 
         <div className={styles.contactInfo}>
-          {data.personalInfo?.location && (
-            <>
+          {[
+            data.personalInfo?.location && (
               <span
+                key="location"
                 className={styles.editable}
                 contentEditable={!!onChange}
                 suppressContentEditableWarning
                 onBlur={(e) => updatePersonalInfo("location", e.currentTarget.innerText)}
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.location) }}
               />
-              <span className={styles.contactSeparator}>|</span>
-            </>
-          )}
-          {data.personalInfo?.phone && (
-            <>
+            ),
+            data.personalInfo?.phone && (
               <span
+                key="phone"
                 className={styles.editable}
                 contentEditable={!!onChange}
                 suppressContentEditableWarning
                 onBlur={(e) => updatePersonalInfo("phone", e.currentTarget.innerText)}
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.phone) }}
               />
-              <span className={styles.contactSeparator}>|</span>
-            </>
-          )}
-          {data.personalInfo?.email && (
-            <>
+            ),
+            data.personalInfo?.email && (
               <a
+                key="email"
                 href={`mailto:${data.personalInfo.email}`}
                 onClick={(e) => {
                   if (onChange) e.preventDefault();
@@ -75,12 +72,10 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
                   dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.email) }}
                 />
               </a>
-            </>
-          )}
-          {data.personalInfo?.linkedinUrl && (
-            <>
-              <span className={styles.contactSeparator}>|</span>
+            ),
+            data.personalInfo?.linkedinUrl && (
               <a 
+                key="linkedin"
                 href={data.personalInfo.linkedinUrl.startsWith("http") ? data.personalInfo.linkedinUrl : `https://${data.personalInfo.linkedinUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -97,8 +92,15 @@ export default function AtsTemplate({ data, className, onChange }: AtsTemplatePr
                   dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.linkedinUrl.replace("https://www.", "")) }}
                 />
               </a>
-            </>
-          )}
+            ),
+          ]
+            .filter(Boolean)
+            .map((item, idx, arr) => (
+              <React.Fragment key={idx}>
+                {item}
+                {idx < arr.length - 1 && <span className={styles.contactSeparator}>|</span>}
+              </React.Fragment>
+            ))}
         </div>
       </div>
 

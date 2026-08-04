@@ -67,7 +67,9 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
         ? `${prompt}\n\n--- TARGET JOB DESCRIPTION ---\n${jobDesc}\n\nPlease tailor my resume summary, skills, and bullet points to match the keywords and requirements in this job description.` 
         : prompt;
         
-      const contextToSend = jobContext || (jobDesc.trim() ? { title: "Target Role", company: "Target Company" } : undefined);
+      const contextToSend = jobContext 
+        ? { ...jobContext, ...(jobDesc.trim() ? { description: jobDesc.trim() } : {}) }
+        : (jobDesc.trim() ? { title: "Target Role", company: "Target Company", description: jobDesc.trim() } : undefined);
 
       const res = await fetch("/api/generate", {
         method: "POST",

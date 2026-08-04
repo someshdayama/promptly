@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { ResumeData } from "@/types/resume";
 import styles from "./MinimalistTemplate.module.css";
 import { useResumeEditor } from "@/hooks/useResumeEditor";
@@ -36,48 +37,45 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo?.fullName || "Your Name") }}
         />
         <div className={styles.contact}>
-          {data.personalInfo?.email && (
-            <a
-              href={`mailto:${data.personalInfo.email}`}
-              onClick={(e) => {
-                if (isEditable) e.preventDefault();
-              }}
-              style={{ color: "inherit", textDecoration: "none" }}
-            >
+          {[
+            data.personalInfo?.email && (
+              <a
+                key="email"
+                href={`mailto:${data.personalInfo.email}`}
+                onClick={(e) => {
+                  if (isEditable) e.preventDefault();
+                }}
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
+                <span
+                  contentEditable={isEditable}
+                  suppressContentEditableWarning
+                  onBlur={(e) => updatePersonalInfo("email", e.currentTarget.innerText)}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.email) }}
+                />
+              </a>
+            ),
+            data.personalInfo?.phone && (
               <span
-                contentEditable={isEditable}
-                suppressContentEditableWarning
-                onBlur={(e) => updatePersonalInfo("email", e.currentTarget.innerText)}
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.email) }}
-              />
-            </a>
-          )}
-          {data.personalInfo?.phone && (
-            <>
-              <span className={styles.dot}>•</span>
-              <span
+                key="phone"
                 contentEditable={isEditable}
                 suppressContentEditableWarning
                 onBlur={(e) => updatePersonalInfo("phone", e.currentTarget.innerText)}
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.phone) }}
               />
-            </>
-          )}
-          {data.personalInfo?.location && (
-            <>
-              <span className={styles.dot}>•</span>
+            ),
+            data.personalInfo?.location && (
               <span
+                key="location"
                 contentEditable={isEditable}
                 suppressContentEditableWarning
                 onBlur={(e) => updatePersonalInfo("location", e.currentTarget.innerText)}
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.personalInfo.location) }}
               />
-            </>
-          )}
-          {data.personalInfo?.linkedinUrl && (
-            <>
-              <span className={styles.dot}>•</span>
+            ),
+            data.personalInfo?.linkedinUrl && (
               <a
+                key="linkedin"
                 href={data.personalInfo.linkedinUrl.startsWith("http") ? data.personalInfo.linkedinUrl : `https://${data.personalInfo.linkedinUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -86,8 +84,15 @@ export default function MinimalistTemplate({ data, className = "", onChange }: M
               >
                 linkedin
               </a>
-            </>
-          )}
+            ),
+          ]
+            .filter(Boolean)
+            .map((item, idx, arr) => (
+              <React.Fragment key={idx}>
+                {item}
+                {idx < arr.length - 1 && <span className={styles.dot}>•</span>}
+              </React.Fragment>
+            ))}
         </div>
       </header>
 

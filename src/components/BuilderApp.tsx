@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, Suspense } from "react";
-import Link from "next/link";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useReactToPrint } from "react-to-print";
 import { Download, Sparkles, Loader2 } from "lucide-react";
@@ -33,9 +32,8 @@ const STORAGE_KEY = "promptly_saved_prompt";
 import { serializeProfileToPrompt } from "@/utils/promptSerializer";
 
 
-// A4 dimensions in mm
+// A4 width in mm
 const A4_WIDTH_MM = 210;
-const A4_HEIGHT_MM = 297;
 
 const WELCOME_PROFILE: ResumeData = {
   personalInfo: {
@@ -69,19 +67,73 @@ function BuilderApp({ onGoHome }: BuilderAppProps) {
     localStorage.setItem(STORAGE_KEY, serialized);
   };
 
-  // Hidden print target — renders template at natural A4 width, no zoom wrapper
+  // Hidden print target — renders template at natural A4 width
   const printRef = useRef<HTMLDivElement>(null);
+
+  const rawName = resumeData.personalInfo?.fullName || "Resume";
+  const sanitizedName = rawName
+    .trim()
+    .replace(/[^a-zA-Z0-9]/g, "_")
+    .replace(/_+/g, "_");
+  const documentTitle = `${sanitizedName}_Resume`;
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: `${resumeData.personalInfo?.fullName || "Resume"}_CV`,
+    documentTitle,
     pageStyle: `
-      @page { size: ${A4_WIDTH_MM}mm ${A4_HEIGHT_MM}mm; margin: 10mm; }
-      html, body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      /* Safari fix — @page adds 10mm margin, so strip equivalent top/bottom padding from any template's
-         root element. This is centralized here so no individual template needs to handle it. */
-      [data-resume-print] > * { padding-top: 0 !important; padding-bottom: 0 !important; }
-      [data-resume-print] > * > * { padding-top: 0 !important; padding-bottom: 0 !important; }
+      @page { 
+        size: A4 portrait; 
+        margin: 8mm 10mm; 
+      }
+      *, *::before, *::after {
+        box-sizing: border-box !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      html, body { 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        background: white !important; 
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      [contenteditable] {
+        outline: none !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+      /* Prevent orphaned section headings */
+      h1, h2, h3, h4, 
+      [class*="sectionTitle"], 
+      [class*="sidebarTitle"],
+      [class*="jobHeader"], 
+      [class*="educationHeader"],
+      [class*="itemHeader"] {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+      }
+      /* Prevent splitting job & education blocks across pages */
+      [class*="job"], 
+      [class*="educationItem"], 
+      [class*="sidebarSection"],
+      [class*="item"],
+      ul li {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      /* Print Canvas Container */
+      [data-resume-print] {
+        width: 100% !important;
+        max-width: 210mm !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        background: white !important;
+      }
+      [data-resume-print] > * {
+        box-shadow: none !important;
+      }
     `,
     onAfterPrint: () => setIsPrinting(false),
   });
