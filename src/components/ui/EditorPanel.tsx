@@ -1,6 +1,7 @@
 "use client";
 
 import PromptInput from "./PromptInput";
+import ResumeCheck from "./ResumeCheck";
 import { ResumeData } from "@/types/resume";
 
 interface EditorPanelProps {
@@ -9,27 +10,28 @@ interface EditorPanelProps {
   onLoading?: (isLoading: boolean) => void;
   jobContext?: { title: string; company: string };
   initialJobDesc?: string;
+  onResetExample?: () => void;
 }
 
 export default function EditorPanel({
+  resumeData,
   onDataChange,
   onLoading,
   jobContext,
   initialJobDesc,
+  onResetExample,
 }: EditorPanelProps) {
-  const handleGeneratedData = (updatedData: ResumeData) => {
-    onDataChange(updatedData);
-  };
-
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <div style={{ flex: 1, overflowY: "auto" }}>
         <PromptInput
-          onDataGenerated={handleGeneratedData}
+          onDataGenerated={onDataChange}
           onLoading={onLoading}
           jobContext={jobContext}
           initialJobDesc={initialJobDesc}
+          onResetExample={onResetExample}
         />
+        <ResumeCheck resumeData={resumeData} />
       </div>
     </div>
   );
