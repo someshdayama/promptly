@@ -4,7 +4,7 @@ import styles from "./ResumeSkeleton.module.css";
 
 export default function ResumeSkeleton() {
   return (
-    <div className={styles.skeletonWrapper}>
+    <div className={styles.skeletonWrapper} data-skeleton="true" aria-busy="true" aria-label="Loading resume">
       <div className={styles.header}>
         <div className={`${styles.box} ${styles.avatar}`}></div>
         <div className={`${styles.box} ${styles.title}`}></div>

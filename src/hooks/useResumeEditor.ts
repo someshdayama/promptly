@@ -1,4 +1,6 @@
-import { ResumeData } from "@/types/resume";
+import { ResumeData, SkillGroup } from "@/types/resume";
+import { normalizeUrl } from "@/utils/links";
+import { parseSkillList } from "@/utils/skills";
 
 export function useResumeEditor(data: ResumeData, onChange?: (updated: ResumeData) => void) {
   const isEditable = !!onChange;
@@ -87,14 +89,57 @@ export function useResumeEditor(data: ResumeData, onChange?: (updated: ResumeDat
     });
   };
 
-  const handleLinkedinClick = (e: React.MouseEvent) => {
+  /**
+   * In edit mode, clicking a profile link asks for a new URL instead of navigating.
+   * An empty answer removes the link.
+   */
+  const handleLinkClick = (field: "linkedinUrl" | "portfolioUrl", label: string) => (e: React.MouseEvent) => {
     if (!isEditable) return;
     e.preventDefault();
-    const currentUrl = data.personalInfo?.linkedinUrl || "";
-    const newUrl = prompt("Enter your LinkedIn URL:", currentUrl);
+    const currentUrl = data.personalInfo?.[field] || "";
+    const newUrl = prompt(`Enter your ${label} URL (leave empty to remove):`, currentUrl);
     if (newUrl !== null) {
-      updatePersonalInfo("linkedinUrl", newUrl);
+      const trimmed = newUrl.trim();
+      updatePersonalInfo(field, trimmed ? normalizeUrl(trimmed) || currentUrl : "");
     }
+  };
+
+  const handleLinkedinClick = handleLinkClick("linkedinUrl", "LinkedIn");
+
+  /** Renames the company on every role in a grouped company block in one update. */
+  const updateCompanyForRoles = (indices: number[], value: string) => {
+    if (!onChange) return;
+    const updatedExp = [...(data.experience || [])];
+    indices.forEach((i) => {
+      if (updatedExp[i]) updatedExp[i] = { ...updatedExp[i], company: value };
+    });
+    onChange({ ...data, experience: updatedExp });
+  };
+
+  /** Updates the items of one skill group. Seeds explicit groups from `groups` (e.g. auto-grouped) if needed. */
+  const updateSkillGroupItems = (groups: SkillGroup[], groupIndex: number, text: string) => {
+    if (!onChange) return;
+    const items = parseSkillList(text);
+    const updatedGroups = groups
+      .map((g, i) => (i === groupIndex ? { ...g, items } : g))
+      .filter((g) => g.items.length > 0);
+    onChange({
+      ...data,
+      skillGroups: updatedGroups,
+      skills: updatedGroups.flatMap((g) => g.items),
+    });
+  };
+
+  const updateSkillsFromText = (text: string) => {
+    if (!onChange) return;
+    onChange({ ...data, skills: parseSkillList(text), skillGroups: undefined });
+  };
+
+  const updateCertification = (index: number, value: string) => {
+    if (!onChange) return;
+    const certs = [...(data.certifications || [])];
+    certs[index] = value.trim();
+    onChange({ ...data, certifications: certs.filter(Boolean) });
   };
 
   const handleJobDateBlur = (index: number, text: string) => {
@@ -150,6 +195,11 @@ export function useResumeEditor(data: ResumeData, onChange?: (updated: ResumeDat
     updateEduField,
     updateSkill,
     handleLinkedinClick,
+    handleLinkClick,
+    updateCompanyForRoles,
+    updateSkillGroupItems,
+    updateSkillsFromText,
+    updateCertification,
     handleJobDateBlur,
     handleEduDateBlur,
   };
