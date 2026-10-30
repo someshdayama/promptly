@@ -1125,3 +1125,9 @@
   .featuresGrid { grid-template-columns: 1fr; }
   .ctaBanner { padding: 5rem 1.25rem; }
 }
+
+.candidateMeta a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

@@ -68,6 +68,6 @@ describe("MinimalistTemplate Component", () => {
   it("renders skill tags", () => {
     render(<MinimalistTemplate data={mockResumeData} />);
     expect(screen.getByText("Skills")).toBeInTheDocument();
-    expect(screen.getByText("React • Node.js • Docker")).toBeInTheDocument();
+    expect(screen.getByText("React, Node.js, Docker")).toBeInTheDocument();
   });
 });

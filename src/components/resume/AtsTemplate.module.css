@@ -1,217 +1,107 @@
-/* ── Strict ATS Optimized Template ──
-   Legacy-parser friendly, single column, strict serif typography.
-   No icons, no columns, standard bullet points.
+/* ── ATS template ──
+   Single column, plain section headings with a thin rule, real text only
+   (no icons, tables or columns) so applicant tracking systems parse it cleanly.
+   Spacing classes (.sp-*) are applied by the builder to fit one page.
 */
 
 .page {
-  /* Default fallbacks */
-  --page-padding: 24px 48px;
-  --section-gap: 0.8rem;
-  --item-list-gap: 0.6rem;
-  --text-base-size: 0.85rem;
-  --text-title-size: 0.95rem;
-  --name-size: 2.2rem;
-  
+  --page-padding: 28px 40px;
+  --section-gap: 10px;
+  --item-gap: 8px;
+  --text-size: 10pt;
+  --small-size: 9.5pt;
+  --title-size: 10.5pt;
+  --name-size: 22pt;
+  --line: 1.35;
+
   width: 100%;
   min-height: 297mm;
   padding: var(--page-padding);
   margin: 0 auto;
-  background-color: white;
-  color: black;
-  font-family: var(--resume-font, 'Inter', sans-serif);
+  background: #fff;
+  color: #111;
+  font-family: var(--resume-font, "Inter", Arial, sans-serif);
+  font-size: var(--text-size);
+  line-height: var(--line);
   box-sizing: border-box;
-  line-height: 1.4;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
+  text-align: left;
 }
 
-/* Global Spacing variables applied dynamically by the wrapper */
-.page:global(.sp-comfortable) {
-  --page-padding: 24px 48px;
-  --section-gap: 0.8rem;
-  --item-list-gap: 0.6rem;
-  --text-base-size: 0.85rem;
-  --text-title-size: 0.95rem;
-  --name-size: 2.2rem;
-}
+.page:global(.sp-comfortable) { --page-padding: 28px 40px; --section-gap: 10px; --item-gap: 8px; --text-size: 10pt; --small-size: 9.5pt; --title-size: 10.5pt; --name-size: 22pt; --line: 1.35; }
+.page:global(.sp-regular) { --page-padding: 22px 34px; --section-gap: 8px; --item-gap: 6px; --text-size: 9.6pt; --small-size: 9.1pt; --title-size: 10.2pt; --name-size: 20pt; --line: 1.3; }
+.page:global(.sp-compact) { --page-padding: 16px 28px; --section-gap: 6px; --item-gap: 5px; --text-size: 9.2pt; --small-size: 8.8pt; --title-size: 9.8pt; --name-size: 18pt; --line: 1.27; }
+.page:global(.sp-dense) { --page-padding: 10px 22px; --section-gap: 5px; --item-gap: 4px; --text-size: 8.8pt; --small-size: 8.4pt; --title-size: 9.4pt; --name-size: 17pt; --line: 1.22; }
 
-.page:global(.sp-regular) {
-  --page-padding: 20px 42px;
-  --section-gap: 0.7rem;
-  --item-list-gap: 0.5rem;
-  --text-base-size: 0.82rem;
-  --text-title-size: 0.9rem;
-  --name-size: 2.0rem;
-}
-
-.page:global(.sp-compact) {
-  --page-padding: 16px 32px;
-  --section-gap: 0.6rem;
-  --item-list-gap: 0.4rem;
-  --text-base-size: 0.8rem;
-  --text-title-size: 0.86rem;
-  --name-size: 1.8rem;
-}
-
-.page:global(.sp-dense) {
-  --page-padding: 12px 24px;
-  --section-gap: 0.5rem;
-  --item-list-gap: 0.35rem;
-  --text-base-size: 0.76rem;
-  --text-title-size: 0.82rem;
-  --name-size: 1.6rem;
-}
-
-/* Base text */
-.text {
-  font-size: var(--text-base-size);
-  color: black;
-  margin: 0;
-  line-height: 1.4;
-}
-
-/* Editable fields */
-.editable {
-  outline: none;
-  cursor: text;
-  border-radius: 2px;
-  transition: background-color 0.2s;
-}
-
-.editable:hover,
-.editable:focus {
-  background-color: rgba(0, 0, 0, 0.05);
-}
+.page h1, .page h2, .page h3, .page p, .page ul { margin: 0; padding: 0; }
 
 /* Header */
-.header {
-  text-align: center;
-  margin-bottom: var(--section-gap);
-}
-
+.header { text-align: center; margin-bottom: var(--section-gap); }
 .name {
   font-size: var(--name-size);
-  font-weight: bold;
-  line-height: 1.1;
-  margin: 0 0 0.4rem 0;
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  margin-bottom: 4px;
 }
-
-.contactInfo {
-  font-size: var(--text-base-size);
-}
-
-.contactSeparator {
-  margin: 0 0.5rem;
-  color: #666;
-}
+.contact { font-size: var(--small-size); color: #222; }
+.contactLine { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; }
+.contactSeparator { margin: 0 0.45em; color: #555; }
+.contactLink { color: #1a4fa0; text-decoration: underline; text-underline-offset: 2px; }
+.linkLabel { color: #222; }
 
 /* Sections */
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  margin-bottom: var(--section-gap);
-}
-
+.section { margin-bottom: var(--section-gap); break-inside: auto; }
+.section:last-child { margin-bottom: 0; }
 .sectionTitle {
-  font-size: var(--text-title-size);
-  font-weight: bold;
+  font-size: var(--title-size);
+  font-weight: 800;
   text-transform: uppercase;
-  color: black;
-  margin: 0;
-  padding-bottom: 0.2rem;
-  border-bottom: 1px solid black;
-  page-break-after: avoid;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid #111;
+  padding-bottom: 1px;
+  margin-bottom: 4px;
   break-after: avoid;
+  page-break-after: avoid;
 }
 
-.summary {
-  font-size: var(--text-base-size);
-  line-height: 1.5;
-  text-align: justify;
-}
+.summary { color: #111; }
 
 /* Skills */
-.skillsList {
-  font-size: var(--text-base-size);
-  line-height: 1.5;
-}
+.skillGroups { list-style: none; }
+.skillRow { margin: 0 0 1px; }
+.skillCategory { font-weight: 700; }
+.skillsList { color: #111; }
 
-/* Item Lists (Experience, Education) */
-.itemList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--item-list-gap);
-}
+/* Experience & education */
+.itemList { display: flex; flex-direction: column; gap: var(--item-gap); }
+.item { break-inside: avoid; page-break-inside: avoid; }
+.itemHeader { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.company, .institution { font-size: var(--text-size); font-weight: 700; }
+.itemDate { white-space: nowrap; text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.role + .role { margin-top: 3px; }
+.roleLine { display: flex; flex-wrap: wrap; align-items: baseline; }
+.position { font-weight: 700; }
+.degree { font-weight: 600; font-size: var(--small-size); }
+.roleSeparator { color: #555; margin: 0 0.4em; }
+.roleDate, .roleNote { color: #222; }
 
-.item {
-  page-break-inside: avoid;
+.bulletList { list-style: none; margin-top: 2px; }
+.bullet {
+  position: relative;
+  padding-left: 14px;
+  margin-bottom: 1px;
   break-inside: avoid;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
 }
+.bullet::before { content: "•"; position: absolute; left: 3px; top: 0; }
 
-.itemHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  page-break-after: avoid;
-  break-after: avoid;
-}
+.plainList { list-style: none; }
 
-.company {
-  font-size: var(--text-title-size);
-  font-weight: bold;
-}
-
-.location {
-  font-size: var(--text-base-size);
-}
-
-.positionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: var(--text-base-size);
-  page-break-after: avoid;
-  break-after: avoid;
-}
-
-.position {
-  font-weight: bold;
-}
-
-.itemDate {
-  white-space: nowrap;
-}
-
-.bulletList {
-  margin: 0.1rem 0 0 0;
-  padding-left: 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.bulletList li {
-  font-size: var(--text-base-size);
-  line-height: 1.4;
-  text-align: justify;
-  list-style-type: disc;
-}
+/* Editing affordances (builder only, never printed) */
+.isEditable [contenteditable="true"] { border-radius: 2px; cursor: text; outline: none; transition: background-color 0.15s; }
+.isEditable [contenteditable="true"]:hover { background-color: rgba(26, 79, 160, 0.06); }
+.isEditable [contenteditable="true"]:focus { background-color: rgba(26, 79, 160, 0.1); box-shadow: 0 0 0 1px rgba(26, 79, 160, 0.35); }
 
 @media print {
-  .page {
-    box-shadow: none !important;
-    width: 100% !important;
-    min-height: auto !important;
-    height: auto !important;
-    overflow: visible !important;
-    background: white !important;
-    color: black !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
+  .page { min-height: auto !important; width: 100% !important; box-shadow: none !important; }
 }

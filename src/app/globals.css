@@ -117,3 +117,18 @@ textarea {
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+/* Resume templates rendered inside a page "sheet" (preview, print and measuring):
+   the sheet/@page supplies the margins, so the template adds none. */
+.resume-in-sheet {
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Visible keyboard focus for app controls */
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}

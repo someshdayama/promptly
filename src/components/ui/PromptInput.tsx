@@ -10,6 +10,8 @@ interface PromptInputProps {
   onLoading?: (isLoading: boolean) => void;
   jobContext?: { title: string; company: string };
   initialJobDesc?: string;
+  /** Also show the example resume in the preview when "Example" is clicked. */
+  onResetExample?: () => void;
 }
 
 import { SOMESH_PROFILE } from "@/data/someshProfile";
@@ -19,7 +21,7 @@ const DEFAULT_PROFILE_TEXT = serializeProfileToPrompt(SOMESH_PROFILE);
 
 const STORAGE_KEY = "promptly_saved_prompt";
 
-export default function PromptInput({ onDataGenerated, onLoading, jobContext, initialJobDesc }: PromptInputProps) {
+export default function PromptInput({ onDataGenerated, onLoading, jobContext, initialJobDesc, onResetExample }: PromptInputProps) {
   const [prompt, setPrompt] = useState("");
   const [jobDesc, setJobDesc] = useState(initialJobDesc || "");
   const [isLoading, setIsLoading] = useState(false);
@@ -102,13 +104,16 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
   const handleInsertExample = () => {
     setPrompt(DEFAULT_PROFILE_TEXT);
     setError("");
+    onResetExample?.();
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.tabHeader}>
+      <div className={styles.tabHeader} role="tablist" aria-label="Resume inputs">
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === "profile"}
           className={`${styles.tabButton} ${activeTab === "profile" ? styles.activeTab : ""}`}
           onClick={() => setActiveTab("profile")}
         >
@@ -116,6 +121,8 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === "job"}
           className={`${styles.tabButton} ${activeTab === "job" ? styles.activeTab : ""}`}
           onClick={() => setActiveTab("job")}
         >
@@ -129,8 +136,8 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
             <div className={styles.headerRow}>
               <h2 className={styles.title}>Your Details</h2>
               <div className={styles.helperActions}>
-                <button className={styles.helperButton} onClick={handleClear} disabled={isLoading}>Clear</button>
-                <button className={styles.helperButton} onClick={handleInsertExample} disabled={isLoading}>Example</button>
+                <button type="button" className={styles.helperButton} onClick={handleClear} disabled={isLoading}>Clear</button>
+                <button type="button" className={styles.helperButton} onClick={handleInsertExample} disabled={isLoading} title="Load an example resume">Example</button>
               </div>
             </div>
             <p className={styles.subtitle}>
@@ -138,6 +145,7 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
             </p>
             <textarea
               className={styles.textarea}
+              aria-label="Your details"
               placeholder="e.g. My name is John Doe. I've worked as a Software Engineer at Acme Corp since Jan 2020 where I migrated the database to PostgreSQL and increased performance by 40%. Before that, I was at..."
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -163,6 +171,7 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
             </p>
             <textarea
               className={styles.textarea}
+              aria-label="Target job description"
               placeholder="Paste the job description here..."
               value={jobDesc}
               onChange={(e) => setJobDesc(e.target.value)}
@@ -180,9 +189,10 @@ export default function PromptInput({ onDataGenerated, onLoading, jobContext, in
         )}
       </div>
 
-      {error && <div className={styles.errorBanner}>{error}</div>}
+      {error && <div className={styles.errorBanner} role="alert">{error}</div>}
 
       <button
+        type="button"
         className={styles.button}
         onClick={handleGenerate}
         disabled={isLoading}

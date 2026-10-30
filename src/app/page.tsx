@@ -162,21 +162,21 @@ export default function HeroPage() {
                   {/* Showcase Content */}
                   <div className={styles.showcaseBody}>
                     <div className={styles.showcaseCandidate}>
-                      <div className={styles.candidateName}>Alex Morgan</div>
-                      <div className={styles.candidateRole}>Senior Full Stack & Cloud Engineer</div>
+                      <div className={styles.candidateName}>Somesh Dayama</div>
+                      <div className={styles.candidateRole}>Software Engineer · DevOps &amp; SRE</div>
                       <div className={styles.candidateMeta}>
-                        <span>alex.morgan@example.com</span>
+                        <span>Mumbai, India</span>
                         <span>•</span>
-                        <span>San Francisco, CA</span>
+                        <a href="https://www.linkedin.com/in/somesh-dayama/" target="_blank" rel="noopener noreferrer">linkedin.com/in/somesh-dayama</a>
                         <span>•</span>
-                        <span>linkedin.com/in/alexmorgan</span>
+                        <a href="https://portfolio-someshdayama.netlify.app/" target="_blank" rel="noopener noreferrer">portfolio-someshdayama.netlify.app</a>
                       </div>
                     </div>
 
                     <div className={styles.showcaseSection}>
                       <div className={styles.showcaseSectionHeader}>Summary</div>
                       <p className={styles.showcaseSummaryText}>
-                        Experienced Full Stack & Cloud Engineer with 5+ years building scalable microservices, optimizing CI/CD pipelines, and reducing infrastructure costs by <strong>35%</strong>.
+                        DevOps and SRE-focused Software Engineer with <strong>4 years</strong> of experience building CI/CD pipelines, cloud infrastructure, and release automation across GCP, Azure, and AWS.
                       </p>
                     </div>
 
@@ -185,24 +185,24 @@ export default function HeroPage() {
                       
                       <div className={styles.jobBlock}>
                         <div className={styles.jobMetaRow}>
-                          <strong>TechCorp Systems</strong>
-                          <span>2022 - Present</span>
+                          <strong>Monocept Consulting Pvt. Ltd.</strong>
+                          <span>Jan 2023 - Feb 2025</span>
                         </div>
-                        <div className={styles.jobSubTitle}>Senior Software Engineer</div>
+                        <div className={styles.jobSubTitle}>Software Engineer (SRE / Cloud) · promoted from Trainee</div>
                         <ul className={styles.jobBulletList}>
-                          <li>Architected cloud microservices handling 2M+ daily active users.</li>
-                          <li>Automated CI/CD pipelines with GitHub Actions, cutting build times by 45%.</li>
+                          <li>Built autoscaling scripts on GCP, cutting infrastructure costs by <strong>34.56%</strong>.</li>
+                          <li>Developed failover setups with Terraform and Ansible, reducing database incidents by <strong>24%</strong>.</li>
                         </ul>
                       </div>
                     </div>
 
                     <div className={styles.showcaseTags}>
-                      <span>TypeScript</span>
-                      <span>React</span>
-                      <span>Node.js</span>
-                      <span>AWS</span>
-                      <span>Docker</span>
+                      <span>GCP</span>
+                      <span>Azure</span>
                       <span>Kubernetes</span>
+                      <span>Terraform</span>
+                      <span>GitHub Actions</span>
+                      <span>Prometheus</span>
                     </div>
                   </div>
                 </div>
@@ -312,44 +312,44 @@ export default function HeroPage() {
                     <div className={styles.templatePreview}>
                       {t.badge === "Minimalist" && (
                         <div className={styles.miniMinimalist}>
-                          <div className={styles.mMiniName}>JOHN DOE</div>
-                          <div className={styles.mMiniContact}>johndoe@email.com • (555) 123-4567</div>
+                          <div className={styles.mMiniName}>SOMESH DAYAMA</div>
+                          <div className={styles.mMiniContact}>linkedin.com/in/somesh-dayama • portfolio-someshdayama.netlify.app</div>
                           <div className={styles.mMiniSection}>EXPERIENCE</div>
-                          <div className={styles.mMiniItemTitle}>Senior Software Engineer</div>
-                          <div className={styles.mMiniItemSubtitle}>Tech Corp • 2020 - Present</div>
-                          <div className={styles.mMiniBullet}>• Developed high-performance web applications.</div>
-                          <div className={styles.mMiniBullet}>• Led a team of 5 engineers to deliver features.</div>
+                          <div className={styles.mMiniItemTitle}>Software Engineer</div>
+                          <div className={styles.mMiniItemSubtitle}>NCR Atleos Corporation • Feb 2025 - Present</div>
+                          <div className={styles.mMiniBullet}>• Own releases and deployment automation for AMPS.</div>
+                          <div className={styles.mMiniBullet}>• Release Train Engineer for 5 teams (21 members).</div>
                         </div>
                       )}
                       {t.badge === "Modern" && (
                         <div className={styles.miniModern}>
                           <div className={styles.miniModernLeft}>
-                            <div className={styles.mMiniNameInv}>JOHN DOE</div>
+                            <div className={styles.mMiniNameInv}>SOMESH DAYAMA</div>
                             <div className={styles.mMiniSectionInv}>CONTACT</div>
-                            <div className={styles.mMiniBulletInv}>johndoe@email.com</div>
-                            <div className={styles.mMiniBulletInv}>(555) 123-4567</div>
+                            <div className={styles.mMiniBulletInv}>linkedin.com/in/somesh-dayama</div>
+                            <div className={styles.mMiniBulletInv}>portfolio-someshdayama.netlify.app</div>
                           </div>
                           <div className={styles.miniModernRight}>
                             <div className={styles.mMiniSection}>EXPERIENCE</div>
-                            <div className={styles.mMiniItemTitle}>Senior Software Engineer</div>
-                            <div className={styles.mMiniItemSubtitle}>Tech Corp • 2020 - Present</div>
-                            <div className={styles.mMiniBullet}>• Developed high-performance web apps.</div>
-                            <div className={styles.mMiniBullet}>• Led a team of 5 engineers.</div>
+                            <div className={styles.mMiniItemTitle}>Software Engineer</div>
+                            <div className={styles.mMiniItemSubtitle}>NCR Atleos Corporation • Feb 2025 - Present</div>
+                            <div className={styles.mMiniBullet}>• Own releases and deployment automation.</div>
+                            <div className={styles.mMiniBullet}>• Release Train Engineer for 5 teams.</div>
                           </div>
                         </div>
                       )}
                       {t.badge === "ATS" && (
                         <div className={styles.miniAts}>
-                          <div className={styles.aMiniName}>John Doe</div>
-                          <div className={styles.aMiniContact}>johndoe@email.com | (555) 123-4567</div>
+                          <div className={styles.aMiniName}>Somesh Dayama</div>
+                          <div className={styles.aMiniContact}>linkedin.com/in/somesh-dayama | portfolio-someshdayama.netlify.app</div>
                           <div className={styles.aMiniSection}>Experience</div>
                           <div className={styles.aMiniRow}>
-                            <span className={styles.aMiniItemTitle}>Senior Software Engineer</span>
-                            <span className={styles.aMiniDate}>2020 - Present</span>
+                            <span className={styles.aMiniItemTitle}>NCR Atleos Corporation</span>
+                            <span className={styles.aMiniDate}>Feb 2025 - Present</span>
                           </div>
-                          <div className={styles.aMiniItemSubtitle}>Tech Corp</div>
-                          <div className={styles.aMiniBullet}>• Developed high-performance web applications.</div>
-                          <div className={styles.aMiniBullet}>• Led a team of 5 engineers to deliver features.</div>
+                          <div className={styles.aMiniItemSubtitle}>Software Engineer</div>
+                          <div className={styles.aMiniBullet}>• Own releases and deployment automation for AMPS.</div>
+                          <div className={styles.aMiniBullet}>• Release Train Engineer for 5 teams (21 members).</div>
                         </div>
                       )}
                     </div>

@@ -6,6 +6,25 @@ export const maxDuration = 60;
 
 import { SOMESH_PROFILE } from '@/data/someshProfile';
 
+/**
+ * Writing rules shared by both modes. They steer the model toward plain, specific
+ * resumes: role-focused summary, grouped skills, plain verbs, concrete scope,
+ * roles at one company kept together, and a one-page length.
+ */
+const WRITING_RULES = `
+WRITING STYLE (apply to every section):
+- Summary: 2-4 plain sentences that say what role the candidate does, years of experience, the main tools/platforms, and 1-2 concrete highlights (team size, scale, certifications). No buzzwords ("results-driven", "proven track record", "passionate", "world-class", "dynamic").
+- Bullets: start with a plain past- or present-tense verb (Built, Ran, Owned, Cut, Automated, Led, Migrated, Designed). Do NOT use inflated verbs or filler such as "Architected", "Spearheaded", "Orchestrated", "Harnessed", "Leveraged", "Utilized", "Slashed", "robust", "complex", "cutting-edge", "seamless".
+- Every bullet should carry concrete scope: a number, team size, users, systems, environments, % or time saved. Keep the candidate's real metrics exactly; never invent numbers. If none exist, name the concrete system, platform or audience instead.
+- No "Label: ..." prefixes on bullets (e.g. "Cloud Optimization: ..."). One to two lines per bullet (under ~220 characters).
+- Skills: fill "skillGroups" with 4-7 short categories that fit the candidate (for a DevOps/SRE profile e.g. Cloud, CI/CD, Containers & IaC, Monitoring, Languages, Delivery & AI). Also fill the flat "skills" array with the same items. Drop spoken languages and soft skills unless the job needs them.
+- Experience: one entry per role, most recent first. Multiple roles at the same company must use the exact same company string and be listed consecutively (newest first); put a short "note" such as "promoted to Software Engineer" on the earlier role when it led to a promotion.
+- Education: put GPA/CGPA or honours in "details", not in the degree name.
+- Keep personalInfo.linkedinUrl and personalInfo.portfolioUrl (portfolio, GitHub or personal site) when present in the source.
+- Certifications go in "certifications".
+- Length: the resume must fit on ONE page. Aim for 4-6 bullets for the current role, 2-4 for older roles, and drop the weakest or most repetitive bullets first.
+`.trim();
+
 const resumeSchema = {
   type: SchemaType.OBJECT,
   properties: {
@@ -17,6 +36,7 @@ const resumeSchema = {
         phone: { type: SchemaType.STRING },
         location: { type: SchemaType.STRING },
         linkedinUrl: { type: SchemaType.STRING },
+        portfolioUrl: { type: SchemaType.STRING },
       },
       required: ['fullName', 'email'],
     },
@@ -30,6 +50,7 @@ const resumeSchema = {
           position: { type: SchemaType.STRING },
           startDate: { type: SchemaType.STRING },
           endDate: { type: SchemaType.STRING },
+          note: { type: SchemaType.STRING },
           description: {
             type: SchemaType.ARRAY,
             items: { type: SchemaType.STRING },
@@ -47,11 +68,27 @@ const resumeSchema = {
           degree: { type: SchemaType.STRING },
           startDate: { type: SchemaType.STRING },
           endDate: { type: SchemaType.STRING },
+          details: { type: SchemaType.STRING },
         },
         required: ['institution', 'degree', 'startDate', 'endDate'],
       },
     },
     skills: {
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
+    },
+    skillGroups: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          category: { type: SchemaType.STRING },
+          items: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+        },
+        required: ['category', 'items'],
+      },
+    },
+    certifications: {
       type: SchemaType.ARRAY,
       items: { type: SchemaType.STRING },
     },
@@ -141,22 +178,22 @@ CORE OPTIMIZATION RULES — Follow each precisely:
    - Identify the top high-frequency technical keywords, frameworks, tools, and methodologies in the job description.
    - Inject these matching keywords naturally into the Summary, Work Experience bullets, and Skills array.
 
-3. HIGH-IMPACT BULLET POINT REWRITING (Google XYZ Formula):
-   - For EVERY work experience entry, rewrite bullet points using the XYZ formula: "Accomplished [X], as measured by [Y], by doing [Z]".
-   - Begin EVERY bullet point with a powerful active verb (e.g., Spearheaded, Architected, Engineered, Optimized, Orchestrated, Automated, Reduced).
-   - Retain 100% of existing quantitative metrics (percentages, cost savings, downtime reductions, team sizes). If metrics are absent, highlight technical complexity, scale, and business impact.
-   - Never fabricate non-existent companies, degrees, dates, or credentials.
+3. BULLET POINT REWRITING:
+   - Rewrite bullets to show what was done, for whom/at what scope, and the result, following the WRITING STYLE rules below.
+   - Retain 100% of existing quantitative metrics (percentages, cost savings, downtime reductions, team sizes).
+   - Never fabricate non-existent companies, degrees, dates, metrics or credentials.
 
-4. EXECUTIVE PROFESSIONAL SUMMARY:
-   - Draft a crisp 2-3 sentence executive summary tailored for the target job.
-   - Explicitly highlight core competencies, key metrics, and value proposition for the target role.
+4. PROFESSIONAL SUMMARY:
+   - 2-4 plain sentences tailored to the target job: the candidate's role, years of experience, the tools that match the job, and concrete highlights.
 
 5. SKILLS CURATION & ORDERING:
-   - Reorder the skills array so the technical and soft skills most relevant to the target job description appear FIRST.
-   - Retain all authentic skills from the candidate profile.
+   - Order skill groups (and items within them) so the skills most relevant to the target job appear first.
+   - Retain all authentic technical skills from the candidate profile.
 
 6. STRICT SCHEMA ADHERENCE:
-   - Return valid JSON matching the schema. Ensure fullName, email, phone, location, linkedinUrl, experience, education, and skills are populated cleanly.
+   - Return valid JSON matching the schema. Ensure fullName, email, phone, location, linkedinUrl, portfolioUrl, experience, education, skills and skillGroups are populated cleanly.
+
+${WRITING_RULES}
 `.trim();
     } else {
       // GENERIC MODE: Parse & optimize raw text into structured resume JSON
@@ -166,11 +203,13 @@ You are a world-class executive resume writer and ATS parser.
 Your task is to parse raw candidate text and structure it into a clean, highly polished JSON format matching the schema provided.
 
 INSTRUCTIONS:
-1. Extract all personal contact info (name, email, phone, location, LinkedIn URL) accurately.
-2. Extract and preserve EVERY work experience, job title, company, start/end dates, education, and skill.
-3. Enhance work experience bullet points to start with strong active verbs (e.g. Engineered, Spearheaded, Optimized, Automated) while preserving all facts and metrics.
-4. Craft a compelling 2-3 sentence professional summary highlighting core engineering strengths.
+1. Extract all personal contact info (name, email, phone, location, LinkedIn URL, portfolio/GitHub/personal site URL) accurately.
+2. Extract and preserve EVERY work experience, job title, company, start/end dates, education, certification and skill.
+3. Tighten work experience bullets following the WRITING STYLE rules below, preserving all facts and metrics.
+4. Write a 2-4 sentence role-focused professional summary.
 5. Return ONLY valid JSON matching the schema.
+
+${WRITING_RULES}
 `.trim();
     }
 
