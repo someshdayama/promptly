@@ -108,6 +108,8 @@
 
 .previewPanel {
   flex: 1;
+  min-width: 0;
+  position: relative;
   display: flex;
   flex-direction: column;
   background-color: rgba(8, 8, 9, 0.2);
@@ -157,11 +159,116 @@
 }
 
 .resumeCanvas {
-  width: 210mm;
-  min-height: 297mm;
+  position: relative;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+  background: #ffffff;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+/* Dashed line marking where page 1 ends when content overflows */
+.pageBreakGuide {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-bottom: 2px dashed #f59e0b;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.pageBreakGuide span {
+  position: absolute;
+  right: 6px;
+  bottom: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #b45309;
+  background: #fffbeb;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* Preview toolbar: paper size, spacing, one-page status */
+.previewToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  padding: 0.75rem 2rem 0;
+}
+
+.toolbarField {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.toolbarField select {
+  background: #111113;
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font: inherit;
+  font-weight: 500;
+}
+
+.fitStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.fitOk {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.fitWarn {
+  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* Off-screen copies of the resume used to measure printed height */
+.measureArea {
+  position: absolute;
+  left: -10000px;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.measureArea > div {
+  display: flow-root;
+}
+
+.jobBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 8px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  color: #a5b4fc;
+  max-width: 360px;
+}
+
+.jobBanner strong {
+  color: #e0e7ff;
 }
 
 /* Generating Overlay */
@@ -226,6 +333,10 @@
   .resumeWrapper {
     padding: 1.25rem;
   }
+
+  .previewToolbar {
+    padding: 0.75rem 1.25rem 0;
+  }
 }
 
 /* ── Mobile (≤ 640px) ── */
@@ -270,7 +381,10 @@
 @media print {
   /* Hide all UI chrome */
   .appHeader,
-  .editorPanel {
+  .editorPanel,
+  .previewToolbar,
+  .measureArea,
+  .resumeCanvas {
     display: none !important;
   }
 
@@ -307,9 +421,7 @@
 
 .templateFadeIn {
   animation: templateFadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
   width: 100%;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
   background: #ffffff;
 }
 
