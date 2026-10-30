@@ -1,3 +1,26 @@
+# Promptly — AI resume builder
+
+Paste raw notes, an old CV, or a LinkedIn profile, optionally add a job description, and Promptly turns it into a clean, one-page, ATS-friendly resume. Live at https://resumebuilder-promptly.vercel.app.
+
+## Resume quality features
+
+- **Resume check** (left panel): flags buzzwords ("architected", "spearheaded", "robust", "complex"…) with plainer alternatives, bullets with no concrete scope (no number, team size, users or %), passive openings ("Responsible for…"), "Label: …" prefixes, overlong bullets, and a buzzword-heavy summary. Runs locally, no AI call.
+- **Grouped skills**: skills render as `Category: items` lines (Cloud, CI/CD, Containers & IaC, …). The AI fills `skillGroups`; long flat lists are auto-grouped when the categories are clear.
+- **Roles grouped by company**: consecutive roles at one company show under one company heading with the overall dates, each role's dates, and an optional note such as "promoted to Software Engineer".
+- **One-page fit**: the preview measures the printed height for A4 or Letter, auto-picks the roomiest spacing that fits one page, and warns (with a page-break guide) when it still runs over.
+- **Profile links**: LinkedIn and portfolio URLs render as clickable links in the header.
+- **What you see is what prints**: the preview uses the same page size and margins as the PDF.
+
+## Testing
+
+```bash
+npm test         # Jest + React Testing Library
+npx tsc --noEmit # type check
+npm run lint
+```
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

@@ -1,9 +1,8 @@
 # Testing Conventions
 
 ## General
-- This project does not currently have a test suite
-- When adding tests, use Jest + React Testing Library (Next.js default)
-- Place test files alongside source files with `.test.tsx` suffix
+- Tests use Jest + React Testing Library (`npm test`)
+- Test files live in `src/__tests__/` with a `.test.ts` / `.test.tsx` suffix
 
 ## Guidelines
 - Test component rendering, form interactions, and template selection
