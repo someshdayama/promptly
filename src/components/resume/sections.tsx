@@ -48,6 +48,9 @@ interface BlockProps {
 }
 
 /** Contact details and profile links. `layout="lines"` puts links on their own line. */
+/** Character count for the sidebar's shrink-to-fit lines (see .fitLine). */
+const fitChars = (text: string | undefined) => ({ "--chars": String(Math.max(1, (text || "").length)) }) as React.CSSProperties;
+
 export function ContactInfo({ data, ed, s, layout = "lines" }: BlockProps & { layout?: "lines" | "stack" }) {
   const info = data.personalInfo || { fullName: "", email: "", phone: "", location: "" };
   const editable = ed.isEditable;
@@ -62,8 +65,8 @@ export function ContactInfo({ data, ed, s, layout = "lines" }: BlockProps & { la
         onCommit={(t) => ed.updatePersonalInfo("phone", t)} className={s.contactItem} />
     ),
     info.email && (
-      <a key="email" href={`mailto:${info.email}`} className={s.contactLink}
-        onClick={(e) => editable && e.preventDefault()}>
+      <a key="email" href={`mailto:${info.email}`} className={cx(s.contactLink, layout === "stack" && s.fitLine)}
+        style={fitChars(info.email)} onClick={(e) => editable && e.preventDefault()}>
         <Editable html={info.email} editable={editable} label="Email"
           onCommit={(t) => ed.updatePersonalInfo("email", t)} />
       </a>
@@ -84,7 +87,8 @@ export function ContactInfo({ data, ed, s, layout = "lines" }: BlockProps & { la
           href={normalizeUrl(info[field])}
           target="_blank"
           rel="noopener noreferrer"
-          className={s.contactLink}
+          className={cx(s.contactLink, layout === "stack" && s.fitLine)}
+          style={fitChars(displayUrl(info[field]))}
           onClick={ed.handleLinkClick(field, label)}
           title={editable ? `Click to change your ${label} URL` : undefined}
         >
@@ -198,10 +202,12 @@ export function ExperienceSection({ data, ed, s, title = "Experience" }: BlockPr
                       </span>
                     )}
                     {role.note && (
-                      <span className={s.roleExtra}>
-                        <span className={s.roleSeparator} aria-hidden="true">|</span>
+                      // No "|" before the note: when the line wraps it would start the next line.
+                      <span className={s.roleNoteWrap}>
+                        {" ("}
                         <Editable className={s.roleNote} html={role.note} editable={editable}
                           label="Role note" onCommit={(t) => ed.updateJobField(role.index, "note", t)} />
+                        {")"}
                       </span>
                     )}
                   </div>

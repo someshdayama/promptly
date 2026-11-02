@@ -1,17 +1,20 @@
 /* ── Minimalist template ──
    Single column, left-aligned header, slate accent headings with a thin rule
-   and a right-aligned date column. Spacing classes (.sp-*) fit it to one page.
+   and a right-aligned date column. Sizes scale with --fit to fit one page.
 */
 
 .page {
+  /* Sizes scale with --fit (set by the builder to fit one page; 1 = normal).
+     Keep these base numbers in step with components/pdf/pdfStyles.ts. */
+  --f: var(--fit, 1);
   --page-padding: 32px 44px;
-  --section-gap: 12px;
-  --item-gap: 9px;
-  --text-size: 10pt;
-  --small-size: 9.4pt;
-  --title-size: 9pt;
-  --name-size: 24pt;
-  --line: 1.4;
+  --section-gap: calc(11px * var(--f));
+  --item-gap: calc(8px * var(--f));
+  --text-size: calc(10pt * var(--f));
+  --small-size: calc(9.4pt * var(--f));
+  --title-size: calc(9pt * var(--f));
+  --name-size: calc(24pt * var(--f));
+  --line: calc(1.34 + var(--fit-dl, 0));
   --accent: #1e3a5f;
   --muted: #475569;
 
@@ -27,11 +30,6 @@
   box-sizing: border-box;
   text-align: left;
 }
-
-.page:global(.sp-comfortable) { --page-padding: 32px 44px; --section-gap: 12px; --item-gap: 9px; --text-size: 10pt; --small-size: 9.4pt; --title-size: 9pt; --name-size: 24pt; --line: 1.4; }
-.page:global(.sp-regular) { --page-padding: 24px 36px; --section-gap: 10px; --item-gap: 7px; --text-size: 9.6pt; --small-size: 9pt; --title-size: 8.8pt; --name-size: 22pt; --line: 1.33; }
-.page:global(.sp-compact) { --page-padding: 18px 30px; --section-gap: 8px; --item-gap: 5px; --text-size: 9.2pt; --small-size: 8.7pt; --title-size: 8.5pt; --name-size: 20pt; --line: 1.28; }
-.page:global(.sp-dense) { --page-padding: 12px 24px; --section-gap: 6px; --item-gap: 4px; --text-size: 8.8pt; --small-size: 8.3pt; --title-size: 8.2pt; --name-size: 18pt; --line: 1.22; }
 
 .page h1, .page h2, .page h3, .page p, .page ul { margin: 0; padding: 0; }
 
@@ -77,6 +75,7 @@
 .roleLine { display: flex; flex-wrap: wrap; align-items: baseline; color: var(--muted); font-size: var(--small-size); }
 .position { font-weight: 600; font-style: italic; color: #1e293b; }
 .degree { font-weight: 500; color: #1e293b; }
+.roleNoteWrap { margin-left: 0.3em; color: inherit; }
 .roleSeparator { color: #94a3b8; margin: 0 0.4em; }
 
 .bulletList { list-style: none; margin-top: 2px; }

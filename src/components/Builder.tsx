@@ -9,15 +9,18 @@ import { EXAMPLE_PROFILE } from "@/data/exampleProfile";
 import { serializeProfileToPrompt } from "@/utils/promptSerializer";
 import { LIMITS } from "@/utils/generateRequest";
 import {
-  DENSITIES,
-  DENSITY_LABELS,
-  Density,
-  DensitySetting,
+  FIT_STEPS,
   PAGE_MARGIN_MM,
   PAGE_SIZES,
   PageSizeKey,
+  SPACING_LABELS,
+  SPACING_PRESETS,
+  SpacingPreset,
+  SpacingSetting,
   contentBox,
-  pickDensity,
+  fitStyle,
+  isSpacingSetting,
+  pickFit,
 } from "@/utils/pageFit";
 import { STORAGE, isResumeData, loadSaved } from "@/utils/storage";
 import ResumeSkeleton from "@/components/ui/ResumeSkeleton";
@@ -55,13 +58,13 @@ export default function Builder() {
   const [resume, setResume] = useState<ResumeData | null>(null);
   const [template, setTemplate] = useState<TemplateKey>("ats");
   const [pageSize, setPageSize] = useState<PageSizeKey>("a4");
-  const [densitySetting, setDensitySetting] = useState<DensitySetting>("auto");
+  const [densitySetting, setDensitySetting] = useState<SpacingSetting>("auto");
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
   const [confirmClear, setConfirmClear] = useState(false);
   const [reading, setReading] = useState(false);
-  const [heights, setHeights] = useState<Partial<Record<Density, number>>>({});
+  const [heights, setHeights] = useState<Partial<Record<number, number>>>({});
   const [zoom, setZoom] = useState(1);
   const [sheetHeight, setSheetHeight] = useState(0);
 
@@ -85,7 +88,7 @@ export default function Builder() {
     setResume(saved.resume);
     if (saved.prefs.template && TEMPLATES.some((t) => t.key === saved.prefs.template)) setTemplate(saved.prefs.template as TemplateKey);
     if (saved.prefs.pageSize && saved.prefs.pageSize in PAGE_SIZES) setPageSize(saved.prefs.pageSize as PageSizeKey);
-    if (saved.prefs.density === "auto" || DENSITIES.includes(saved.prefs.density as Density)) setDensitySetting(saved.prefs.density as DensitySetting);
+    if (isSpacingSetting(saved.prefs.spacing)) setDensitySetting(saved.prefs.spacing);
     setHydrated(true);
   }, []);
 
@@ -108,35 +111,35 @@ export default function Builder() {
     try {
       if (resume) localStorage.setItem(STORAGE.resume, JSON.stringify(resume));
       else localStorage.removeItem(STORAGE.resume);
-      localStorage.setItem(STORAGE.prefs, JSON.stringify({ template, pageSize, density: densitySetting }));
+      localStorage.setItem(STORAGE.prefs, JSON.stringify({ template, pageSize, spacing: densitySetting }));
     } catch {
       /* ignore */
     }
   }, [resume, template, pageSize, densitySetting, hydrated]);
 
   // ── One-page fit: render off-screen at every spacing and measure.
-  const measureRefs = useRef<Partial<Record<Density, HTMLDivElement | null>>>({});
+  const measureRefs = useRef<Partial<Record<number, HTMLDivElement | null>>>({});
   const measure = useCallback(() => {
-    const next: Partial<Record<Density, number>> = {};
-    DENSITIES.forEach((d) => {
+    const next: Partial<Record<number, number>> = {};
+    FIT_STEPS.forEach((d) => {
       const el = measureRefs.current[d];
       if (el && !el.querySelector("[data-skeleton]")) next[d] = el.scrollHeight;
     });
-    setHeights((prev) => (DENSITIES.every((d) => prev[d] === next[d]) ? prev : next));
+    setHeights((prev) => (FIT_STEPS.every((d) => prev[d] === next[d]) ? prev : next));
   }, []);
 
   useEffect(() => {
     if (!resume) return;
     const observer = new ResizeObserver(() => measure());
-    DENSITIES.forEach((d) => {
+    FIT_STEPS.forEach((d) => {
       const el = measureRefs.current[d];
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
   }, [measure, template, pageSize, resume]);
 
-  const fit = resume ? pickDensity(heights, content.heightPx, densitySetting) : null;
-  const density: Density = fit?.density || (densitySetting === "auto" ? "sp-comfortable" : densitySetting);
+  const fit = resume ? pickFit(heights, content.heightPx, densitySetting) : null;
+  const scale = fit?.scale ?? (densitySetting === "auto" ? 1 : SPACING_PRESETS[densitySetting]);
 
   // ── Scale the page to the available width (transform keeps text spacing exact).
   const pagePx = (page.widthMm * 96) / 25.4;
@@ -264,7 +267,7 @@ export default function Builder() {
     setError("");
     try {
       const { makeResumePdf, resumeFileName } = await import("@/components/pdf/makePdf");
-      const { blob } = await makeResumePdf({ data: resume, template, pageSize, density });
+      const { blob } = await makeResumePdf({ data: resume, template, pageSize, scale });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -281,7 +284,7 @@ export default function Builder() {
     }
   };
 
-  const templateClass = `${density} resume-in-sheet`;
+  const templateClass = "resume-in-sheet";
 
   const downloadButton = (extra = "") => (
     <button
@@ -410,10 +413,10 @@ export default function Builder() {
               </label>
               <label className={styles.selectField}>
                 <span className={styles.srOnly}>Spacing</span>
-                <select value={densitySetting} onChange={(e) => setDensitySetting(e.target.value as DensitySetting)} aria-label="Spacing">
+                <select value={densitySetting} onChange={(e) => setDensitySetting(e.target.value as SpacingSetting)} aria-label="Spacing">
                   <option value="auto">Auto spacing</option>
-                  {DENSITIES.map((d) => (
-                    <option key={d} value={d}>{DENSITY_LABELS[d]}</option>
+                  {(Object.keys(SPACING_PRESETS) as SpacingPreset[]).map((k) => (
+                    <option key={k} value={k}>{SPACING_LABELS[k]}</option>
                   ))}
                 </select>
               </label>
@@ -448,7 +451,7 @@ export default function Builder() {
                 <ResumeSkeleton />
               ) : resume ? (
                 <ErrorBoundary>
-                  <div key={template} className={styles.fadeIn}>{renderTemplate(template, resume, templateClass, setResume)}</div>
+                  <div key={template} className={styles.fadeIn} style={fitStyle(scale)}>{renderTemplate(template, resume, templateClass, setResume)}</div>
                 </ErrorBoundary>
               ) : (
                 <div className={styles.placeholder}>
@@ -465,9 +468,9 @@ export default function Builder() {
 
           {resume && (
             <div className={styles.measureArea} aria-hidden="true" style={{ width: `${content.widthMm}mm` }}>
-              {DENSITIES.map((d) => (
-                <div key={d} ref={(el) => { measureRefs.current[d] = el; }}>
-                  {renderTemplate(template, resume, `${d} resume-in-sheet`)}
+              {FIT_STEPS.map((d) => (
+                <div key={d} style={fitStyle(d)} ref={(el) => { measureRefs.current[d] = el; }}>
+                  {renderTemplate(template, resume, "resume-in-sheet")}
                 </div>
               ))}
             </div>

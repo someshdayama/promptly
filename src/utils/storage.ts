@@ -29,7 +29,7 @@ export interface Saved {
   notes: string;
   jobPost: string;
   resume: ResumeData | null;
-  prefs: { template?: string; pageSize?: string; density?: string };
+  prefs: { template?: string; pageSize?: string; spacing?: string };
 }
 
 const read = (k: string) => {
