@@ -25,9 +25,9 @@
 - API routes in `src/app/api/` — always server-side
 
 ## CSS
-- Premium dark UI aesthetic
-- Glassmorphism, gradients, animated borders
-- Shimmer loading effects
+- Minimal black and white UI (no grey-blue, indigo or green accents)
+- Amber only for the "runs over one page" warning, red only for errors
+- One page scroll on phones (no nested scroll panels)
 - Responsive across devices
 
 ## Imports

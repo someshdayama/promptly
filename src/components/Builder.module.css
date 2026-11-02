@@ -1,0 +1,492 @@
+/* ── Shell ── */
+.shell {
+  min-height: 100vh;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: minmax(340px, 440px) minmax(0, 1fr);
+  gap: 48px;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 40px 32px 0;
+  align-items: start;
+}
+
+/* ── Input column ── */
+.inputColumn {
+  position: sticky;
+  top: 92px;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 300px;
+  resize: vertical;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.5;
+  transition: border-color 0.15s ease;
+}
+
+.textarea::placeholder {
+  color: var(--text-3);
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--text);
+}
+
+.jobTextarea {
+  min-height: 160px;
+}
+
+.uploadRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.uploadButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.uploadButton:hover:not(:disabled) {
+  background: var(--fill);
+}
+
+.uploadButton:disabled {
+  opacity: 0.5;
+}
+
+.tip {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+.counter {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-2);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.addJob {
+  align-self: flex-start;
+  margin-top: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  padding: 4px 0;
+}
+
+.addJob:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.jobBlock {
+  margin-top: 16px;
+}
+
+.jobHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.error {
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--red);
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.primaryButton {
+  background: #ffffff;
+  color: #000000;
+}
+
+.primaryButton:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.secondaryButton {
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+}
+
+.secondaryButton:hover:not(:disabled) {
+  background: var(--fill);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+  opacity: 0.4;
+}
+
+.headerDownload {
+  height: 36px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.inlineMake {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.smallActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.textButton {
+  font-size: 14px;
+  color: var(--text-2);
+  padding: 4px 2px;
+}
+
+.textButton:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.dotSep {
+  color: var(--text-3);
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Preview column ── */
+.previewColumn {
+  min-width: 0;
+  scroll-margin-top: 72px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.segment,
+.segmentActive {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.segment {
+  color: var(--text-2);
+}
+
+.segment:hover {
+  color: var(--text);
+}
+
+.segmentActive {
+  background: #ffffff;
+  color: #000000;
+}
+
+.selectField select {
+  height: 36px;
+  padding: 0 30px 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath stroke='%23fff' stroke-width='1.4' d='m1 1 4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color: var(--text);
+  font-size: 13px;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.fit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.fitWarn {
+  color: var(--amber);
+}
+
+.sheetArea {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.sheetFrame {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sheet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  color: #111111;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+.placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #d9d9d9;
+  border-radius: 6px;
+  color: #8a8a8a;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.pageBreak {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-bottom: 2px dashed var(--amber);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.pageBreak span {
+  position: absolute;
+  right: 6px;
+  bottom: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #000000;
+  background: var(--amber);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.fadeIn {
+  width: 100%;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.editHint {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.measureArea {
+  position: absolute;
+  left: -10000px;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.measureArea > div {
+  display: flow-root;
+}
+
+/* ── Phone bottom bar (hidden on desktop) ── */
+.bottomBar {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .header {
+    height: 52px;
+    padding: 0 20px;
+  }
+
+  .headerActions,
+  .inlineMake {
+    display: none;
+  }
+
+  .main {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 24px 20px 0;
+  }
+
+  .inputColumn {
+    position: static;
+  }
+
+  .title {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+
+  .textarea {
+    min-height: 220px;
+  }
+
+  .previewColumn {
+    scroll-margin-top: 64px;
+  }
+
+  /* One row that scrolls sideways instead of stacking */
+  .toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin: 0 -20px 14px;
+    padding: 0 20px 2px;
+    scrollbar-width: none;
+  }
+
+  .toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .placeholder {
+    font-size: 28px;
+  }
+
+  .bottomBar {
+    display: flex;
+    gap: 10px;
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    margin-top: 24px;
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+    background: rgba(0, 0, 0, 0.86);
+    backdrop-filter: saturate(180%) blur(16px);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    border-top: 1px solid var(--line);
+  }
+
+  .bottomBar > button {
+    flex: 1;
+    min-width: 0;
+    padding: 0 12px;
+    font-size: 15px;
+  }
+}

@@ -1,5 +1,5 @@
 import { analyzeBullet, analyzeResume, findBuzzwords } from "@/utils/resumeQuality";
-import { SOMESH_PROFILE } from "@/data/someshProfile";
+import { EXAMPLE_PROFILE } from "@/data/exampleProfile";
 import { ResumeData } from "@/types/resume";
 
 const codes = (text: string) => analyzeBullet(text).map((i) => i.code);
@@ -51,15 +51,15 @@ describe("resume quality checks", () => {
   });
 
   it("finds no buzzwords in the default example resume", () => {
-    const report = analyzeResume(SOMESH_PROFILE);
+    const report = analyzeResume(EXAMPLE_PROFILE);
     expect(report.summaryIssues).toEqual([]);
     expect(report.bullets.flatMap((b) => b.issues).filter((i) => i.code === "buzzword")).toEqual([]);
   });
 
   it("suggests grouping a long flat skills list that cannot be auto-grouped", () => {
     const skills = ["Negotiation", "Sales", "CRM", "Excel", "Forecasting", "Coaching", "Hiring", "Budgeting", "Pricing", "Retail", "Ops", "Training", "Payroll"];
-    const data = { ...SOMESH_PROFILE, skillGroups: undefined, skills };
+    const data = { ...EXAMPLE_PROFILE, skillGroups: undefined, skills };
     expect(analyzeResume(data).tips.join(" ")).toMatch(/Grouping them by category/);
-    expect(analyzeResume({ ...SOMESH_PROFILE, skillGroups: undefined }).tips.join(" ")).not.toMatch(/Grouping them/);
+    expect(analyzeResume({ ...EXAMPLE_PROFILE, skillGroups: undefined }).tips.join(" ")).not.toMatch(/Grouping them/);
   });
 });

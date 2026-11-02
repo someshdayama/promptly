@@ -47,7 +47,7 @@
 .contact { font-size: var(--small-size); color: #222; }
 .contactLine { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; }
 .contactSeparator { margin: 0 0.45em; color: #555; }
-.contactLink { color: #1a4fa0; text-decoration: underline; text-underline-offset: 2px; }
+.contactLink { color: #111; text-decoration: underline; text-underline-offset: 2px; }
 .linkLabel { color: #222; }
 
 /* Sections */
@@ -99,8 +99,8 @@
 
 /* Editing affordances (builder only, never printed) */
 .isEditable [contenteditable="true"] { border-radius: 2px; cursor: text; outline: none; transition: background-color 0.15s; }
-.isEditable [contenteditable="true"]:hover { background-color: rgba(26, 79, 160, 0.06); }
-.isEditable [contenteditable="true"]:focus { background-color: rgba(26, 79, 160, 0.1); box-shadow: 0 0 0 1px rgba(26, 79, 160, 0.35); }
+.isEditable [contenteditable="true"]:hover { background-color: rgba(0, 0, 0, 0.05); }
+.isEditable [contenteditable="true"]:focus { background-color: rgba(0, 0, 0, 0.07); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4); }
 
 @media print {
   .page { min-height: auto !important; width: 100% !important; box-shadow: none !important; }
