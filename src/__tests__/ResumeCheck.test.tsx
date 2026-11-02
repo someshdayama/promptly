@@ -14,10 +14,11 @@ const base: ResumeData = {
 };
 
 describe("ResumeCheck", () => {
-  it("shows all clear for plain bullets with scope", () => {
-    render(<ResumeCheck resumeData={base} />);
+  it("is one collapsed line that says all clear for plain bullets with scope", () => {
+    const { container } = render(<ResumeCheck resumeData={base} />);
     expect(screen.getByRole("heading", { name: "Resume check" })).toBeInTheDocument();
     expect(screen.getByText("All clear")).toBeInTheDocument();
+    expect(container.querySelector("details")).not.toHaveAttribute("open");
   });
 
   it("lists buzzword bullets with the reason", () => {

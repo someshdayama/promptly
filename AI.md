@@ -1,51 +1,39 @@
-# Resume Builder
+# Promptly
 
-> An AI-powered resume builder using Google Gemini AI to generate tailored resumes. Deployed on Vercel.
+> Resume maker: notes / old resume / LinkedIn PDF in, one-page resume and PDF out. Deployed on Vercel.
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript
-- **AI**: Google Gemini 2.0 Flash (`@google/generative-ai`)
-- **PDF/Print**: react-to-print
+- **Framework**: Next.js 16 (App Router), React 19, TypeScript (strict)
+- **AI**: Google Gemini `gemini-2.5-flash` via `@google/generative-ai` (server only, `src/app/api/generate`)
+- **PDF export**: `@react-pdf/renderer`, client-side, Inter TTFs in `public/fonts` (embedded, text-selectable)
+- **PDF import**: `pdfjs-dist` (legacy build), client-side, lazy-loaded; worker copied to `public/` by `scripts/copy-pdf-worker.mjs`
 - **Icons**: Lucide React
-- **Deployment**: Vercel
-- **Styling**: CSS (premium dark UI with glassmorphism, gradient backgrounds, animated borders)
+- **Styling**: CSS modules. Black and white UI only; amber only for "runs over one page", red only for errors.
+- **Deployment**: Vercel (auto-deploys `main`)
 
 ## Project Structure
 
 ```
 src/
-├── app/             # Next.js App Router pages and layouts
-├── components/      # UI components (forms, templates, preview)
-└── types/           # TypeScript type definitions
-```
-
-## Development
-
-```bash
-npm run dev      # Start Next.js dev server (port 3000)
-npm run build    # Production build
-npm run start    # Start production server
-npm run lint     # ESLint check
+├── app/              # page.tsx (builder + footer), layout.tsx (metadata), api/generate (Gemini)
+├── components/       # Builder, SiteFooter, resume/ templates, pdf/ PDF templates, ui/
+├── data/             # exampleProfile.ts — a fictional person for "Try an example"
+├── utils/            # page fit, resume check, storage, validation, PDF text, etc.
+└── types/
 ```
 
 ## Environment Variables
 
 | Variable | Purpose | Required |
 |---|---|---|
-| `GEMINI_API_KEY` | Google Gemini AI API key | ✅ |
+| `GEMINI_API_KEY` | Google Gemini API key | ✅ |
 
-- **Local**: Set in `.env.local`
-- **Vercel**: Set in Vercel dashboard → Environment Variables
-- **NEVER** commit API keys to source code
+- **Local**: `.env.local`. **Vercel**: dashboard → Environment Variables.
+- **NEVER** commit API keys or real personal data.
 
 ## Conventions
 
-- App Router conventions: `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`
-- Server Components by default, `'use client'` only when needed
-- API routes in `src/app/api/` for server-side AI calls
-- Template registry pattern for resume templates
-- TypeScript strict mode — all types in `src/types/`
-- Premium UI: dark background, glassmorphism, shimmer loading effects, animated borders
-- Custom format options for resume output
+- Plain words in the UI. No hype, no claims that are not true.
+- Never ship real personal data as defaults or test fixtures; use the fictional example.
+- Keep the on-screen templates (`components/resume`) and PDF templates (`components/pdf`) in step.

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { AlertTriangle, CheckCircle2, Info } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import styles from "./ResumeCheck.module.css";
 import { ResumeData } from "@/types/resume";
 import { analyzeResume } from "@/utils/resumeQuality";
@@ -12,7 +12,7 @@ interface ResumeCheckProps {
 
 /**
  * Local (no AI) checks on the current resume: buzzwords, missing scope,
- * overlong bullets and summary, and layout tips.
+ * overlong bullets and summary. Shown as one line that opens for details.
  */
 export default function ResumeCheck({ resumeData }: ResumeCheckProps) {
   const report = useMemo(() => analyzeResume(resumeData), [resumeData]);
@@ -21,43 +21,36 @@ export default function ResumeCheck({ resumeData }: ResumeCheckProps) {
     report.bullets.filter((b) => b.issues.some((i) => i.severity === "warning")).length;
   const allClear = report.flaggedCount === 0 && report.summaryIssues.length === 0;
 
+  const status = allClear
+    ? "All clear"
+    : warningCount > 0
+      ? `${warningCount} to fix · ${report.flaggedCount} of ${report.bulletCount} bullets flagged`
+      : `${report.flaggedCount} of ${report.bulletCount} bullets could be sharper`;
+
   return (
-    <section className={styles.panel} aria-labelledby="resume-check-title">
-      <div className={styles.header}>
-        <h2 id="resume-check-title" className={styles.title}>Resume check</h2>
-        <span className={`${styles.badge} ${warningCount > 0 ? styles.badgeWarn : styles.badgeOk}`}>
-          {allClear
-            ? "All clear"
-            : warningCount > 0
-              ? `${warningCount} to fix · ${report.flaggedCount} of ${report.bulletCount} bullets flagged`
-              : `${report.flaggedCount} of ${report.bulletCount} bullets could be sharper`}
-        </span>
-      </div>
-      <p className={styles.hint}>
-        Plain verbs and concrete scope (team size, %, users, systems) read better than buzzwords.
-        Click any text in the preview to edit it.
-      </p>
+    <details className={styles.panel}>
+      <summary className={styles.summary}>
+        <h2 className={styles.title}>Resume check</h2>
+        <span className={styles.status}>{status}</span>
+        <ChevronDown size={16} className={styles.caret} aria-hidden="true" />
+      </summary>
 
-      {allClear && (
-        <p className={styles.ok}>
-          <CheckCircle2 size={14} aria-hidden="true" /> No buzzwords, every bullet has concrete scope.
+      <div className={styles.body}>
+        <p className={styles.hint}>
+          Plain verbs and real numbers (team size, users, %) read better than buzzwords. Click any line on the page to change it.
         </p>
-      )}
 
-      {report.summaryIssues.length > 0 && (
-        <ul className={styles.list}>
-          {report.summaryIssues.map((issue, i) => (
-            <li key={i} className={styles.issue}>
-              <IssueIcon severity={issue.severity} />
-              <span>{issue.message}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+        {allClear && <p className={styles.ok}>No buzzwords, and every bullet has a concrete detail.</p>}
 
-      {report.bullets.length > 0 && (
-        <details className={styles.details} open={report.bullets.length <= 4}>
-          <summary>Flagged bullets ({report.bullets.length})</summary>
+        {report.summaryIssues.length > 0 && (
+          <ul className={styles.list}>
+            {report.summaryIssues.map((issue, i) => (
+              <li key={i} className={styles.issue}><span>Summary: {issue.message}</span></li>
+            ))}
+          </ul>
+        )}
+
+        {report.bullets.length > 0 && (
           <ul className={styles.list}>
             {report.bullets.map((b) => {
               const job = resumeData.experience[b.jobIndex];
@@ -67,37 +60,23 @@ export default function ResumeCheck({ resumeData }: ResumeCheckProps) {
                   <q className={styles.bulletText}>{b.text}</q>
                   <ul className={styles.subList}>
                     {b.issues.map((issue) => (
-                      <li key={issue.code} className={styles.issue}>
-                        <IssueIcon severity={issue.severity} />
-                        <span>{issue.message}</span>
-                      </li>
+                      <li key={issue.code} className={styles.issue}><span>{issue.message}</span></li>
                     ))}
                   </ul>
                 </li>
               );
             })}
           </ul>
-        </details>
-      )}
+        )}
 
-      {report.tips.length > 0 && (
-        <ul className={styles.list}>
-          {report.tips.map((tip, i) => (
-            <li key={i} className={styles.issue}>
-              <Info size={14} aria-hidden="true" className={styles.iconInfo} />
-              <span>{tip}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
-
-function IssueIcon({ severity }: { severity: "warning" | "info" }) {
-  return severity === "warning" ? (
-    <AlertTriangle size={14} className={styles.iconWarn} aria-label="Warning" />
-  ) : (
-    <Info size={14} className={styles.iconInfo} aria-label="Suggestion" />
+        {report.tips.length > 0 && (
+          <ul className={styles.list}>
+            {report.tips.map((tip, i) => (
+              <li key={i} className={styles.issue}><span>{tip}</span></li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </details>
   );
 }

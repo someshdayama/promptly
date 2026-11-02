@@ -1,0 +1,117 @@
+.footer {
+  border-top: 1px solid var(--line);
+  margin-top: 64px;
+  padding: 56px 24px 40px;
+}
+
+.inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+}
+
+.heading {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 20px;
+}
+
+.steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+}
+
+.stepNum {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.stepTitle {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.faqs {
+  display: flex;
+  flex-direction: column;
+}
+
+.faq {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq:first-child {
+  border-top: 1px solid var(--line);
+}
+
+.question {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 0;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.question::-webkit-details-marker {
+  display: none;
+}
+
+.question::after {
+  content: "+";
+  color: var(--text-2);
+  font-weight: 400;
+}
+
+.faq[open] .question::after {
+  content: "–";
+}
+
+.faq .text {
+  padding-bottom: 16px;
+}
+
+.copy {
+  max-width: 1080px;
+  margin: 48px auto 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+@media (max-width: 899px) {
+  .footer {
+    padding: 40px 20px 40px;
+  }
+
+  .inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}

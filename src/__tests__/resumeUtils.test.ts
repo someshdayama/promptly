@@ -3,16 +3,16 @@ import { autoGroupSkills, getSkillGroups, parseSkillList } from "@/utils/skills"
 import { displayUrl, normalizeUrl } from "@/utils/links";
 import { pickDensity, contentBox, PAGE_SIZES } from "@/utils/pageFit";
 import { serializeProfileToPrompt } from "@/utils/promptSerializer";
-import { SOMESH_PROFILE } from "@/data/someshProfile";
+import { EXAMPLE_PROFILE } from "@/data/exampleProfile";
 
 describe("groupExperienceByCompany", () => {
   it("groups consecutive roles at the same company and spans their dates", () => {
-    const groups = groupExperienceByCompany(SOMESH_PROFILE.experience);
+    const groups = groupExperienceByCompany(EXAMPLE_PROFILE.experience);
     expect(groups).toHaveLength(2);
-    expect(groups[1].company).toBe("Monocept Consulting Pvt. Ltd.");
-    expect(groups[1].roles.map((r) => r.position)).toEqual(["Software Engineer (SRE / Cloud)", "Trainee Software Engineer"]);
-    expect(groups[1].roles.map((r) => r.index)).toEqual([1, 2]);
-    expect(formatDateRange(groups[1].startDate, groups[1].endDate)).toBe("Jan 2023 – Feb 2025");
+    expect(groups[0].company).toBe("Kestrel Pay Pvt. Ltd.");
+    expect(groups[0].roles.map((r) => r.position)).toEqual(["Senior Backend Engineer", "Backend Engineer"]);
+    expect(groups[0].roles.map((r) => r.index)).toEqual([0, 1]);
+    expect(formatDateRange(groups[0].startDate, groups[0].endDate)).toBe("Jul 2021 – Present");
   });
 
   it("ignores punctuation and case differences in company names but not other companies", () => {
@@ -28,8 +28,8 @@ describe("groupExperienceByCompany", () => {
 
 describe("skills grouping", () => {
   it("prefers explicit skill groups", () => {
-    expect(getSkillGroups(SOMESH_PROFILE)?.map((g) => g.category)).toEqual([
-      "Cloud", "CI/CD", "Containers & IaC", "Monitoring", "Languages", "Delivery & AI",
+    expect(getSkillGroups(EXAMPLE_PROFILE)?.map((g) => g.category)).toEqual([
+      "Languages", "Cloud", "Containers & IaC", "Data", "Monitoring",
     ]);
   });
 
@@ -54,7 +54,7 @@ describe("links", () => {
   it("normalizes and shortens URLs", () => {
     expect(normalizeUrl("linkedin.com/in/x")).toBe("https://linkedin.com/in/x");
     expect(normalizeUrl("javascript:alert(1)")).toBe("");
-    expect(displayUrl("https://www.linkedin.com/in/somesh-dayama/")).toBe("linkedin.com/in/somesh-dayama");
+    expect(displayUrl("https://www.linkedin.com/in/jane-doe/")).toBe("linkedin.com/in/jane-doe");
   });
 });
 
@@ -79,11 +79,11 @@ describe("pickDensity", () => {
 
 describe("serializeProfileToPrompt", () => {
   it("includes links, grouped skills, promotion notes and certifications", () => {
-    const text = serializeProfileToPrompt(SOMESH_PROFILE);
-    expect(text).toContain("LinkedIn: https://www.linkedin.com/in/somesh-dayama/");
-    expect(text).toContain("Portfolio: https://portfolio-someshdayama.netlify.app/");
-    expect(text).toContain("- Cloud: GCP, Azure, AWS");
-    expect(text).toContain("(promoted to Software Engineer)");
-    expect(text).toContain("CERTIFICATIONS:\n- Certified Scrum Master (CSM)");
+    const text = serializeProfileToPrompt(EXAMPLE_PROFILE);
+    expect(text).toContain("LinkedIn: https://www.linkedin.com/in/maya-fernandes-example/");
+    expect(text).toContain("Portfolio: https://maya.example.com/");
+    expect(text).toContain("- Cloud: AWS, GCP");
+    expect(text).toContain("(promoted to Senior Backend Engineer)");
+    expect(text).toContain("CERTIFICATIONS:\n- AWS Certified Developer – Associate");
   });
 });
