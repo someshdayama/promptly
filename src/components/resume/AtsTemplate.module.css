@@ -1,18 +1,21 @@
 /* ── ATS template ──
    Single column, plain section headings with a thin rule, real text only
    (no icons, tables or columns) so applicant tracking systems parse it cleanly.
-   Spacing classes (.sp-*) are applied by the builder to fit one page.
+   Sizes scale with --fit, set by the builder to fit one page.
 */
 
 .page {
+  /* Sizes scale with --fit (set by the builder to fit one page; 1 = normal).
+     Keep these base numbers in step with components/pdf/pdfStyles.ts. */
+  --f: var(--fit, 1);
   --page-padding: 28px 40px;
-  --section-gap: 10px;
-  --item-gap: 8px;
-  --text-size: 10pt;
-  --small-size: 9.5pt;
-  --title-size: 10.5pt;
-  --name-size: 22pt;
-  --line: 1.35;
+  --section-gap: calc(10px * var(--f));
+  --item-gap: calc(7px * var(--f));
+  --text-size: calc(10pt * var(--f));
+  --small-size: calc(9.5pt * var(--f));
+  --title-size: calc(10.5pt * var(--f));
+  --name-size: calc(22pt * var(--f));
+  --line: calc(1.32 + var(--fit-dl, 0));
 
   width: 100%;
   min-height: 297mm;
@@ -26,11 +29,6 @@
   box-sizing: border-box;
   text-align: left;
 }
-
-.page:global(.sp-comfortable) { --page-padding: 28px 40px; --section-gap: 10px; --item-gap: 8px; --text-size: 10pt; --small-size: 9.5pt; --title-size: 10.5pt; --name-size: 22pt; --line: 1.35; }
-.page:global(.sp-regular) { --page-padding: 22px 34px; --section-gap: 8px; --item-gap: 6px; --text-size: 9.6pt; --small-size: 9.1pt; --title-size: 10.2pt; --name-size: 20pt; --line: 1.3; }
-.page:global(.sp-compact) { --page-padding: 16px 28px; --section-gap: 6px; --item-gap: 5px; --text-size: 9.2pt; --small-size: 8.8pt; --title-size: 9.8pt; --name-size: 18pt; --line: 1.27; }
-.page:global(.sp-dense) { --page-padding: 10px 22px; --section-gap: 5px; --item-gap: 4px; --text-size: 8.8pt; --small-size: 8.4pt; --title-size: 9.4pt; --name-size: 17pt; --line: 1.22; }
 
 .page h1, .page h2, .page h3, .page p, .page ul { margin: 0; padding: 0; }
 
@@ -83,6 +81,7 @@
 .roleLine { display: flex; flex-wrap: wrap; align-items: baseline; }
 .position { font-weight: 700; }
 .degree { font-weight: 600; font-size: var(--small-size); }
+.roleNoteWrap { margin-left: 0.3em; color: inherit; }
 .roleSeparator { color: #555; margin: 0 0.4em; }
 .roleDate, .roleNote { color: #222; }
 

@@ -1,7 +1,7 @@
 import { groupExperienceByCompany, formatDateRange } from "@/utils/experience";
 import { autoGroupSkills, getSkillGroups, parseSkillList } from "@/utils/skills";
 import { displayUrl, normalizeUrl } from "@/utils/links";
-import { pickDensity, contentBox, PAGE_SIZES } from "@/utils/pageFit";
+import { FIT_STEPS, SPACING_PRESETS, contentBox, fitLineHeight, pickFit, PAGE_SIZES } from "@/utils/pageFit";
 import { serializeProfileToPrompt } from "@/utils/promptSerializer";
 import { EXAMPLE_PROFILE } from "@/data/exampleProfile";
 
@@ -58,19 +58,34 @@ describe("links", () => {
   });
 });
 
-describe("pickDensity", () => {
+describe("pickFit", () => {
   const limit = contentBox(PAGE_SIZES.a4).heightPx;
-  it("picks the roomiest spacing that fits one page", () => {
-    const fit = pickDensity({ "sp-comfortable": limit + 100, "sp-regular": limit - 10, "sp-compact": 900, "sp-dense": 800 }, limit);
-    expect(fit).toEqual({ density: "sp-regular", pages: 1, fits: true });
+  const all = (h: (f: number) => number) => Object.fromEntries(FIT_STEPS.map((f) => [f, h(f)]));
+
+  it("uses the roomiest scale that fits one page", () => {
+    // Height grows with scale; only 0.96 and below fit.
+    const fit = pickFit(all((f) => (f > 0.96 ? limit + 50 : limit - 20)), limit);
+    expect(fit).toEqual({ scale: 0.96, pages: 1, fits: true });
+  });
+  it("gives a short resume the roomiest step, never more", () => {
+    expect(pickFit(all(() => limit * 0.6), limit)?.scale).toBe(FIT_STEPS[0]);
+    expect(FIT_STEPS[0]).toBeLessThanOrEqual(1.12);
   });
   it("reports page count when nothing fits", () => {
-    const fit = pickDensity({ "sp-comfortable": limit * 2, "sp-regular": limit * 1.8, "sp-compact": limit * 1.6, "sp-dense": limit * 1.4 }, limit);
-    expect(fit).toEqual({ density: "sp-dense", pages: 1.4, fits: false });
+    expect(pickFit(all((f) => limit * (1 + f)), limit)).toEqual({ scale: 0.84, pages: 1.8, fits: false });
   });
   it("waits for all measurements in auto mode and honours a manual choice", () => {
-    expect(pickDensity({ "sp-comfortable": 100 }, limit)).toBeNull();
-    expect(pickDensity({ "sp-compact": limit * 1.25 }, limit, "sp-compact")).toEqual({ density: "sp-compact", pages: 1.3, fits: false });
+    expect(pickFit({ 1: 100 }, limit)).toBeNull();
+    expect(pickFit({ 0.92: limit * 1.25 }, limit, "compact")).toEqual({ scale: 0.92, pages: 1.3, fits: false });
+    expect(pickFit({ 1.08: 500 }, limit, "roomy")).toEqual({ scale: 1.08, pages: 1, fits: true });
+  });
+  it("every manual preset is one of the measured steps", () => {
+    Object.values(SPACING_PRESETS).forEach((f) => expect(FIT_STEPS as readonly number[]).toContain(f));
+  });
+  it("keeps line height in a tidy band", () => {
+    expect(fitLineHeight(1.34, 1.08)).toBeLessThanOrEqual(1.4);
+    expect(fitLineHeight(1.32, 0.84)).toBeGreaterThanOrEqual(1.24);
+    expect(fitLineHeight(1.34, 1)).toBe(1.34);
   });
   it("letter pages are shorter than A4", () => {
     expect(contentBox(PAGE_SIZES.letter).heightPx).toBeLessThan(limit);

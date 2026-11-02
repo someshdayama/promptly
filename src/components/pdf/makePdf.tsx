@@ -1,8 +1,8 @@
 import { Font, pdf } from "@react-pdf/renderer";
 import { ResumeData } from "@/types/resume";
-import { DENSITIES, Density, PageSizeKey } from "@/utils/pageFit";
+import { FIT_STEPS, PageSizeKey } from "@/utils/pageFit";
 import ResumePdf from "./ResumePdf";
-import { SPACING, TemplateKey, scaleSpacing } from "./pdfStyles";
+import { TemplateKey, spacingFor } from "./pdfStyles";
 
 let fontsReady = false;
 
@@ -36,27 +36,23 @@ export interface MakePdfOptions {
   data: ResumeData;
   template: TemplateKey;
   pageSize: PageSizeKey;
-  /** Spacing used by the on-screen preview; the PDF starts there. */
-  density: Density;
+  /** Fit scale used by the on-screen preview; the PDF starts there. */
+  scale: number;
 }
 
 /**
- * Builds the PDF and tightens spacing (then font size, down to 88%) until it
- * fits on one page. Returns the last attempt if nothing fits.
+ * Builds the PDF at the preview's scale and, only if the PDF layout runs over,
+ * steps the scale down (to 0.76 at most) until it fits one page. Returns the
+ * last attempt if nothing fits.
  */
-export async function makeResumePdf({ data, template, pageSize, density }: MakePdfOptions) {
+export async function makeResumePdf({ data, template, pageSize, scale }: MakePdfOptions) {
   registerFonts();
-  const start = Math.max(0, DENSITIES.indexOf(density));
-  const attempts: { d: Density; f: number }[] = [
-    ...DENSITIES.slice(start).map((d) => ({ d, f: 1 })),
-    ...[0.96, 0.92, 0.88].map((f) => ({ d: DENSITIES[DENSITIES.length - 1], f })),
-  ];
+  const steps = [scale, ...[...FIT_STEPS, 0.8, 0.76].filter((f) => f < scale - 0.001)];
 
   let blob: Blob | null = null;
   let pages = 0;
-  for (const { d, f } of attempts) {
-    const spacing = scaleSpacing(SPACING[template][d], f);
-    blob = await pdf(<ResumePdf data={data} template={template} pageSize={pageSize} spacing={spacing} />).toBlob();
+  for (const f of steps) {
+    blob = await pdf(<ResumePdf data={data} template={template} pageSize={pageSize} spacing={spacingFor(template, f)} />).toBlob();
     pages = await countPdfPages(blob);
     if (pages <= 1) break;
   }

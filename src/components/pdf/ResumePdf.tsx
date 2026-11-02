@@ -248,12 +248,7 @@ function Experience({ data, st, dot }: { data: ResumeData; st: Styles; dot: bool
                       <Text>{formatDateRange(role.startDate, role.endDate)}</Text>
                     </>
                   )}
-                  {role.note && (
-                    <>
-                      <Text style={st.roleSep}>|</Text>
-                      <Text>{role.note}</Text>
-                    </>
-                  )}
+                  {role.note && <Text style={{ marginLeft: 3 }}>({role.note})</Text>}
                 </View>
                 <View style={{ marginTop: px(2) }}>
                   {(role.description || []).filter(Boolean).map((d, di) => (

@@ -20,17 +20,42 @@ export const PAGE_SIZES: Record<PageSizeKey, PageSize> = {
 /** Print margins, also used as padding on the on-screen page so preview = PDF. */
 export const PAGE_MARGIN_MM = { vertical: 10, horizontal: 13 };
 
-/** Spacing presets from roomiest to tightest; each template defines these classes. */
-export const DENSITIES = ["sp-comfortable", "sp-regular", "sp-compact", "sp-dense"] as const;
-export type Density = (typeof DENSITIES)[number];
-export type DensitySetting = Density | "auto";
+/**
+ * Fit-to-page scale. Every template sizes its fonts and gaps from one number
+ * (`--fit`, 1 = normal). Auto mode measures the resume at each step and uses the
+ * roomiest one that fits one page: long resumes shrink a little before they
+ * overflow, short ones get slightly roomier. Nothing is ever stretched apart to
+ * fill the page, so a short resume may end with some white space.
+ */
+export const FIT_STEPS = [1.12, 1.08, 1.04, 1, 0.96, 0.92, 0.88, 0.84] as const;
+export type FitStep = (typeof FIT_STEPS)[number];
 
-export const DENSITY_LABELS: Record<Density, string> = {
-  "sp-comfortable": "Comfortable",
-  "sp-regular": "Regular",
-  "sp-compact": "Compact",
-  "sp-dense": "Dense",
+export const SPACING_PRESETS = { roomy: 1.08, regular: 1, compact: 0.92, dense: 0.84 } as const;
+export type SpacingPreset = keyof typeof SPACING_PRESETS;
+export type SpacingSetting = SpacingPreset | "auto";
+
+export const SPACING_LABELS: Record<SpacingPreset, string> = {
+  roomy: "Roomy",
+  regular: "Regular",
+  compact: "Compact",
+  dense: "Dense",
 };
+
+export const isSpacingSetting = (v: unknown): v is SpacingSetting =>
+  v === "auto" || (typeof v === "string" && v in SPACING_PRESETS);
+
+/**
+ * Line height follows the scale a little, within a tidy 1.24–1.4 band, so
+ * dense resumes stay readable and roomy ones never look loose.
+ */
+export function fitLineHeight(base: number, scale: number): number {
+  return Math.round(Math.min(1.4, Math.max(1.24, base + (scale - 1) * 0.5)) * 1000) / 1000;
+}
+
+/** CSS custom properties the templates read (`--fit`, `--fit-dl`). */
+export function fitStyle(scale: number): Record<string, string> {
+  return { "--fit": String(scale), "--fit-dl": String(Math.round((scale - 1) * 0.5 * 1000) / 1000) };
+}
 
 const PX_PER_MM = 96 / 25.4;
 
@@ -43,36 +68,36 @@ export function contentBox(size: PageSize) {
 }
 
 export interface FitResult {
-  density: Density;
-  /** Estimated number of printed pages at that density (1 decimal). */
+  scale: number;
+  /** Estimated number of printed pages at that scale (1 decimal). */
   pages: number;
   fits: boolean;
 }
 
 /**
- * Chooses the roomiest density whose measured height fits on one page.
- * Falls back to the tightest density when nothing fits.
- * `heights` maps density → rendered content height in px (0/undefined = not measured yet).
+ * Picks the fit scale. `heights` maps scale → measured content height in px
+ * (0/undefined = not measured yet). Auto mode waits for every step.
  */
-export function pickDensity(
-  heights: Partial<Record<Density, number>>,
+export function pickFit(
+  heights: Partial<Record<number, number>>,
   pageHeightPx: number,
-  setting: DensitySetting = "auto"
+  setting: SpacingSetting = "auto"
 ): FitResult | null {
-  const pagesFor = (d: Density) => {
-    const h = heights[d] || 0;
+  const pagesFor = (f: number) => {
+    const h = heights[f] || 0;
     return h > 0 ? Math.max(1, Math.round((h / pageHeightPx) * 10) / 10) : 0;
   };
   // Small tolerance for sub-pixel rounding.
-  const fitsFor = (d: Density) => (heights[d] || 0) > 0 && (heights[d] as number) <= pageHeightPx + 2;
+  const fitsFor = (f: number) => (heights[f] || 0) > 0 && (heights[f] as number) <= pageHeightPx + 2;
 
   if (setting !== "auto") {
-    if (!heights[setting]) return null;
-    return { density: setting, pages: pagesFor(setting), fits: fitsFor(setting) };
+    const f = SPACING_PRESETS[setting];
+    if (!heights[f]) return null;
+    return { scale: f, pages: pagesFor(f), fits: fitsFor(f) };
   }
 
-  if (DENSITIES.some((d) => !heights[d])) return null;
-  const fitting = DENSITIES.find(fitsFor);
-  const density = fitting || DENSITIES[DENSITIES.length - 1];
-  return { density, pages: pagesFor(density), fits: !!fitting };
+  if (FIT_STEPS.some((f) => !heights[f])) return null;
+  const fitting = FIT_STEPS.find(fitsFor);
+  const scale = fitting ?? FIT_STEPS[FIT_STEPS.length - 1];
+  return { scale, pages: pagesFor(scale), fits: fitting !== undefined };
 }
