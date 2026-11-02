@@ -8,9 +8,10 @@
   /* Sizes scale with --fit (set by the builder to fit one page; 1 = normal).
      Keep these base numbers in step with components/pdf/pdfStyles.ts. */
   --f: var(--fit, 1);
+  --g: var(--fit-gap, 1);
   --page-padding: 28px 40px;
-  --section-gap: calc(10px * var(--f));
-  --item-gap: calc(7px * var(--f));
+  --section-gap: calc(10px * var(--g));
+  --item-gap: calc(7px * var(--g));
   --text-size: calc(10pt * var(--f));
   --small-size: calc(9.5pt * var(--f));
   --title-size: calc(10.5pt * var(--f));
@@ -89,7 +90,7 @@
 .bullet {
   position: relative;
   padding-left: 14px;
-  margin-bottom: 1px;
+  margin-bottom: calc(1.5px * var(--g));
   break-inside: avoid;
 }
 .bullet::before { content: "•"; position: absolute; left: 3px; top: 0; }

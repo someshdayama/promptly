@@ -57,12 +57,7 @@ function makeStyles({ t, s, template }: Ctx) {
       paddingRight: mm(PAGE_MARGIN_MM.horizontal),
     },
     headerAts: { alignItems: "center", marginBottom: px(s.sectionGap) },
-    headerMin: {
-      marginBottom: px(s.sectionGap + 2),
-      paddingBottom: px(8),
-      borderBottomWidth: px(2),
-      borderBottomColor: t.accent,
-    },
+    headerMin: { marginBottom: px(s.sectionGap + 2) },
     name:
       template === "ats"
         ? { fontSize: s.name, fontWeight: 800, textTransform: "uppercase", letterSpacing: s.name * 0.02, lineHeight: 1.1, marginBottom: px(4), textAlign: "center" }
@@ -103,12 +98,12 @@ function makeStyles({ t, s, template }: Ctx) {
           : { fontWeight: 700, color: t.ink },
     degree: template === "ats" ? { fontWeight: 600, fontSize: s.small } : { fontWeight: 500, color: "#1e293b" },
     roleSep: { color: template === "ats" ? "#555555" : "#94a3b8", marginHorizontal: s.small * 0.4 },
-    bulletRow: { flexDirection: "row", marginBottom: px(1) },
-    bulletMark: { width: px(14) },
+    bulletRow: { flexDirection: "row", marginBottom: px(s.bulletGap) },
+    bulletMark: { width: s.text * 1.15, paddingLeft: s.text * 0.3 },
     dotWrap: { width: px(13), paddingTop: s.text * lh * 0.5 - 1.5 },
     dot: { width: 3, height: 3, borderRadius: 1.5, backgroundColor: t.accent, marginLeft: px(3) },
     bulletText: { flex: 1, color: t.body },
-    skillRow: { marginBottom: px(1), color: t.body },
+    skillRow: { marginBottom: px(s.bulletGap), color: t.body },
     bold: { fontWeight: 700, color: t.ink },
     roleGap: { marginTop: px(template === "ats" ? 3 : 4) },
   });
@@ -189,7 +184,7 @@ function Bullet({ text, st, dot }: { text: string; st: Styles; dot: boolean }) {
       {dot ? (
         <View style={st.dotWrap}><View style={st.dot} /></View>
       ) : (
-        <Text style={st.bulletMark}>{"  •"}</Text>
+        <Text style={st.bulletMark}>•</Text>
       )}
       <Text style={st.bulletText}>{text}</Text>
     </View>
@@ -232,7 +227,7 @@ function Experience({ data, st, dot }: { data: ResumeData; st: Styles; dot: bool
         const first = group.roles[0];
         return (
           <View key={gi} style={st.item}>
-            <View style={st.itemHeader} wrap={false}>
+            <View style={st.itemHeader} wrap={false} minPresenceAhead={36}>
               <Text style={st.company}>{group.company}</Text>
               <Text style={st.date}>
                 {multi ? formatDateRange(group.startDate, group.endDate) : formatDateRange(first.startDate, first.endDate)}
@@ -240,7 +235,7 @@ function Experience({ data, st, dot }: { data: ResumeData; st: Styles; dot: bool
             </View>
             {group.roles.map((role, ri) => (
               <View key={ri} style={ri > 0 ? st.roleGap : undefined}>
-                <View style={st.roleLine}>
+                <View style={st.roleLine} wrap={false} minPresenceAhead={24}>
                   <Text style={st.position}>{role.position}</Text>
                   {multi && formatDateRange(role.startDate, role.endDate) && (
                     <>
@@ -334,25 +329,17 @@ export default function ResumePdf({ data, template, pageSize, spacing }: ResumeP
 
   if (template === "modern") {
     const side = makeStyles({ t, s: spacing, template, sidebar: true });
+    const sideWidth = 0.31 * PAGE_WIDTH_PT[pageSize];
     return (
       <Document {...meta}>
-        <Page size={size} style={st.page}>
-          {/* Sidebar background on every page */}
+        <Page size={size} style={[st.page, { paddingLeft: 0, paddingRight: 0 }]}>
+          {/* Sidebar background, edge to edge, on every page */}
           <View
             fixed
-            style={{
-              position: "absolute",
-              top: mm(PAGE_MARGIN_MM.vertical),
-              bottom: mm(PAGE_MARGIN_MM.vertical),
-              left: mm(PAGE_MARGIN_MM.horizontal),
-              width: 0.31 * (PAGE_WIDTH_PT[pageSize] - 2 * mm(PAGE_MARGIN_MM.horizontal)),
-              backgroundColor: "#f1f5f9",
-              borderRightWidth: px(1),
-              borderRightColor: "#e2e8f0",
-            }}
+            style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: sideWidth, backgroundColor: "#f1f5f9" }}
           />
           <View style={{ flexDirection: "row" }}>
-            <View style={{ width: "31%", paddingVertical: px(spacing.padV), paddingHorizontal: px(spacing.padH) }}>
+            <View style={{ width: sideWidth, paddingHorizontal: mm(spacing.sideH ?? 7) }}>
               <Text style={[side.name, { marginBottom: px(spacing.sectionGap) }]}>{name}</Text>
               <Section title="Contact" st={side}>
                 <View style={{ fontSize: spacing.small }}>
@@ -361,7 +348,7 @@ export default function ResumePdf({ data, template, pageSize, spacing }: ResumeP
                     st={side}
                     stack
                     base={spacing.small}
-                    width={0.31 * (PAGE_WIDTH_PT[pageSize] - 2 * mm(PAGE_MARGIN_MM.horizontal)) - 2 * px(spacing.padH) - 2}
+                    width={sideWidth - 2 * mm(spacing.sideH ?? 7) - 2}
                   />
                 </View>
               </Section>
@@ -371,7 +358,7 @@ export default function ResumePdf({ data, template, pageSize, spacing }: ResumeP
                 <Certifications data={data} st={side} />
               </View>
             </View>
-            <View style={{ flex: 1, paddingVertical: px(spacing.mainV ?? spacing.padV), paddingHorizontal: px(spacing.mainH ?? spacing.padH) }}>
+            <View style={{ flex: 1, paddingHorizontal: mm(spacing.mainH ?? 9) }}>
               <Summary data={data} st={st} />
               <Experience data={data} st={st} dot />
             </View>

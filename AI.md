@@ -9,7 +9,7 @@
 - **PDF export**: `@react-pdf/renderer`, client-side, Inter TTFs in `public/fonts` (embedded, text-selectable)
 - **PDF import**: `pdfjs-dist` (legacy build), client-side, lazy-loaded; worker copied to `public/` by `scripts/copy-pdf-worker.mjs`
 - **Icons**: Lucide React
-- **Styling**: CSS modules. Black and white UI only; amber only for "runs over one page", red only for errors.
+- **Styling**: CSS modules. Black and white UI only; red only for errors.
 - **Deployment**: Vercel (auto-deploys `main`)
 
 ## Project Structure

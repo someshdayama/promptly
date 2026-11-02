@@ -20,8 +20,8 @@ export const FAQS = [
     a: "The PDF is real text, not a picture, so software that reads resumes can pull the words out. The ATS layout is the plainest of the three.",
   },
   {
-    q: "Does it fit on one page?",
-    a: "It picks the roomiest spacing that fits one page. If it still runs over, you will see a warning and where page one ends.",
+    q: "One page or more?",
+    a: "Your choice. One page sizes the text and spacing so the page is filled. If it's too long for readable text on one page, it moves on to a second page. Multi-page keeps the normal size and adds pages as needed.",
   },
   {
     q: "Do I need an account?",
