@@ -1,6 +1,6 @@
 import { Font, pdf } from "@react-pdf/renderer";
 import { ResumeData } from "@/types/resume";
-import { FIT_STEPS, PageSizeKey } from "@/utils/pageFit";
+import { FIT_RANGE, PageMode, PageSizeKey } from "@/utils/pageFit";
 import ResumePdf from "./ResumePdf";
 import { TemplateKey, spacingFor } from "./pdfStyles";
 
@@ -36,27 +36,53 @@ export interface MakePdfOptions {
   data: ResumeData;
   template: TemplateKey;
   pageSize: PageSizeKey;
-  /** Fit scale used by the on-screen preview; the PDF starts there. */
+  mode: PageMode;
+}
+
+export interface MadePdf {
+  blob: Blob;
+  pages: number;
+  /** Scale the PDF was laid out at (the edit view uses the same one). */
   scale: number;
 }
 
 /**
- * Builds the PDF at the preview's scale and, only if the PDF layout runs over,
- * steps the scale down (to 0.76 at most) until it fits one page. Returns the
- * last attempt if nothing fits.
+ * Builds the PDF that is both shown and downloaded.
+ * Multi-page: normal size, content flows over as many pages as it needs.
+ * One page: the largest scale in FIT_RANGE that still fits one page, found by
+ * bisection on the real PDF layout, so the page reads as filled. If even the
+ * smallest scale runs over, it uses the normal size and flows onto more pages
+ * rather than shrinking text further.
  */
-export async function makeResumePdf({ data, template, pageSize, scale }: MakePdfOptions) {
+export async function makeResumePdf({ data, template, pageSize, mode }: MakePdfOptions): Promise<MadePdf> {
   registerFonts();
-  const steps = [scale, ...[...FIT_STEPS, 0.8, 0.76].filter((f) => f < scale - 0.001)];
+  const build = async (scale: number) => {
+    const blob = await pdf(
+      <ResumePdf data={data} template={template} pageSize={pageSize} spacing={spacingFor(template, scale)} />
+    ).toBlob();
+    return { blob, pages: await countPdfPages(blob), scale };
+  };
 
-  let blob: Blob | null = null;
-  let pages = 0;
-  for (const f of steps) {
-    blob = await pdf(<ResumePdf data={data} template={template} pageSize={pageSize} spacing={spacingFor(template, f)} />).toBlob();
-    pages = await countPdfPages(blob);
-    if (pages <= 1) break;
+  if (mode === "multi") return build(1);
+
+  const top = await build(FIT_RANGE.max);
+  if (top.pages <= 1) return top;
+  let best = await build(FIT_RANGE.min);
+  // Too long for one readable page: use the normal size over two pages instead of tiny text.
+  if (best.pages > 1) return build(1);
+  let lo: number = FIT_RANGE.min;
+  let hi: number = FIT_RANGE.max;
+  while (hi - lo > 0.012) {
+    const mid = Math.round(((lo + hi) / 2) * 1000) / 1000;
+    const tryMid = await build(mid);
+    if (tryMid.pages <= 1) {
+      best = tryMid;
+      lo = mid;
+    } else {
+      hi = mid;
+    }
   }
-  return { blob: blob as Blob, pages };
+  return best;
 }
 
 export { resumeFileName } from "@/utils/fileName";

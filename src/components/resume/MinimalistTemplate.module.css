@@ -7,9 +7,10 @@
   /* Sizes scale with --fit (set by the builder to fit one page; 1 = normal).
      Keep these base numbers in step with components/pdf/pdfStyles.ts. */
   --f: var(--fit, 1);
+  --g: var(--fit-gap, 1);
   --page-padding: 32px 44px;
-  --section-gap: calc(11px * var(--f));
-  --item-gap: calc(8px * var(--f));
+  --section-gap: calc(11px * var(--g));
+  --item-gap: calc(8px * var(--g));
   --text-size: calc(10pt * var(--f));
   --small-size: calc(9.4pt * var(--f));
   --title-size: calc(9pt * var(--f));
@@ -34,7 +35,7 @@
 .page h1, .page h2, .page h3, .page p, .page ul { margin: 0; padding: 0; }
 
 /* Header */
-.header { margin-bottom: calc(var(--section-gap) + 2px); padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+.header { margin-bottom: calc(var(--section-gap) + 2px); }
 .name { font-size: var(--name-size); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; color: var(--accent); margin-bottom: 4px; }
 .contact { font-size: var(--small-size); color: var(--muted); }
 .contactLine { display: flex; flex-wrap: wrap; align-items: baseline; }
@@ -62,7 +63,7 @@
 
 /* Skills */
 .skillGroups { list-style: none; }
-.skillRow { margin-bottom: 1px; color: #1f2937; }
+.skillRow { margin-bottom: calc(1.5px * var(--g)); color: #1f2937; }
 .skillCategory { font-weight: 700; color: #0f172a; }
 
 /* Experience & education */
@@ -79,7 +80,7 @@
 .roleSeparator { color: #94a3b8; margin: 0 0.4em; }
 
 .bulletList { list-style: none; margin-top: 2px; }
-.bullet { position: relative; padding-left: 13px; margin-bottom: 1px; color: #1f2937; break-inside: avoid; }
+.bullet { position: relative; padding-left: 13px; margin-bottom: calc(1.5px * var(--g)); color: #1f2937; break-inside: avoid; }
 .bullet::before { content: ""; position: absolute; left: 3px; top: 0.62em; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
 
 .plainList { list-style: none; color: #1f2937; }

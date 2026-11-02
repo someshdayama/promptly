@@ -7,10 +7,11 @@
   /* Sizes scale with --fit (set by the builder to fit one page; 1 = normal).
      Keep these base numbers in step with components/pdf/pdfStyles.ts. */
   --f: var(--fit, 1);
-  --side-padding: calc(24px * var(--f)) 20px;
-  --main-padding: calc(24px * var(--f)) 26px;
-  --section-gap: calc(13px * var(--f));
-  --item-gap: calc(8px * var(--f));
+  --g: var(--fit-gap, 1);
+  --side-padding: 10mm 7mm;
+  --main-padding: 10mm 9mm;
+  --section-gap: calc(13px * var(--g));
+  --item-gap: calc(8px * var(--g));
   --text-size: calc(9.8pt * var(--f));
   --small-size: calc(9pt * var(--f));
   --title-size: calc(8.8pt * var(--f));
@@ -36,7 +37,7 @@
 
 .page h1, .page h2, .page h3, .page p, .page ul { margin: 0; padding: 0; }
 
-.sidebar { background: #f1f5f9; padding: var(--side-padding); border-right: 1px solid #e2e8f0; min-width: 0; }
+.sidebar { background: #f1f5f9; padding: var(--side-padding); min-width: 0; }
 .main { padding: var(--main-padding); min-width: 0; }
 
 .header { margin-bottom: var(--section-gap); }
@@ -92,7 +93,7 @@
 .roleSeparator { color: #94a3b8; margin: 0 0.4em; }
 
 .bulletList { list-style: none; margin-top: 2px; }
-.bullet { position: relative; padding-left: 13px; margin-bottom: 1px; color: #1f2937; break-inside: avoid; }
+.bullet { position: relative; padding-left: 13px; margin-bottom: calc(1.5px * var(--g)); color: #1f2937; break-inside: avoid; }
 .bullet::before { content: ""; position: absolute; left: 3px; top: 0.62em; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
 
 .plainList { list-style: none; font-size: var(--small-size); }

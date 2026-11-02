@@ -2,26 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { AlertTriangle, CheckCircle2, Download, FileUp, Loader2 } from "lucide-react";
+import { Check, Download, FileUp, Loader2, PenLine } from "lucide-react";
 import styles from "./Builder.module.css";
 import { ResumeData } from "@/types/resume";
 import { EXAMPLE_PROFILE } from "@/data/exampleProfile";
 import { serializeProfileToPrompt } from "@/utils/promptSerializer";
 import { LIMITS } from "@/utils/generateRequest";
-import {
-  FIT_STEPS,
-  PAGE_MARGIN_MM,
-  PAGE_SIZES,
-  PageSizeKey,
-  SPACING_LABELS,
-  SPACING_PRESETS,
-  SpacingPreset,
-  SpacingSetting,
-  contentBox,
-  fitStyle,
-  isSpacingSetting,
-  pickFit,
-} from "@/utils/pageFit";
+import { PAGE_MARGIN_MM, PAGE_MODES, PAGE_SIZES, PageMode, PageSizeKey, fitStyle, isPageMode } from "@/utils/pageFit";
+import type { MadePdf } from "@/components/pdf/makePdf";
+import PdfPreview from "@/components/PdfPreview";
 import { STORAGE, isResumeData, loadSaved } from "@/utils/storage";
 import ResumeSkeleton from "@/components/ui/ResumeSkeleton";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
@@ -58,13 +47,15 @@ export default function Builder() {
   const [resume, setResume] = useState<ResumeData | null>(null);
   const [template, setTemplate] = useState<TemplateKey>("ats");
   const [pageSize, setPageSize] = useState<PageSizeKey>("a4");
-  const [densitySetting, setDensitySetting] = useState<SpacingSetting>("auto");
+  const [pageMode, setPageMode] = useState<PageMode>("one");
+  const [editing, setEditing] = useState(false);
+  const [made, setMade] = useState<(MadePdf & { key: string }) | null>(null);
+  const [making, setMaking] = useState(false);
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
   const [confirmClear, setConfirmClear] = useState(false);
   const [reading, setReading] = useState(false);
-  const [heights, setHeights] = useState<Partial<Record<number, number>>>({});
   const [zoom, setZoom] = useState(1);
   const [sheetHeight, setSheetHeight] = useState(0);
 
@@ -72,7 +63,6 @@ export default function Builder() {
   const fileRef = useRef<HTMLInputElement>(null);
   const notesRef = useRef<HTMLTextAreaElement>(null);
   const page = PAGE_SIZES[pageSize];
-  const content = contentBox(page);
 
   // ── Restore saved work (and quietly drop the old, mixed-up storage keys).
   useEffect(() => {
@@ -88,7 +78,7 @@ export default function Builder() {
     setResume(saved.resume);
     if (saved.prefs.template && TEMPLATES.some((t) => t.key === saved.prefs.template)) setTemplate(saved.prefs.template as TemplateKey);
     if (saved.prefs.pageSize && saved.prefs.pageSize in PAGE_SIZES) setPageSize(saved.prefs.pageSize as PageSizeKey);
-    if (isSpacingSetting(saved.prefs.spacing)) setDensitySetting(saved.prefs.spacing);
+    if (isPageMode(saved.prefs.pageMode)) setPageMode(saved.prefs.pageMode);
     setHydrated(true);
   }, []);
 
@@ -111,35 +101,40 @@ export default function Builder() {
     try {
       if (resume) localStorage.setItem(STORAGE.resume, JSON.stringify(resume));
       else localStorage.removeItem(STORAGE.resume);
-      localStorage.setItem(STORAGE.prefs, JSON.stringify({ template, pageSize, spacing: densitySetting }));
+      localStorage.setItem(STORAGE.prefs, JSON.stringify({ template, pageSize, pageMode }));
     } catch {
       /* ignore */
     }
-  }, [resume, template, pageSize, densitySetting, hydrated]);
+  }, [resume, template, pageSize, pageMode, hydrated]);
 
-  // ── One-page fit: render off-screen at every spacing and measure.
-  const measureRefs = useRef<Partial<Record<number, HTMLDivElement | null>>>({});
-  const measure = useCallback(() => {
-    const next: Partial<Record<number, number>> = {};
-    FIT_STEPS.forEach((d) => {
-      const el = measureRefs.current[d];
-      if (el && !el.querySelector("[data-skeleton]")) next[d] = el.scrollHeight;
-    });
-    setHeights((prev) => (FIT_STEPS.every((d) => prev[d] === next[d]) ? prev : next));
-  }, []);
+  // ── Build the real PDF (shown in the preview and saved by Download), shortly after each change.
+  const pdfKey = resume ? JSON.stringify([resume, template, pageSize, pageMode]) : "";
+  const runRef = useRef(0);
+  const buildPdf = useCallback(async (): Promise<MadePdf & { key: string }> => {
+    const { makeResumePdf } = await import("@/components/pdf/makePdf");
+    const out = await makeResumePdf({ data: resume as ResumeData, template, pageSize, mode: pageMode });
+    return { ...out, key: pdfKey };
+  }, [resume, template, pageSize, pageMode, pdfKey]);
 
   useEffect(() => {
-    if (!resume) return;
-    const observer = new ResizeObserver(() => measure());
-    FIT_STEPS.forEach((d) => {
-      const el = measureRefs.current[d];
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, [measure, template, pageSize, resume]);
+    if (!resume || loading) return;
+    const run = ++runRef.current;
+    const id = setTimeout(async () => {
+      setMaking(true);
+      try {
+        const out = await buildPdf();
+        if (run === runRef.current) setMade(out);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (run === runRef.current) setMaking(false);
+      }
+    }, editing ? 700 : 250);
+    return () => clearTimeout(id);
+  }, [buildPdf, resume, loading, editing]);
 
-  const fit = resume ? pickFit(heights, content.heightPx, densitySetting) : null;
-  const scale = fit?.scale ?? (densitySetting === "auto" ? 1 : SPACING_PRESETS[densitySetting]);
+  // The edit view uses the scale the PDF was laid out at, so it looks the same.
+  const scale = made?.scale ?? 1;
 
   // ── Scale the page to the available width (transform keeps text spacing exact).
   const pagePx = (page.widthMm * 96) / 25.4;
@@ -158,7 +153,7 @@ export default function Builder() {
     observer.observe(area);
     observer.observe(sheet);
     return () => observer.disconnect();
-  }, [pagePx]);
+  }, [pagePx, editing, resume, loading]);
 
   const scrollToPreview = () => {
     if (isPhone()) previewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -190,7 +185,7 @@ export default function Builder() {
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !isResumeData(json.data)) throw new Error(json.error || "Could not make your resume this time. Please try again.");
       setResume(json.data);
-      setHeights({});
+      setEditing(false);
       setTimeout(scrollToPreview, 50);
     } catch (err: unknown) {
       setError((err as Error)?.message || "Something went wrong. Please try again.");
@@ -231,7 +226,7 @@ export default function Builder() {
     setShowJob(false);
     setError("");
     setResume(EXAMPLE_PROFILE);
-    setHeights({});
+    setEditing(false);
     setTimeout(scrollToPreview, 50);
   };
 
@@ -253,7 +248,8 @@ export default function Builder() {
     setJobLabel(null);
     setResume(null);
     setError("");
-    setHeights({});
+    setMade(null);
+    setEditing(false);
     try {
       Object.values(STORAGE).forEach((k) => localStorage.removeItem(k));
     } catch {
@@ -266,8 +262,8 @@ export default function Builder() {
     setDownloading(true);
     setError("");
     try {
-      const { makeResumePdf, resumeFileName } = await import("@/components/pdf/makePdf");
-      const { blob } = await makeResumePdf({ data: resume, template, pageSize, scale });
+      const { resumeFileName } = await import("@/components/pdf/makePdf");
+      const { blob } = made && made.key === pdfKey ? made : await buildPdf();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -397,7 +393,7 @@ export default function Builder() {
                     type="button"
                     aria-pressed={template === t.key}
                     className={template === t.key ? styles.segmentActive : styles.segment}
-                    onClick={() => { setTemplate(t.key); setHeights({}); }}
+                    onClick={() => setTemplate(t.key)}
                   >
                     {t.label}
                   </button>
@@ -405,32 +401,47 @@ export default function Builder() {
               </div>
               <label className={styles.selectField}>
                 <span className={styles.srOnly}>Paper</span>
-                <select value={pageSize} onChange={(e) => { setPageSize(e.target.value as PageSizeKey); setHeights({}); }} aria-label="Paper">
+                <select value={pageSize} onChange={(e) => setPageSize(e.target.value as PageSizeKey)} aria-label="Paper">
                   {(Object.keys(PAGE_SIZES) as PageSizeKey[]).map((k) => (
                     <option key={k} value={k}>{PAGE_SIZES[k].label}</option>
                   ))}
                 </select>
               </label>
-              <label className={styles.selectField}>
-                <span className={styles.srOnly}>Spacing</span>
-                <select value={densitySetting} onChange={(e) => setDensitySetting(e.target.value as SpacingSetting)} aria-label="Spacing">
-                  <option value="auto">Auto spacing</option>
-                  {(Object.keys(SPACING_PRESETS) as SpacingPreset[]).map((k) => (
-                    <option key={k} value={k}>{SPACING_LABELS[k]}</option>
-                  ))}
-                </select>
-              </label>
-              <span className={`${styles.fit} ${fit && !fit.fits ? styles.fitWarn : ""}`} role="status" aria-live="polite">
-                {!fit ? "Checking length…" : fit.fits ? (
-                  <><CheckCircle2 size={14} aria-hidden="true" /> Fits on one page</>
-                ) : (
-                  <><AlertTriangle size={14} aria-hidden="true" /> Runs over one page (about {fit.pages}). Cut older bullets.</>
-                )}
-              </span>
+              <div className={styles.segmented} role="group" aria-label="Pages">
+                {PAGE_MODES.map((m) => (
+                  <button
+                    key={m.key}
+                    type="button"
+                    aria-pressed={pageMode === m.key}
+                    className={pageMode === m.key ? styles.segmentActive : styles.segment}
+                    onClick={() => setPageMode(m.key)}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                className={`${styles.editButton} ${editing ? styles.editOn : ""}`}
+                aria-pressed={editing}
+                onClick={() => setEditing((v) => !v)}
+              >
+                {editing ? <><Check size={14} aria-hidden="true" /> Done</> : <><PenLine size={14} aria-hidden="true" /> Edit</>}
+              </button>
+              {making && <span className={styles.busy} aria-label="Updating"><Loader2 size={14} className={styles.spin} aria-hidden="true" /></span>}
             </div>
           )}
 
           <div ref={sheetAreaRef} className={styles.sheetArea}>
+            {resume && !editing && !loading ? (
+              <div className={styles.pdfArea} style={{ maxWidth: pagePx }}>
+                <PdfPreview
+                  blob={made?.blob ?? null}
+                  aspect={page.widthMm / page.heightMm}
+                  onPageClick={() => setEditing(true)}
+                />
+              </div>
+            ) : (
             <div className={styles.sheetFrame} style={{ width: pagePx * zoom, height: sheetHeight ? sheetHeight * zoom : undefined }}>
             <div
               ref={sheetRef}
@@ -438,15 +449,10 @@ export default function Builder() {
               style={{
                 width: `${page.widthMm}mm`,
                 minHeight: `${page.heightMm}mm`,
-                padding: `${PAGE_MARGIN_MM.vertical}mm ${PAGE_MARGIN_MM.horizontal}mm`,
+                padding: template === "modern" && resume && !loading ? 0 : `${PAGE_MARGIN_MM.vertical}mm ${PAGE_MARGIN_MM.horizontal}mm`,
                 transform: zoom < 1 ? `scale(${zoom})` : undefined,
               }}
             >
-              {resume && fit && !fit.fits && (
-                <div className={styles.pageBreak} style={{ top: `${PAGE_MARGIN_MM.vertical}mm`, height: `${content.heightMm}mm` }} aria-hidden="true">
-                  <span>End of page 1</span>
-                </div>
-              )}
               {loading ? (
                 <ResumeSkeleton />
               ) : resume ? (
@@ -460,20 +466,13 @@ export default function Builder() {
               )}
             </div>
             </div>
+            )}
           </div>
 
           {resume && (
-            <p className={styles.editHint}>Click any line on the page to change it.</p>
-          )}
-
-          {resume && (
-            <div className={styles.measureArea} aria-hidden="true" style={{ width: `${content.widthMm}mm` }}>
-              {FIT_STEPS.map((d) => (
-                <div key={d} style={fitStyle(d)} ref={(el) => { measureRefs.current[d] = el; }}>
-                  {renderTemplate(template, resume, "resume-in-sheet")}
-                </div>
-              ))}
-            </div>
+            <p className={styles.editHint}>
+              {editing ? "Click any line to change it. Tap Done to see the final PDF." : "This is the exact PDF you'll download. Tap the page or Edit to change text."}
+            </p>
           )}
         </section>
       </main>

@@ -1,17 +1,16 @@
-import { fitLineHeight } from "@/utils/pageFit";
+import { fitFactors, fitLineHeight } from "@/utils/pageFit";
 
 export type TemplateKey = "ats" | "minimalist" | "modern";
 
 /** Spacing at one fit scale (px values for gaps/padding, pt for font sizes). */
 export interface PdfSpacing {
-  /** Modern only: sidebar padding. The sheet margins replace page padding elsewhere. */
-  padV: number;
-  padH: number;
-  /** Modern only: main column padding. */
-  mainV?: number;
+  /** Modern only: sidebar and main column side padding, in mm (the page has no side margin). */
+  sideH?: number;
   mainH?: number;
   sectionGap: number;
   itemGap: number;
+  /** Space under each bullet / skill row (px at scale 1 = 1.5). */
+  bulletGap: number;
   text: number;
   small: number;
   title: number;
@@ -20,26 +19,26 @@ export interface PdfSpacing {
 }
 
 /** Base sizes at --fit = 1. Keep in step with the template CSS modules. */
-const BASE: Record<TemplateKey, PdfSpacing> = {
-  ats: { padV: 0, padH: 0, sectionGap: 10, itemGap: 7, text: 10, small: 9.5, title: 10.5, name: 22, line: 1.32 },
-  minimalist: { padV: 0, padH: 0, sectionGap: 11, itemGap: 8, text: 10, small: 9.4, title: 9, name: 24, line: 1.34 },
-  modern: { padV: 24, padH: 20, mainV: 24, mainH: 26, sectionGap: 13, itemGap: 8, text: 9.8, small: 9, title: 8.8, name: 22, line: 1.34 },
+const BASE: Record<TemplateKey, Omit<PdfSpacing, "bulletGap">> = {
+  ats: { sectionGap: 10, itemGap: 7, text: 10, small: 9.5, title: 10.5, name: 22, line: 1.32 },
+  minimalist: { sectionGap: 11, itemGap: 8, text: 10, small: 9.4, title: 9, name: 24, line: 1.34 },
+  modern: { sideH: 7, mainH: 9, sectionGap: 13, itemGap: 8, text: 9.8, small: 9, title: 8.8, name: 22, line: 1.34 },
 };
 
-/** Same formula as the CSS: sizes and gaps × scale, line height kept in a tidy band. */
+/** Same formula as the CSS: text × font factor, gaps × gap factor, line height in a tidy band. */
 export function spacingFor(template: TemplateKey, scale: number): PdfSpacing {
   const b = BASE[template];
+  const { font, gap } = fitFactors(scale);
   return {
     ...b,
-    padV: b.padV * scale,
-    mainV: b.mainV !== undefined ? b.mainV * scale : undefined,
-    sectionGap: b.sectionGap * scale,
-    itemGap: b.itemGap * scale,
-    text: b.text * scale,
-    small: b.small * scale,
-    title: b.title * scale,
-    name: b.name * scale,
-    line: fitLineHeight(b.line, scale),
+    sectionGap: b.sectionGap * gap,
+    itemGap: b.itemGap * gap,
+    bulletGap: 1.5 * gap,
+    text: b.text * font,
+    small: b.small * font,
+    title: b.title * font,
+    name: b.name * font,
+    line: fitLineHeight(b.line, font),
   };
 }
 
