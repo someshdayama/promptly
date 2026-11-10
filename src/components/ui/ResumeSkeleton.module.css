@@ -1,6 +1,8 @@
+/* Fills the page it sits on (A4 or Letter) instead of a fixed A4 box that spilled past it. */
 .skeletonWrapper {
-  width: 210mm;
-  height: 297mm;
+  width: 100%;
+  flex: 1 0 auto;
+  min-height: 100%;
   background-color: white;
   padding: 3rem;
   box-sizing: border-box;

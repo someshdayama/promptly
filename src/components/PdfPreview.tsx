@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import styles from "./Builder.module.css";
+import { loadPdfjs } from "@/utils/pdfjs";
 
 interface Props {
   blob: Blob | null;
@@ -18,7 +19,14 @@ interface Props {
 export default function PdfPreview({ blob, aspect, onPageClick }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const clickRef = useRef(onPageClick);
-  clickRef.current = onPageClick;
+  useEffect(() => {
+    clickRef.current = onPageClick;
+  });
+
+  // Fetch pdf.js while the PDF itself is still being made, not after.
+  useEffect(() => {
+    loadPdfjs().catch(() => {});
+  }, []);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -30,9 +38,8 @@ export default function PdfPreview({ blob, aspect, onPageClick }: Props) {
       const width = host.clientWidth;
       if (!width || width === lastWidth) return;
       lastWidth = width;
-      const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-      pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
-      const doc = await pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise;
+      const { pdfjs, worker } = await loadPdfjs();
+      const doc = await pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()), worker }).promise;
       const dpr = Math.min(3, window.devicePixelRatio || 1);
       const pages: HTMLElement[] = [];
       for (let n = 1; n <= doc.numPages; n++) {
@@ -77,7 +84,7 @@ export default function PdfPreview({ blob, aspect, onPageClick }: Props) {
   }, [blob]);
 
   return (
-    <div ref={hostRef} className={styles.pdfPages}>
+    <div ref={hostRef} className={styles.pdfPages} style={{ "--page-aspect": String(aspect) } as React.CSSProperties}>
       {!blob && <div className={styles.pdfPage} style={{ aspectRatio: String(aspect) }} />}
     </div>
   );

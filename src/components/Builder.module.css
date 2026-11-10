@@ -364,6 +364,13 @@
   gap: 20px;
 }
 
+/* Before the first page is drawn, hold a blank page of the right shape so nothing collapses or jumps. */
+.pdfPages:empty {
+  aspect-ratio: var(--page-aspect);
+  background: #ffffff;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
 .pdfPage {
   position: relative;
   width: 100%;
