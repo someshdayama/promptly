@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Check, Download, FileUp, Loader2, PenLine } from "lucide-react";
 import styles from "./Builder.module.css";
@@ -58,6 +58,9 @@ export default function Builder() {
   const [reading, setReading] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [sheetHeight, setSheetHeight] = useState(0);
+  // A newly made (or example) resume: keep the placeholder page up until its own PDF is ready,
+  // instead of briefly showing the previous resume's PDF.
+  const [awaitingPdf, setAwaitingPdf] = useState(false);
 
   const previewRef = useRef<HTMLElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -110,15 +113,34 @@ export default function Builder() {
   // ── Build the real PDF (shown in the preview and saved by Download), shortly after each change.
   const pdfKey = resume ? JSON.stringify([resume, template, pageSize, pageMode]) : "";
   const runRef = useRef(0);
+  // Recent PDFs by content, so Edit → Done with no changes, or flipping back to a template,
+  // paper or page mode you just saw, shows the PDF at once instead of laying it out again.
+  const pdfCache = useRef(new Map<string, MadePdf & { key: string }>());
   const buildPdf = useCallback(async (): Promise<MadePdf & { key: string }> => {
+    const cached = pdfCache.current.get(pdfKey);
+    if (cached) return cached;
     const { makeResumePdf } = await import("@/components/pdf/makePdf");
-    const out = await makeResumePdf({ data: resume as ResumeData, template, pageSize, mode: pageMode });
-    return { ...out, key: pdfKey };
+    const out = { ...(await makeResumePdf({ data: resume as ResumeData, template, pageSize, mode: pageMode })), key: pdfKey };
+    const cache = pdfCache.current;
+    cache.set(pdfKey, out);
+    if (cache.size > 12) cache.delete(cache.keys().next().value as string);
+    return out;
   }, [resume, template, pageSize, pageMode, pdfKey]);
+
+  // Start fetching the PDF code as soon as there is a resume, alongside everything else.
+  useEffect(() => {
+    if (resume) import("@/components/pdf/makePdf").catch(() => {});
+  }, [resume]);
 
   useEffect(() => {
     if (!resume || loading) return;
     const run = ++runRef.current;
+    const cached = pdfCache.current.get(pdfKey);
+    if (cached) {
+      setMade(cached);
+      setMaking(false);
+      return;
+    }
     const id = setTimeout(async () => {
       setMaking(true);
       try {
@@ -126,12 +148,17 @@ export default function Builder() {
         if (run === runRef.current) setMade(out);
       } catch (err) {
         console.error(err);
+        if (run === runRef.current) setAwaitingPdf(false);
       } finally {
         if (run === runRef.current) setMaking(false);
       }
     }, editing ? 700 : 250);
     return () => clearTimeout(id);
-  }, [buildPdf, resume, loading, editing]);
+  }, [buildPdf, resume, loading, editing, pdfKey]);
+
+  useEffect(() => {
+    if (awaitingPdf && made && made.key === pdfKey) setAwaitingPdf(false);
+  }, [awaitingPdf, made, pdfKey]);
 
   // The edit view uses the scale the PDF was laid out at, so it looks the same.
   const scale = made?.scale ?? 1;
@@ -140,7 +167,8 @@ export default function Builder() {
   const pagePx = (page.widthMm * 96) / 25.4;
   const sheetAreaRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
+  // Measured before paint, so the page never shows for a frame at a stale size.
+  useLayoutEffect(() => {
     const area = sheetAreaRef.current;
     const sheet = sheetRef.current;
     if (!area || !sheet) return;
@@ -153,7 +181,7 @@ export default function Builder() {
     observer.observe(area);
     observer.observe(sheet);
     return () => observer.disconnect();
-  }, [pagePx, editing, resume, loading]);
+  }, [pagePx, editing, resume, loading, awaitingPdf]);
 
   const scrollToPreview = () => {
     if (isPhone()) previewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -185,6 +213,7 @@ export default function Builder() {
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !isResumeData(json.data)) throw new Error(json.error || "Could not make your resume this time. Please try again.");
       setResume(json.data);
+      setAwaitingPdf(true);
       setEditing(false);
       setTimeout(scrollToPreview, 50);
     } catch (err: unknown) {
@@ -226,6 +255,7 @@ export default function Builder() {
     setShowJob(false);
     setError("");
     setResume(EXAMPLE_PROFILE);
+    setAwaitingPdf(true);
     setEditing(false);
     setTimeout(scrollToPreview, 50);
   };
@@ -249,6 +279,8 @@ export default function Builder() {
     setResume(null);
     setError("");
     setMade(null);
+    pdfCache.current.clear();
+    setAwaitingPdf(false);
     setEditing(false);
     try {
       Object.values(STORAGE).forEach((k) => localStorage.removeItem(k));
@@ -281,6 +313,9 @@ export default function Builder() {
   };
 
   const templateClass = "resume-in-sheet";
+  // While a resume is being made (or its first PDF is on the way), show a placeholder page
+  // that is exactly the paper size, so the preview keeps its shape.
+  const building = loading || (awaitingPdf && !editing && !(made && made.key === pdfKey));
 
   const downloadButton = (extra = "") => (
     <button
@@ -433,7 +468,7 @@ export default function Builder() {
           )}
 
           <div ref={sheetAreaRef} className={styles.sheetArea}>
-            {resume && !editing && !loading ? (
+            {resume && !editing && !building ? (
               <div className={styles.pdfArea} style={{ maxWidth: pagePx }}>
                 <PdfPreview
                   blob={made?.blob ?? null}
@@ -449,11 +484,12 @@ export default function Builder() {
               style={{
                 width: `${page.widthMm}mm`,
                 minHeight: `${page.heightMm}mm`,
-                padding: template === "modern" && resume && !loading ? 0 : `${PAGE_MARGIN_MM.vertical}mm ${PAGE_MARGIN_MM.horizontal}mm`,
+                height: building ? `${page.heightMm}mm` : undefined,
+                padding: building || (template === "modern" && resume) ? 0 : `${PAGE_MARGIN_MM.vertical}mm ${PAGE_MARGIN_MM.horizontal}mm`,
                 transform: zoom < 1 ? `scale(${zoom})` : undefined,
               }}
             >
-              {loading ? (
+              {building ? (
                 <ResumeSkeleton />
               ) : resume ? (
                 <ErrorBoundary>
